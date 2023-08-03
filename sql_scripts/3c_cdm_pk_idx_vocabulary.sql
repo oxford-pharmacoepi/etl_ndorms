@@ -1,0 +1,4 @@
+ALTER TABLE {VOCABULARY_SCHEMA}.VOCABULARY ADD CONSTRAINT xpk_vocabulary PRIMARY KEY (vocabulary_id);
+
+CREATE UNIQUE INDEX idx_vocabulary_vocabulary_id  ON {VOCABULARY_SCHEMA}.VOCABULARY  (vocabulary_id ASC);
+CLUSTER {VOCABULARY_SCHEMA}.VOCABULARY  USING idx_vocabulary_vocabulary_id ;

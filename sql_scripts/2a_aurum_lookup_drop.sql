@@ -1,0 +1,9 @@
+drop table if exists {SOURCE_SCHEMA}.gender CASCADE;
+drop table if exists {SOURCE_SCHEMA}.region CASCADE;
+drop table if exists {SOURCE_SCHEMA}.jobcat CASCADE;
+drop table if exists {SOURCE_SCHEMA}.numunit CASCADE;
+drop table if exists {SOURCE_SCHEMA}.quantunit CASCADE;
+drop table if exists {SOURCE_SCHEMA}.refservicetype CASCADE;
+drop table if exists {SOURCE_SCHEMA}.medicaldictionary CASCADE;
+drop table if exists {SOURCE_SCHEMA}.productdictionary CASCADE;
+drop table if exists {SOURCE_SCHEMA}.VisionToEmisMigrators CASCADE;
