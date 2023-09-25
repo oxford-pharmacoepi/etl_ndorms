@@ -2,7 +2,6 @@ drop table if exists {TARGET_SCHEMA}.STEM CASCADE;
 drop table if exists {TARGET_SCHEMA}.STEM_SOURCE CASCADE;
 drop table if exists {TARGET_SCHEMA}.ATTRIBUTE_DEFINITION CASCADE;
 drop table if exists {TARGET_SCHEMA}.COHORT_DEFINITION CASCADE;
-drop table if exists {TARGET_SCHEMA}.CDM_SOURCE CASCADE;
 drop table if exists {TARGET_SCHEMA}.METADATA CASCADE;
 drop table if exists {TARGET_SCHEMA}.CONDITION_ERA CASCADE;
 drop table if exists {TARGET_SCHEMA}.DOSE_ERA CASCADE;
