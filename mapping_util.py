@@ -407,9 +407,8 @@ def execute_sql_files_parallel(fname_list, debug = True):
 		print("Function = {0}, Error = {1}, {2}".format("execute_sql_files_parallel", err[0], err[1]))
 	return(ret)	
 
-
 # ---------------------------------------------------------
-def unzip_file(fname, dir_study, dir_downloaded, dir_data, debug = True):
+def unzip_file(fname, extraction_method, extraction_folder):
 # The queries in the file are executed in parallel
 # ---------------------------------------------------------
 	ret = True
@@ -427,23 +426,14 @@ def unzip_file(fname, dir_study, dir_downloaded, dir_data, debug = True):
 # ---------------------------------------------------------
 # Unzip with 7Z
 # ---------------------------------------------------------
-		name = os.path.splitext(os.path.basename(fname))[0]
-		if name in db_conf['tbl_gold1']:
-			extraction_method = 'x'
-			folder = dir_data
-		elif name in db_conf['tbl_gold2']:
-			extraction_method = 'x'
-			folder = dir_study
-		else:
-			extraction_method = 'e'
-			folder = dir_data + [tbl for tbl in db_conf['tbl_gold1'] if name.startswith(tbl)][0]
-		if subprocess.call(['7z', extraction_method, fname, '-bso0', '-aos', '-o'+folder]) != 0:
+		dir_downloaded = os.path.dirname(fname)
+		if subprocess.call(['7z', extraction_method, fname, '-bso0', '-aos', '-o'+extraction_folder]) != 0:
 			ret = False
 # ---------------------------------------------------------
 # Move zipped file to PROCESSED directory
 # ---------------------------------------------------------
 		else:
-			file_processed = dir_downloaded + 'processed\\' + os.path.basename(fname)
+			file_processed = dir_downloaded + '\\processed\\' + os.path.basename(fname)
 			os.rename(fname, file_processed)
 	except:
 		ret = False
@@ -452,18 +442,15 @@ def unzip_file(fname, dir_study, dir_downloaded, dir_data, debug = True):
 	return(ret)	
 
 # ---------------------------------------------------------
-def execute_unzip_parallel(dir_study, dir_downloaded, dir_data, debug = True):
+def execute_unzip_parallel(file_list, extraction_method, extraction_folder):
 # The zipped files are unzipped in parallel
 # ---------------------------------------------------------
 	ret = True
 
 	try:
 		time1 = time.time()
-		msg = 'Starting parallel unzip at ' + time1.strftime("%H:%M:%S") + ' ... \n'
-		log.log_message(msg)
-		file_list = sorted(glob.iglob(dir_downloaded + '*.7z'))
 		with ProcessPoolExecutor(len(file_list)) as executor:
-			futures = [executor.submit(unzip_file, fname.lower(), dir_study, dir_downloaded, dir_data, debug) for fname in file_list]
+			futures = [executor.submit(unzip_file, file_list[idx], extraction_method[idx], extraction_folder[idx]) for idx, fname in enumerate(file_list)]
 # Retrieve the results in completion order
 			for future in as_completed(futures):
 				if future.result() == False:
