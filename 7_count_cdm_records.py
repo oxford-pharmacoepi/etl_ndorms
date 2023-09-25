@@ -28,7 +28,7 @@ def main():
 			rec_tbl = input('I did not understand that. Are you sure you want to build the _RECORDS table (y/n):') 
 		if rec_tbl.lower() in ['y', 'yes']:
 			time1 = time.time()
-			tbl_list_count = [target_schema + "." + tbl for tbl in db_conf['tbl_cdm']] #if tbl not in ('practice', 'staff')]
+			tbl_list_count = [target_schema + "." + tbl for tbl in db_conf['tbl_cdm']]
 			tbl_list_count.extend([target_schema + "." + tbl for tbl in db_conf['tbl_cdm_voc']])
 			ret = mapping_util.get_table_count_parallel(tbl_list_count, target_schema + '._records')
 			if ret == True:
