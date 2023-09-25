@@ -12,7 +12,7 @@ log = import_module('write_log', os.getcwd() + '\\write_log.py').Log('1_load_sou
 mapping_util = SourceFileLoader('mapping_util', os.path.dirname(os.path.realpath(__file__)) + '/mapping_util.py').load_module()
 
 # ---------------------------------------------------------
-def is_curation_needed(tbl_patient, tbl_observation):
+def is_curation_needed_aurum(tbl_patient, tbl_observation):
 	"Check if curation is necessary"
 # ---------------------------------------------------------
 	ret 		= True
@@ -41,7 +41,34 @@ def is_curation_needed(tbl_patient, tbl_observation):
 	except:
 		ret = False
 		err = sys.exc_info()
-		print("Function = {0}, Error = {1}, {2}".format("is_curation_needed", err[0], err[1]))
+		print("Function = {0}, Error = {1}, {2}".format("is_curation_needed_aurum", err[0], err[1]))
+	return(ret, curation)
+
+# ---------------------------------------------------------
+def is_curation_needed_gold(tbl_patient):
+	"Check if curation is necessary"
+# ---------------------------------------------------------
+	ret 		= True
+	curation 	= False
+	
+	try:
+		cnx = sql.connect(
+			user = db_conf['username'],
+			password = db_conf['password'],
+			database = db_conf['database']
+		)
+		cursor1 = cnx.cursor()
+		query1 = "SELECT 1 FROM " + tbl_patient + " WHERE accept = 0 OR gender in (0,3,4) OR gender is null OR yob < 75 OR frd is null LIMIT 1"
+		cursor1.execute(query1);
+		found = cursor1.fetchone()
+		if found != None:
+			curation = True
+		cursor1.close()
+		cnx.close()	
+	except:
+		ret = False
+		err = sys.exc_info()
+		print("Function = {0}, Error = {1}, {2}".format("is_curation_needed_gold", err[0], err[1]))
 	return(ret, curation)
 
 # ---------------------------------------------------------
@@ -59,8 +86,6 @@ def main():
 		tbl_db_list =  [source_schema + "." + tbl for tbl in db_conf[tbl_db]]
 		dir_sql = os.getcwd() + '\\sql_scripts\\'
 		dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
-#		dir_voc = db_conf['dir_voc'] + "\\"		#study_directory + "vocabulary\\"
-#		dir_voc_processed = db_conf['dir_voc'] + db_conf['dir_processed']
 # ---------------------------------------------------------
 # Ask the user for DROP confirmation
 # ---------------------------------------------------------
@@ -93,7 +118,6 @@ def main():
 					dir_list_folders = [dir_source_files + tbl for tbl in db_conf[tbl_db]]
 					ret = mapping_util.load_folders_parallel(source_schema, dir_list_folders)
 					if ret == True:
-#						log.log_message('Finished loading ' + database_type.upper() + ' source data.')
 						task_finished = "Finished loading " + database_type.upper() + " source data in {0}".format(mapping_util.calc_time(time.time() - time1))
 						log.log_message(task_finished)
 # ---------------------------------------------------------
@@ -116,17 +140,21 @@ def main():
 # ---------------------------------------------------------
 # Check source data if patient table has patids to remove
 # ---------------------------------------------------------
-					index_patient = db_conf[tbl_db].index('patient')
-					idx_observation = db_conf[tbl_db].index('observation')
-					(ret, curation) = is_curation_needed(tbl_db_list[index_patient], tbl_db_list[idx_observation])
-					if curation == True:
+					if database_type == 'aurum':
+						idx_patient = db_conf[tbl_db].index('patient')
+						idx_observation = db_conf[tbl_db].index('observation')
+						(ret, curation) = is_curation_needed_aurum(tbl_db_list[idx_patient], tbl_db_list[idx_observation])
+					elif database_type == 'gold':
+						idx_patient = db_conf[tbl_db].index('patient')
+						(ret, curation) = is_curation_needed_gold(tbl_db_list[idx_patient])
+					if ret == True and curation == True:
+#ANTO: ADD PARALLELISM FROM gold_202301
 						fname = dir_sql + '1d_' + database_type + '_curation.sql'
 						log.log_message('Executing ' + fname + ' ...')
 						ret = mapping_util.execute_multiple_queries(fname, None, None, True, True)
 						if ret == True:
 							task_finished = "Finished curation on  " + database_type.upper() + " data in {0}".format(mapping_util.calc_time(time.time() - time1))
 							log.log_message(task_finished)
-#							log.log_message('Finished curation on ' + database_type.upper() + ' data\n')	
 # ---------------------------------------------------------
 # Ask the user for RECORD COUNTS confirmation
 # ---------------------------------------------------------
@@ -137,11 +165,9 @@ def main():
 			if load_tbls.lower() in ['y', 'yes']:
 				time1 = time.time()
 				source_nok_schema = db_conf['source_nok_schema']
-#				tbl_list_count = tbl_db_list + [source_nok_schema + "." + tbl for tbl in db_conf[tbl_db] if tbl not in ('practice', 'staff')]
 				tbl_list_count = tbl_db_list + [source_nok_schema + "." + tbl for tbl in db_conf[tbl_db]]
 				ret = mapping_util.get_table_count_parallel(tbl_list_count, source_schema + '._records')
 				if ret == True:
-#					log.log_message('Finished counting on ' + database_type.upper() + ' data\n')	
 					task_finished = "Finished counting on  " + database_type.upper() + " data in {0}".format(mapping_util.calc_time(time.time() - time1))
 					log.log_message(task_finished)
 # ---------------------------------------------------------
