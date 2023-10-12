@@ -87,15 +87,22 @@ def main():
 		dir_sql = os.getcwd() + '\\sql_scripts\\'
 		dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
 # ---------------------------------------------------------
+# Create the schemas
+# ---------------------------------------------------------
+		fname = dir_sql + '1__schema_create.sql'
+		log.log_message('Calling ' + fname + ' ...')
+		ret = mapping_util.execute_sql_file_parallel(fname, False)
+		if ret == True:
+# ---------------------------------------------------------
 # Ask the user for DROP confirmation
 # ---------------------------------------------------------
-		drop_tbls = input('Are you sure you want to DROP all the ' + database_type.upper() + ' tables (y/n):') 
-		while drop_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-			drop_tbls = input('I did not understand that. Are you sure you want to DROP all the ' + database_type.upper() + ' tables (y/n):') 
-		if drop_tbls.lower() in ['y', 'yes']:
-			fname = dir_sql + '1a_' + database_type + '_drop.sql'
-			log.log_message('Calling ' + fname + ' ...')
-			ret = mapping_util.execute_sql_file_parallel(fname, False)
+			drop_tbls = input('Are you sure you want to DROP all the ' + database_type.upper() + ' tables (y/n):') 
+			while drop_tbls.lower() not in ['y', 'n', 'yes', 'no']:
+				drop_tbls = input('I did not understand that. Are you sure you want to DROP all the ' + database_type.upper() + ' tables (y/n):') 
+			if drop_tbls.lower() in ['y', 'yes']:
+				fname = dir_sql + '1a_' + database_type + '_drop.sql'
+				log.log_message('Calling ' + fname + ' ...')
+				ret = mapping_util.execute_sql_file_parallel(fname, False)
 		if ret == True:
 # ---------------------------------------------------------
 # Ask the user for LOAD confirmation
