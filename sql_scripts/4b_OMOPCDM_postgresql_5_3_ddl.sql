@@ -1,9 +1,7 @@
 --postgresql CDM DDL Specification for OMOP Common Data Model v5_3_1 
-CREATE SCHEMA IF NOT EXISTS {TARGET_SCHEMA};
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.PERSON (
- 
 			person_id bigint NOT NULL,
 			gender_concept_id integer NOT NULL,
 			year_of_birth integer NOT NULL,
@@ -25,7 +23,6 @@ CREATE SCHEMA IF NOT EXISTS {TARGET_SCHEMA};
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.OBSERVATION_PERIOD (
- 
 			observation_period_id bigint NOT NULL,
 			person_id bigint NOT NULL,
 			observation_period_start_date date NOT NULL,
@@ -34,17 +31,16 @@ CREATE SCHEMA IF NOT EXISTS {TARGET_SCHEMA};
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.VISIT_OCCURRENCE (
- 
 			visit_occurrence_id bigint NOT NULL,
 			person_id bigint NOT NULL,
-			visit_concept_id bigint NOT NULL,
+			visit_concept_id integer NOT NULL,
 			visit_start_date date NOT NULL,
 			visit_start_datetime TIMESTAMP NULL,
 			visit_end_date date NOT NULL,
 			visit_end_datetime TIMESTAMP NULL,
-			visit_type_concept_id bigint NOT NULL,
+			visit_type_concept_id integer NOT NULL,
 			provider_id bigint NULL,
-			care_site_id bigint NULL,
+			care_site_id integer NULL,
 			visit_source_value varchar(50) NULL,
 			visit_source_concept_id integer NULL,
 			admitting_source_concept_id integer NULL,
@@ -65,7 +61,7 @@ CREATE SCHEMA IF NOT EXISTS {TARGET_SCHEMA};
 			visit_detail_end_datetime TIMESTAMP NULL,
 			visit_detail_type_concept_id integer NOT NULL,
 			provider_id bigint NULL,
-			care_site_id bigint NULL,
+			care_site_id integer NULL,
 			visit_detail_source_value varchar(50) NULL,
 			visit_detail_source_concept_id integer NULL,
 			admitting_source_value Varchar(50) NULL,
@@ -115,7 +111,7 @@ CREATE SCHEMA IF NOT EXISTS {TARGET_SCHEMA};
 			sig TEXT NULL,
 			route_concept_id integer NULL,
 			lot_number varchar(50) NULL,
-			provider_id integer NULL,
+			provider_id bigint NULL,
 			visit_occurrence_id bigint NULL,
 			visit_detail_id bigint NULL,
 			drug_source_value varchar(250) NULL,
@@ -152,7 +148,7 @@ CREATE SCHEMA IF NOT EXISTS {TARGET_SCHEMA};
 			device_exposure_end_date date NULL,
 			device_exposure_end_datetime TIMESTAMP NULL,
 			device_type_concept_id integer NOT NULL,
-			unique_device_id varchar(50) NULL,
+			unique_device_id varchar(255) NULL,
 			quantity integer NULL,
 			provider_id bigint NULL,
 			visit_occurrence_id bigint NULL,
@@ -209,7 +205,7 @@ CREATE SCHEMA IF NOT EXISTS {TARGET_SCHEMA};
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DEATH (
  
-			person_id bigint NULL,
+			person_id bigint NOT NULL,
 			death_date date NOT NULL,
 			death_datetime TIMESTAMP NULL,
 			death_type_concept_id integer NULL,
@@ -221,7 +217,7 @@ CREATE SCHEMA IF NOT EXISTS {TARGET_SCHEMA};
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.NOTE (
  
 			note_id integer NOT NULL,
-			person_id integer NOT NULL,
+			person_id bigint NOT NULL,
 			note_date date NOT NULL,
 			note_datetime TIMESTAMP NULL,
 			note_type_concept_id integer NOT NULL,
@@ -230,9 +226,9 @@ CREATE SCHEMA IF NOT EXISTS {TARGET_SCHEMA};
 			note_text TEXT NOT NULL,
 			encoding_concept_id integer NOT NULL,
 			language_concept_id integer NOT NULL,
-			provider_id integer NULL,
-			visit_occurrence_id integer NULL,
-			visit_detail_id integer NULL,
+			provider_id bigint NULL,
+			visit_occurrence_id bigint NULL,
+			visit_detail_id bigint NULL,
 			note_source_value varchar(50) NULL );
 
 --HINT DISTRIBUTE ON RANDOM
@@ -257,7 +253,7 @@ CREATE SCHEMA IF NOT EXISTS {TARGET_SCHEMA};
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.SPECIMEN (
  
 			specimen_id integer NOT NULL,
-			person_id integer NOT NULL,
+			person_id bigint NOT NULL,
 			specimen_concept_id integer NOT NULL,
 			specimen_type_concept_id integer NOT NULL,
 			specimen_date date NOT NULL,
@@ -296,7 +292,7 @@ CREATE SCHEMA IF NOT EXISTS {TARGET_SCHEMA};
 --HINT DISTRIBUTE ON RANDOM
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.CARE_SITE (
  
-			care_site_id bigint NOT NULL,
+			care_site_id integer NOT NULL,
 			care_site_name varchar(255) NULL,
 			place_of_service_concept_id integer NULL,
 			location_id bigint NULL,
@@ -311,7 +307,7 @@ CREATE SCHEMA IF NOT EXISTS {TARGET_SCHEMA};
 			npi varchar(20) NULL,
 			dea varchar(20) NULL,
 			specialty_concept_id integer NULL,
-			care_site_id bigint NULL,
+			care_site_id integer NULL,
 			year_of_birth integer NULL,
 			gender_concept_id integer NULL,
 			provider_source_value varchar(50) NULL,
@@ -323,7 +319,7 @@ CREATE SCHEMA IF NOT EXISTS {TARGET_SCHEMA};
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.PAYER_PLAN_PERIOD (
  
-			payer_plan_period_id bigint NOT NULL,
+			payer_plan_period_id integer NOT NULL,
 			person_id bigint NOT NULL,
 			payer_plan_period_start_date date NOT NULL,
 			payer_plan_period_end_date date NOT NULL,
@@ -424,39 +420,6 @@ CREATE SCHEMA IF NOT EXISTS {TARGET_SCHEMA};
 			cdm_version varchar(10) NULL,
 			vocabulary_version varchar(20) NULL );
 
---HINT DISTRIBUTE ON RANDOM
--- CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.SOURCE_TO_CONCEPT_MAP ( --Move to create_source_to_concept_vocab_map
--- 
---			source_code varchar(255) NOT NULL,
---			source_concept_id integer NOT NULL,
---			source_vocabulary_id varchar(20) NOT NULL,
---			source_code_description varchar(255) NULL,
---			target_concept_id integer NOT NULL,
---			target_vocabulary_id varchar(20) NOT NULL,
---			valid_start_date date NOT NULL,
---			valid_end_date date NOT NULL,
---			invalid_reason varchar(1) NULL );
-
---HINT DISTRIBUTE ON RANDOM
- CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.COHORT_DEFINITION (
- 
-			cohort_definition_id integer NOT NULL,
-			cohort_definition_name varchar(255) NOT NULL,
-			cohort_definition_description TEXT NULL,
-			definition_type_concept_id integer NOT NULL,
-			cohort_definition_syntax TEXT NULL,
-			subject_concept_id integer NOT NULL,
-			cohort_initiation_date date NULL );
-
---HINT DISTRIBUTE ON RANDOM
- CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.ATTRIBUTE_DEFINITION (
- 
-			attribute_definition_id integer NOT NULL,
-			attribute_name varchar(255) NOT NULL,
-			attribute_description TEXT NULL,
-			attribute_type_concept_id integer NOT NULL,
-			attribute_syntax TEXT NULL );
-
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem_source
 (
     domain_id character varying(20) COLLATE pg_catalog."default",
@@ -553,4 +516,30 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem
     modifier_concept_id integer,
     stem_source_table character varying(255) COLLATE pg_catalog."default",
     stem_source_id character varying(255) COLLATE pg_catalog."default"
-)
+);
+
+--HINT DISTRIBUTE ON RANDOM
+CREATE TABLE IF NOT EXISTS results.COHORT (
+			cohort_definition_id integer NOT NULL,
+			subject_id integer NOT NULL,
+			cohort_start_date date NOT NULL,
+			cohort_end_date date NOT NULL );
+
+--HINT DISTRIBUTE ON RANDOM
+CREATE TABLE IF NOT EXISTS results.COHORT_DEFINITION (
+			cohort_definition_id integer NOT NULL,
+			cohort_definition_name varchar(255) NOT NULL,
+			cohort_definition_description TEXT NULL,
+			definition_type_concept_id integer NOT NULL,
+			cohort_definition_syntax TEXT NULL,
+			subject_concept_id integer NOT NULL,
+			cohort_initiation_date date NULL );
+
+--HINT DISTRIBUTE ON RANDOM
+-- CREATE TABLE IF NOT EXISTS results.ATTRIBUTE_DEFINITION ( -- OBSOLETE
+-- 
+--			attribute_definition_id integer NOT NULL,
+--			attribute_name varchar(255) NOT NULL,
+--			attribute_description TEXT NULL,
+--			attribute_type_concept_id integer NOT NULL,
+--			attribute_syntax TEXT NULL );
