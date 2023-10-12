@@ -20,6 +20,7 @@ def main():
 		study_directory = db_conf['dir_study']
 		schema_voc = db_conf['vocabulary_schema']
 #		dir_code = study_directory + "code\\sql_scripts\\"
+		database_type = db_conf['database_type']
 		dir_sql = os.getcwd() + '\\sql_scripts\\'
 		dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
 		dir_voc = db_conf['dir_voc'] + "\\"		#study_directory + "vocabulary\\"
@@ -75,9 +76,10 @@ def main():
 			while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
 				load_tbls = input('I did not understand that. Are you sure you want to CREATE/LOAD source_to_..._map tables tables (y/n):') 
 			if load_tbls.lower() in ['y', 'yes']:
-				fname = dir_sql + '3d_cdm_source_to_concept_vocab_map.sql'
-				log.log_message('Calling ' + fname + ' ...')
-				ret = mapping_util.execute_multiple_queries(fname, None, None, True, True)
+				fname = dir_sql + '3d_cdm_' + database_type + '_to_concept_vocab_map.sql'
+				if os.path.isfile(fname) == True:
+					log.log_message('Calling ' + fname + ' ...')
+					ret = mapping_util.execute_multiple_queries(fname, None, None, True, True)
 # ---------------------------------------------------------
 # CREATE/LOAD source_to_source_vocab_map
 # ---------------------------------------------------------

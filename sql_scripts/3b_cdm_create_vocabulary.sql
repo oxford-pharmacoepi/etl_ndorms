@@ -1,5 +1,3 @@
-CREATE SCHEMA IF NOT EXISTS {VOCABULARY_SCHEMA};
-
 CREATE TABLE IF NOT EXISTS {VOCABULARY_SCHEMA}.CONCEPT (
 			concept_id integer NOT NULL,
 			concept_name varchar(255) NOT NULL,
@@ -15,7 +13,7 @@ CREATE TABLE IF NOT EXISTS {VOCABULARY_SCHEMA}.CONCEPT (
 CREATE TABLE IF NOT EXISTS {VOCABULARY_SCHEMA}.VOCABULARY (
 			vocabulary_id varchar(20) NOT NULL,
 			vocabulary_name varchar(255) NOT NULL,
-			vocabulary_reference varchar(255) NOT NULL,
+			vocabulary_reference varchar(255) NULL,
 			vocabulary_version varchar(255) NULL,
 			vocabulary_concept_id integer NOT NULL );
 
@@ -45,7 +43,7 @@ CREATE TABLE IF NOT EXISTS {VOCABULARY_SCHEMA}.RELATIONSHIP (
 			reverse_relationship_id varchar(20) NOT NULL,
 			relationship_concept_id integer NOT NULL );
 
-CREATE TABLE IF NOT EXISTS {VOCABULARY_SCHEMA}.CONCEPT_SYNONYM ( 
+CREATE TABLE IF NOT EXISTS {VOCABULARY_SCHEMA}.CONCEPT_SYNONYM (
 			concept_id integer NOT NULL,
 			concept_synonym_name varchar(1000) NOT NULL,
 			language_concept_id integer NOT NULL );
@@ -55,6 +53,17 @@ CREATE TABLE IF NOT EXISTS {VOCABULARY_SCHEMA}.CONCEPT_ANCESTOR (
 			descendant_concept_id integer NOT NULL,
 			min_levels_of_separation integer NOT NULL,
 			max_levels_of_separation integer NOT NULL );
+
+CREATE TABLE IF NOT EXISTS {VOCABULARY_SCHEMA}.SOURCE_TO_CONCEPT_MAP (
+		source_code varchar(255) NOT NULL,
+		source_concept_id integer NOT NULL,
+		source_vocabulary_id varchar(20) NOT NULL,
+		source_code_description varchar(255) NULL,
+		target_concept_id integer NOT NULL,
+		target_vocabulary_id varchar(20) NOT NULL,
+		valid_start_date date NOT NULL,
+		valid_end_date date NOT NULL,
+		invalid_reason varchar(1) NULL );
 
 CREATE TABLE IF NOT EXISTS {VOCABULARY_SCHEMA}.DRUG_STRENGTH (
 			drug_concept_id integer NOT NULL,
