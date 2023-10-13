@@ -41,7 +41,11 @@ def main():
 			log.log_message('Calling ' + fname + ' ...')
 			ret = mapping_util.execute_sql_file_parallel(fname, False)
 			if ret == True:
-				fname = dir_code + '4b_OMOP CDM postgresql v5_3_1 ddl.sql'
+				cdm_version = db_conf['cdm_version']
+				if cdm_version == '5.3':
+					fname = dir_code + '4b_OMOPCDM_postgresql_5_3_ddl.sql'
+				elif cdm_version == '5.4':
+					fname = dir_code + '4b_OMOPCDM_postgresql_5_4_ddl.sql'
 				log.log_message('Calling ' + fname + ' ...')
 				ret = mapping_util.execute_sql_file_parallel(fname, False)
 # ---------------------------------------------------------
@@ -193,19 +197,19 @@ def main():
 # ---------------------------------------------------------
 # Count records per mapped table
 # ---------------------------------------------------------
-		if ret == True:
-			cnx.autocommit = True
-			records_tbl = target_schema + '._records'
-			if mapping_util.does_tbl_exist(cnx, records_tbl) == True:
-				query1 = "TRUNCATE " + records_tbl;
-				cursor1.execute(query1)
-				log.log_message('Counting rows in cdm tables ...')
-#				tbl_cdm = ['LOCATION', 'CARE_SITE', 'PROVIDER', 'PERSON', 'DEATH', 'OBSERVATION_PERIOD', 'VISIT_OCCURRENCE', 'VISIT_DETAIL', 'CONDITION_OCCURRENCE', 'DRUG_EXPOSURE', 'DEVICE_EXPOSURE', 'PROCEDURE_OCCURRENCE', 'MEASUREMENT', 'OBSERVATION']
-				tbl_cdm_list =  [tbl for tbl in db_conf['tbl_cdm']]
-				tbl_cdm_list_full =  [target_schema + "." + tbl for tbl in tbl_cdm_list]
-				for tbl in tbl_cdm_list_full:
-					ret = mapping_util.get_table_count(cnx, tbl, target_schema + '._records')
-			cnx.close()
+#		if ret == True:
+#			cnx.autocommit = True
+#			records_tbl = target_schema + '._records'
+#			if mapping_util.does_tbl_exist(cnx, records_tbl) == True:
+#				query1 = "TRUNCATE " + records_tbl;
+#				cursor1.execute(query1)
+#				log.log_message('Counting rows in cdm tables ...')
+##				tbl_cdm = ['LOCATION', 'CARE_SITE', 'PROVIDER', 'PERSON', 'DEATH', 'OBSERVATION_PERIOD', 'VISIT_OCCURRENCE', 'VISIT_DETAIL', 'CONDITION_OCCURRENCE', 'DRUG_EXPOSURE', 'DEVICE_EXPOSURE', 'PROCEDURE_OCCURRENCE', 'MEASUREMENT', 'OBSERVATION']
+#				tbl_cdm_list =  [tbl for tbl in db_conf['tbl_cdm']]
+#				tbl_cdm_list_full =  [target_schema + "." + tbl for tbl in tbl_cdm_list]
+#				for tbl in tbl_cdm_list_full:
+#					ret = mapping_util.get_table_count(cnx, tbl, target_schema + '._records')
+		cnx.close()
 # ---------------------------------------------------------
 # Report total time
 # ---------------------------------------------------------
