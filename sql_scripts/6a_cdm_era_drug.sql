@@ -27,6 +27,7 @@ WITH ctePreDrugTarget(drug_exposure_id, person_id, ingredient_concept_id, drug_e
  	 */
 	AND d.drug_concept_id != 0
 	AND d.days_supply >= 0
+	AND position('vaccine' IN lower(c.concept_name)) = 0 -- do not add vaccines into drug_era
 )
 
 , cteSubExposureEndDates (person_id, ingredient_concept_id, end_date) AS --- A preliminary sorting that groups all of the overlapping exposures into one exposure so that we don't double-count non-gap-days
