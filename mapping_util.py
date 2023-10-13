@@ -10,9 +10,12 @@ from io import StringIO
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import as_completed
 from importlib import import_module
+import csv
 
 log = import_module('write_log', os.getcwd() + '\\write_log.py').Log('mapping_util')
 db_conf = import_module('__postgres_db_conf', os.getcwd() +'\\__postgres_db_conf.py').db_conf
+dir_stcm = db_conf['dir_stcm'] + "\\" 
+dir_suggest_stcm = dir_stcm + db_conf['dir_suggest_stcm']
 
 # ---------------------------------------------------------
 def calc_time(secs_tot):
@@ -393,11 +396,11 @@ def execute_sql_files_parallel(fname_list, debug = True):
 						msg = 'execute_sql_files_parallel stopped with error at ' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
 						break
 			if ret == True:
-#				processed_folder = os.path.dirname(fname_list[0]) + "\\processed\\"
-#				for i in range(len(fname_list)):
-#					fname = fname_list[i]
-#					file_processed = processed_folder + os.path.basename(fname)
-#					os.rename(fname, file_processed)
+				processed_folder = os.path.dirname(fname_list[0]) + "\\processed\\"
+				for i in range(len(fname_list)):
+					fname = fname_list[i]
+					file_processed = processed_folder + os.path.basename(fname)
+					os.rename(fname, file_processed)
 				msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] execute_sql_files_parallel execution time: '
 				msg += calc_time(time.time() - time1) + "\n"
 			log.log_message(msg)
@@ -568,3 +571,222 @@ def load_folders_parallel(schema, folder_list):
 		err = sys.exc_info()
 		print("Function = {0}, Error = {1}, {2}".format("load_folders_parallel", err[0], err[1]))
 	return(ret)
+# ---------------------------------------------------------
+def check_stcm_and_generate_csv(fname, stcm, debug):
+# ---------------------------------------------------------
+	ret = False
+	
+	try:
+		dir_suggest_stcm = db_conf['dir_stcm'] + "\\" + db_conf['dir_suggest_stcm']
+		dir_processed = dir_suggest_stcm + "\\" + db_conf['dir_processed']
+
+		if not os.path.exists(dir_suggest_stcm):
+			os.makedirs(dir_suggest_stcm)
+
+		if not os.path.exists(dir_processed):
+			os.makedirs(dir_processed)		
+
+		query = parse_queries_file(fname)[0]
+		#stcm_ls = db_conf['stcms']
+
+		#for stcm in stcm_ls:	
+		log.log_message("Checking %s in database..." %stcm)
+		ret = export_csv(query, stcm, (dir_suggest_stcm + '\\' + stcm + '_suggestion' + '.csv'), debug)
+		
+	except:
+		ret = False
+		err = sys.exc_info()
+		print("Function = {0}, Error = {1}, {2}".format("execute_query", err[0], err[1]))
+	return(ret)	
+# ---------------------------------------------------------
+def update_stcm(fname, fcsv, debug = True):
+# ---------------------------------------------------------
+	ret = False
+	i = 0
+	total = 0
+
+	try:
+		queries = parse_queries_file(fname)
+
+		cnx = sql.connect(
+			user=db_conf['username'],
+			password=db_conf['password'],
+			database=db_conf['database']
+		)
+		cursor1 = cnx.cursor()
+		cnx.autocommit = False			
+
+		log.log_message("Reading %s ..." %(os.path.basename(fcsv)))
+		log.log_message("Updating the stcm ...")
+
+		with open(fcsv, 'r') as f:
+			d_reader = csv.DictReader(f)
+
+			for line in d_reader:
+				total+=1
+				
+				if line['update_as_suggested'].upper() == 'Y':
+					i+=1
+					print('Update {source_code=' + line['source_code'] + ', source_vocabulary_id=' + line['source_vocabulary_id'] + '}')
+					#update stcm target_concept_id
+					if debug:
+						time1 = time.time()
+						msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Processing: ' + queries[0]
+						log.log_message(msg)
+
+					cursor1.execute(queries[0], (
+													line['suggested_target_concept_id'], 
+													line['vocabulary_id'],
+													line['valid_start_date'],
+													line['valid_end_date'],
+													line['source_vocabulary_id'], line['source_code']       #where clause
+												))
+					
+					if debug:
+						time1 = time.time()
+						msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Processing: ' + queries[1]
+						log.log_message(msg)
+
+					cursor1.execute(queries[1], (
+													line['suggested_target_concept_id'], 
+													line['concept_name'],
+													line['vocabulary_id'],
+													line['domain_id'],
+													line['concept_class_id'],
+													line['source_vocabulary_id'], line['source_code']       #where clause
+												))
+
+					if debug:
+						time1 = time.time()
+						msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Processing: ' + queries[2]
+						log.log_message(msg)
+
+					cursor1.execute(queries[2], (
+													line['suggested_target_concept_id'], 
+													line['concept_name'],
+													line['vocabulary_id'],
+													line['domain_id'],
+													line['concept_class_id'],
+													line['source_vocabulary_id'], line['source_code']       #where clause
+												))
+					
+				else:
+					print('Skip {source_code=' + line['source_code'] + ', source_vocabulary_id=' + line['source_vocabulary_id'] + '}')
+
+				if debug:
+					msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Query execution time: '
+					msg += calc_time(time.time() - time1) + "\n"
+					log.log_message(msg)
+		
+		cnx.commit()
+		cursor1.close()
+		cursor1 = None
+		cnx.close()
+
+		f.close()
+		ret = True
+		log.log_message("Finished updating stcm")
+
+	except:
+		ret = False
+		err = sys.exc_info()
+		print("Function = {0}, Error = {1}, {2}".format("execute_query", err[0], err[1]))
+		log.log_message('Transaction Rollback!!!')
+		if cursor1 != None:
+			cursor1.close()
+		cnx.close()
+		
+# ---------------------------------------------------------
+# Completed Transaction
+# ---------------------------------------------------------
+
+	#move to processed
+	try:
+		dir_processed = dir_suggest_stcm + "\\" + db_conf['dir_processed']
+		file_processed = dir_processed + os.path.basename(fcsv)
+		os.rename(fcsv, file_processed)
+		log.log_message('Finished MOVING _suggestion.csv files')
+		ret = True
+	except:
+		ret = False
+		err = sys.exc_info()
+		print("Function = {0}, Error = {1}, {2}".format("execute_query", err[0], err[1]))
+
+	if ret and i>0:
+		log.log_message("Generating new stcm csv...")
+		try:
+
+			#rename old stcm
+			fstcm = db_conf['dir_stcm'] + '\\' + os.path.basename(fcsv).replace('_suggestion', '')
+			os.rename(fstcm,  fstcm.replace('.csv', '_old.csv'))
+			log.log_message('Renamed the stcm file')
+
+			#generate new stcm
+			dir_sql = os.getcwd() + '\\sql_scripts\\'
+			fname = dir_sql + '3i_generate_new_stcm.sql'
+
+			query = parse_queries_file(fname)[0]
+			ret = export_csv(query, os.path.basename(fstcm).replace('.csv', ''), fstcm, debug = True)
+
+		except:
+			ret = False
+			err = sys.exc_info()
+			print("Function = {0}, Error = {1}, {2}".format("execute_query", err[0], err[1]))
+
+	return(ret)	
+# ---------------------------------------------------------
+def export_csv(query, params, fcsv, debug = True):
+# ---------------------------------------------------------
+	ret = False
+
+	try:
+		cnx = sql.connect(
+			user=db_conf['username'],
+			password=db_conf['password'],
+			database=db_conf['database']
+		)
+		cursor1 = cnx.cursor()
+		cnx.autocommit = True
+		if debug:
+			time1 = time.time()
+			msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Processing: ' + query
+			log.log_message(msg)
+			
+		cursor1.execute(query, (params,))	
+
+		data = cursor1.fetchall()
+		if not data:
+			log.log_message('No record has been found in table')
+		else:
+			headers = [i[0] for i in cursor1.description]
+			with open(fcsv, 'w') as csvFile:
+				# Create CSV writer.   
+				writer = csv.writer(csvFile, delimiter=',', lineterminator='\r', quoting=csv.QUOTE_NONE, escapechar='\\')
+
+				# Add the headers and data to the CSV file.
+				writer.writerow(headers)
+				# Add data
+				writer.writerows(data)
+
+			csvFile.close()
+			log.log_message("%s has been created." %(os.path.basename(fcsv)))
+
+		if debug:
+			msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Query execution time: '
+			msg += calc_time(time.time() - time1) + "\n"
+			log.log_message(msg)
+
+		cursor1.close()
+		cursor1 = None
+
+		ret = True
+
+	except:
+		ret = False
+		err = sys.exc_info()
+		print("Function = {0}, Error = {1}, {2}".format("execute_query", err[0], err[1]))
+		if cursor1 != None:
+			cursor1.close()
+		cnx.close()
+
+	return(ret)	

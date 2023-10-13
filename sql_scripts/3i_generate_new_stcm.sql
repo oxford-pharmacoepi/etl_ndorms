@@ -1,0 +1,2 @@
+select source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date 
+from {VOCABULARY_SCHEMA}.source_to_concept_map where source_vocabulary_id = %s

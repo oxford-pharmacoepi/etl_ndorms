@@ -25,6 +25,9 @@ def main():
 		dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
 		dir_voc = db_conf['dir_voc'] + "\\"		#study_directory + "vocabulary\\"
 		dir_voc_processed = db_conf['dir_voc'] + db_conf['dir_processed']
+		dir_stcm = db_conf['dir_stcm'] + "\\" 
+		dir_suggest_stcm = dir_stcm + db_conf['dir_suggest_stcm']
+
 # ---------------------------------------------------------
 # Drop vocabularies tables - Parallel execution of queries in the file - Ask the user for DROP confirmation
 # ---------------------------------------------------------
@@ -95,7 +98,44 @@ def main():
 					log.log_message('Calling ' + fname + ' ...')
 					ret = mapping_util.execute_multiple_queries(fname, None, None, True, True)
 					if ret == True:
-						log.log_message('Finished CDM vocabularies processing')
+						log.log_message('Finished CDM vocabularies processing')                        
+# ---------------------------------------------------------
+# CHECK STCM - Select all non-standard, invalid target_concept_ids in stcm
+# ---------------------------------------------------------
+		if ret == True:
+			check_stcm = input('Are you sure you want to CHECKING ALL STCM target_concept_ids (y/n):') 
+			while check_stcm.lower() not in ['y', 'n', 'yes', 'no']:
+				check_stcm = input('I did not understand that. Are you sure you want to select all non-standard, invalid target_concept_ids in stcm (y/n):') 
+			if check_stcm.lower() in ['y', 'yes']:
+				fname = dir_sql + '3g_select_nstard_invalid_target_concept_ids.sql'
+				log.log_message('Calling ' + fname + ' ...')
+
+				for fcsv in glob.iglob(dir_stcm + '*_STCM.csv'):
+					stcm = os.path.basename(fcsv).replace('.csv', '')
+					ret = mapping_util.check_stcm_and_generate_csv(fname, stcm, False)
+
+				if ret == True:
+					log.log_message('Finished checking ALL stcm target_concept_ids.')
+# ---------------------------------------------------------
+# Update stcm 
+# ---------------------------------------------------------
+		if ret == True:
+			load_tbls = input('Are you sure you want to update stcm (y/n):') 
+			while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
+				load_tbls = input('I did not understand that. Are you sure you want to update stcm (y/n):') 
+			if load_tbls.lower() in ['y', 'yes']:
+				fname = dir_sql + '3h_update_target_concept_ids.sql'
+				log.log_message('Calling ' + fname + ' ...')
+				i = 0
+				for fcsv in glob.iglob(dir_suggest_stcm + '*_suggestion.csv'):
+					i+=1
+					ret = mapping_util.update_stcm(fname, fcsv, False)
+				
+				if i==0:
+					log.log_message('No _suggestion.csv has been found.')
+				else:
+					if ret == True:
+						log.log_message('Finished updating non-standard, invalid stcm target_concept_ids.')
 # ---------------------------------------------------------
 # Move CODE to the processed directory?
 # ---------------------------------------------------------
