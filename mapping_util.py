@@ -146,13 +146,12 @@ def load_files_parallel(schema, tbl_list, file_list, dir_processed):
 		print("Function = {0}, Error = {1}, {2}".format("load_files_parallel", err[0], err[1]))
 	return(ret)
 
-
 # ---------------------------------------------------------
-def get_table_count(tbl_name, tbl_result, cnx = None):
+def get_table_count(tbl_name, tbl_result, cnx=None):
 # ---------------------------------------------------------
-	ret 			= True
-	new_connection 	= False
-	cursor1 		= None
+	ret = True
+	new_connection = False
+	cursor1 = None
 
 	try:
 		if cnx == None:
@@ -175,7 +174,8 @@ def get_table_count(tbl_name, tbl_result, cnx = None):
 			query1 = 'select count(*) from ' + tbl_name
 			cursor1.execute(query1)
 			records = str(cursor1.fetchone()[0])
-		schema_name, tbl_name_short = tbl_name.split(".")
+		schema_tbl, tbl_name_short = tbl_name.split(".")
+		schema_tbl_result, tbl_result_short = tbl_result.split(".")
 # Store results in source_records
 #		if "." in tbl_name:
 		tbl_name_short = "\'" + tbl_name_short + "\'"
@@ -185,14 +185,14 @@ def get_table_count(tbl_name, tbl_result, cnx = None):
 		cursor1.execute(query1)
 		present = cursor1.fetchone()
 		if present == None:
-			query1 = 'insert INTO ' + tbl_result + ' (tbl_name, ' + schema_name + '_records) VALUES (' + tbl_name_short + ', ' + records + ')'
+			query1 = 'insert INTO ' + tbl_result + ' (tbl_name, ' + schema_tbl + '_records) VALUES (' + tbl_name_short + ', ' + records + ')'
 			cursor1.execute(query1)
 			log.log_message(f'{tbl_name} row count: {records}')
 		else:
-			query1 = 'update ' + tbl_result + ' SET ' + schema_name + '_records = ' + records + ' where tbl_name = ' + tbl_name_short
+			query1 = 'update ' + tbl_result + ' SET ' + schema_tbl + '_records = ' + records + ' where tbl_name = ' + tbl_name_short
 			cursor1.execute(query1)
 			log.log_message(f'{tbl_name} row count: {records}')
-			query1 = 'update ' + tbl_result + ' SET total_records = COALESCE(source_records,0) + COALESCE(source_nok_records,0) where tbl_name = ' + tbl_name_short
+			query1 = 'update ' + tbl_result + ' SET total_records = COALESCE(' + schema_tbl_result + '_records,0) + COALESCE(' + schema_tbl_result + '_nok_records,0) where tbl_name = ' + tbl_name_short
 			cursor1.execute(query1)
 		cursor1.close()
 		cursor1 = None
@@ -207,7 +207,7 @@ def get_table_count(tbl_name, tbl_result, cnx = None):
 		if new_connection == True:
 			cnx.close()
 	return(ret)	
-
+	
 # ---------------------------------------------------------
 def get_table_count_parallel(tbl_list, tbl_records):
 # ---------------------------------------------------------
@@ -571,6 +571,7 @@ def load_folders_parallel(schema, folder_list):
 		err = sys.exc_info()
 		print("Function = {0}, Error = {1}, {2}".format("load_folders_parallel", err[0], err[1]))
 	return(ret)
+	
 # ---------------------------------------------------------
 def check_stcm_and_generate_csv(fname, stcm, debug):
 # ---------------------------------------------------------
