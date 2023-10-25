@@ -287,26 +287,3 @@ with cte19 as (
 DELETE FROM {SOURCE_SCHEMA}.referral as t3
 USING cte19
 WHERE t3.obsid = cte19.obsid;
-
--- REFERRAL SET TO NULL unexistent pracids
---POC	with t as (
---POC		SELECT t1.obsid
---POC		FROM {SOURCE_SCHEMA}.referral as t1
---POC		left join {SOURCE_SCHEMA}.practice as t2 on t1.pracid = t2.pracid
---POC		WHERE t2.pracid is null
---POC	)
---POC	update {SOURCE_SCHEMA}.referral as t3
---POC	set pracid = null
---POC	from t where t3.obsid = t.obsid;
---POC
-
--- STAFF SET TO NULL unexistent pracids
---POC 	with t as (
---POC 		SELECT t1.staffid
---POC 		FROM {SOURCE_SCHEMA}.staff as t1
---POC 		left join {SOURCE_SCHEMA}.practice as t2 on t1.pracid = t2.pracid
---POC 		WHERE t2.pracid is null
---POC 	)
---POC 	update {SOURCE_SCHEMA}.staff as t3
---POC 	set pracid = null
---POC 	from t where t3.staffid = t.staffid;
