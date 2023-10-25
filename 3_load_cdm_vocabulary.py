@@ -71,7 +71,7 @@ def export_csv(query, params, fcsv, debug):
 	except:
 		ret = False
 		err = sys.exc_info()
-		print("Function = {0}, Error = {1}, {2}".format("execute_query", err[0], err[1]))
+		print("Function = {0}, Error = {1}, {2}".format("export_csv", err[0], err[1]))
 		if cursor1 != None:
 			cursor1.close()
 		cnx.close()
@@ -109,7 +109,7 @@ def check_stcm(fname, stcm, debug):
 	except:
 		ret = False
 		err = sys.exc_info()
-		print("Function = {0}, Error = {1}, {2}".format("execute_query", err[0], err[1]))
+		print("Function = {0}, Error = {1}, {2}".format("check_stcm", err[0], err[1]))
 
 	return(ret)	
 
@@ -211,7 +211,7 @@ def update_stcm(fname, fcsv, debug):
 	except:
 		ret = False
 		err = sys.exc_info()
-		print("Function = {0}, Error = {1}, {2}".format("execute_query", err[0], err[1]))
+		print("Function = {0}, Error = {1}, {2}".format("update_stcm", err[0], err[1]))
 		log.log_message('Transaction Rollback!!!')
 		if cursor1 != None:
 			cursor1.close()
@@ -229,7 +229,7 @@ def update_stcm(fname, fcsv, debug):
 	except:
 		ret = False
 		err = sys.exc_info()
-		print("Function = {0}, Error = {1}, {2}".format("execute_query", err[0], err[1]))
+		print("Function = {0}, Error = {1}, {2}".format("update_stcm", err[0], err[1]))
 
 	if ret and i>0:
 		log.log_message("Generating new stcm csv...")
@@ -242,7 +242,7 @@ def update_stcm(fname, fcsv, debug):
 
 			#generate new stcm
 			dir_sql = os.getcwd() + '\\sql_scripts\\'
-			fname = dir_sql + '3i_generate_new_stcm.sql'
+			fname = dir_sql + '3h_generate_new_stcm.sql'
 
 			query = mapping_util.parse_queries_file(fname)[0]
 			ret = export_csv(query, os.path.basename(fstcm).replace('.csv', ''), fstcm, debug)			
@@ -250,7 +250,7 @@ def update_stcm(fname, fcsv, debug):
 		except:
 			ret = False
 			err = sys.exc_info()
-			print("Function = {0}, Error = {1}, {2}".format("execute_query", err[0], err[1]))
+			print("Function = {0}, Error = {1}, {2}".format("update_stcm", err[0], err[1]))
 
 	return(ret)	
 
@@ -263,14 +263,12 @@ def main():
 	try:
 		study_directory = db_conf['dir_study']
 		schema_voc = db_conf['vocabulary_schema']
-#		dir_code = study_directory + "code\\sql_scripts\\"
 		database_type = db_conf['database_type']
 		dir_sql = os.getcwd() + '\\sql_scripts\\'
 		dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
 		dir_voc = db_conf['dir_voc'] + "\\"		#study_directory + "vocabulary\\"
 		dir_voc_processed = db_conf['dir_voc'] + db_conf['dir_processed']
 		dir_stcm = db_conf['dir_stcm'] + "\\"	
-		#dir_suggest_stcm = dir_stcm + "suggestion" 
 
 # ---------------------------------------------------------
 # Drop vocabularies tables - Parallel execution of queries in the file - Ask the user for DROP confirmation
@@ -323,22 +321,25 @@ def main():
 			while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
 				load_tbls = input('I did not understand that. Are you sure you want to CREATE/LOAD source_to_..._map tables tables (y/n):') 
 			if load_tbls.lower() in ['y', 'yes']:
-				fname = dir_sql + '3d_cdm_' + database_type + '_to_concept_vocab_map.sql'
-				if os.path.isfile(fname) == True:
-					log.log_message('Calling ' + fname + ' ...')
-					ret = mapping_util.execute_multiple_queries(fname, None, None, True, True)
+				csv_file_list = sorted(glob.iglob(dir_stcm + '*_STCM.csv'))
+				for fname in csv_file_list:
+					query = 'COPY ' + target_schema + '.source_to_concept_map FROM ' + fname + ' WITH DELIMITER E\',\' CSV HEADER QUOTE E\'"\'';
+					log.log_message('Running ' + query + ' ...')
+					ret = mapping_util.execute_query(query, True)
+					if ret == False:
+						break
 # ---------------------------------------------------------
 # CREATE/LOAD source_to_source_vocab_map
 # ---------------------------------------------------------
 				if ret == True:
-					fname = dir_sql + '3e_cdm_source_to_source_vocab_map.sql'
+					fname = dir_sql + '3d_cdm_source_to_source_vocab_map.sql'
 					log.log_message('Calling ' + fname + ' ...')
 					ret = mapping_util.execute_multiple_queries(fname, None, None, True, True)
 # ---------------------------------------------------------
 # CREATE/LOAD source_to_standard_vocab_map
 # ---------------------------------------------------------
 				if ret == True:
-					fname = dir_sql + '3f_cdm_source_to_standard_vocab_map.sql'
+					fname = dir_sql + '3e_cdm_source_to_standard_vocab_map.sql'
 					log.log_message('Calling ' + fname + ' ...')
 					ret = mapping_util.execute_multiple_queries(fname, None, None, True, True)
 					if ret == True:
@@ -351,37 +352,38 @@ def main():
 			while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
 				load_tbls = input('I did not understand that. Are you sure you want to CHECKING ALL STCMs (y/n):') 
 			if load_tbls.lower() in ['y', 'yes']:
-				fname = dir_sql + '3g_check_stcm.sql'
+				fname = dir_sql + '3f_check_stcm.sql'
 				log.log_message('Calling ' + fname + ' ...')
-
 				for fcsv in glob.iglob(dir_stcm + '*_STCM.csv'):
 					stcm = os.path.basename(fcsv).replace('.csv', '')
 					ret = check_stcm(fname, stcm, False)
-
+					if ret == False:
+						break
 				if ret == True:
 					log.log_message('Finished checking ALL STCMs.')
 # ---------------------------------------------------------
 # UPDATE STCM 
 # ---------------------------------------------------------
-		ret = False
-		
-		for fcsv in glob.iglob(dir_stcm + "suggestion\\" + '*_suggestion.csv'):
-			ret = True
-			break
-
 		if ret == True:
-			load_tbls = input('Are you sure you want to update stcm (y/n):') 
-			while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-				load_tbls = input('I did not understand that. Are you sure you want to update stcm (y/n):') 
-			if load_tbls.lower() in ['y', 'yes']:
-				fname = dir_sql + '3h_update_stcm.sql'
-				log.log_message('Calling ' + fname + ' ...')
-
-				for fcsv in glob.iglob(dir_stcm + "suggestion\\" + '*_suggestion.csv'):
-					ret = update_stcm(fname, fcsv, False)
-
-				if ret == True:
-					log.log_message('Finished updating non-standard, invalid stcm target_concept_ids.')
+			found = False
+		
+			for fcsv in glob.iglob(dir_stcm + "suggestion\\" + '*_suggestion.csv'):
+				found = True
+				break
+	
+			if found == True:
+				load_tbls = input('Are you sure you want to update stcm (y/n):') 
+				while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
+					load_tbls = input('I did not understand that. Are you sure you want to update stcm (y/n):') 
+				if load_tbls.lower() in ['y', 'yes']:
+					fname = dir_sql + '3g_update_stcm.sql'
+					log.log_message('Calling ' + fname + ' ...')
+					for fcsv in glob.iglob(dir_stcm + "suggestion\\" + '*_suggestion.csv'):
+						ret = update_stcm(fname, fcsv, False)
+						if ret == False:
+							break
+					if ret == True:
+						log.log_message('Finished updating non-standard, invalid stcm target_concept_ids.')
 # ---------------------------------------------------------
 # Move CODE to the processed directory?
 # ---------------------------------------------------------
