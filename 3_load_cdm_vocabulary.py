@@ -324,7 +324,7 @@ def main():
 			if load_tbls.lower() in ['y', 'yes']:
 				csv_file_list = sorted(glob.iglob(dir_stcm + '*_STCM.csv'))
 				for fname in csv_file_list:
-					query = 'COPY ' + target_schema + '.source_to_concept_map FROM ' + fname + ' WITH DELIMITER E\',\' CSV HEADER QUOTE E\'"\'';
+					query = 'COPY ' + target_schema + '.source_to_concept_map FROM \'' + fname + '\' WITH DELIMITER E\',\' CSV HEADER QUOTE E\'"\'';
 					log.log_message('Running ' + query + ' ...')
 					ret = mapping_util.execute_query(query, True)
 					if ret == False:
