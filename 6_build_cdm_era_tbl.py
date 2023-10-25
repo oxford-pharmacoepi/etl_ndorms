@@ -18,8 +18,7 @@ def main():
 	try:
 		database_type = db_conf['database_type']
 		target_schema = db_conf['target_schema']
-		study_directory = db_conf['dir_study']
-		dir_code = study_directory + "code\\sql_scripts\\"
+		dir_code = os.getcwd() + "\\sql_scripts\\"
 # ---------------------------------------------------------
 # Create ERA tables
 # ---------------------------------------------------------
