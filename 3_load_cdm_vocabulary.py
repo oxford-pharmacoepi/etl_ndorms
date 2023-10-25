@@ -263,7 +263,6 @@ def main():
 	try:
 		study_directory = db_conf['dir_study']
 		vocabulary_schema = db_conf['vocabulary_schema']
-		target_schema = db_conf['target_schema']
 		database_type = db_conf['database_type']
 		dir_sql = os.getcwd() + '\\sql_scripts\\'
 		dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
@@ -324,8 +323,7 @@ def main():
 			if load_tbls.lower() in ['y', 'yes']:
 				csv_file_list = sorted(glob.iglob(dir_stcm + '*_STCM.csv'))
 				for fname in csv_file_list:
-					query = 'COPY ' + target_schema + '.source_to_concept_map FROM \'' + fname + '\' WITH DELIMITER E\',\' CSV HEADER QUOTE E\'"\'';
-					log.log_message('Running ' + query + ' ...')
+					query = 'COPY ' + vocabulary_schema + '.source_to_concept_map FROM \'' + fname + '\' WITH DELIMITER E\',\' CSV HEADER QUOTE E\'"\'';
 					ret = mapping_util.execute_query(query, True)
 					if ret == False:
 						break
