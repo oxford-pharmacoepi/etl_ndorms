@@ -143,13 +143,12 @@ def load_files_parallel(schema, tbl_list, file_list, dir_processed):
 		print("Function = {0}, Error = {1}, {2}".format("load_files_parallel", err[0], err[1]))
 	return(ret)
 
-
 # ---------------------------------------------------------
-def get_table_count(tbl_name, tbl_result, cnx = None):
+def get_table_count(tbl_name, tbl_result, cnx=None):
 # ---------------------------------------------------------
-	ret 			= True
-	new_connection 	= False
-	cursor1 		= None
+	ret = True
+	new_connection = False
+	cursor1 = None
 
 	try:
 		if cnx == None:
@@ -172,7 +171,8 @@ def get_table_count(tbl_name, tbl_result, cnx = None):
 			query1 = 'select count(*) from ' + tbl_name
 			cursor1.execute(query1)
 			records = str(cursor1.fetchone()[0])
-		schema_name, tbl_name_short = tbl_name.split(".")
+		schema_tbl, tbl_name_short = tbl_name.split(".")
+		schema_tbl_result, tbl_result_short = tbl_result.split(".")
 # Store results in source_records
 #		if "." in tbl_name:
 		tbl_name_short = "\'" + tbl_name_short + "\'"
@@ -182,14 +182,14 @@ def get_table_count(tbl_name, tbl_result, cnx = None):
 		cursor1.execute(query1)
 		present = cursor1.fetchone()
 		if present == None:
-			query1 = 'insert INTO ' + tbl_result + ' (tbl_name, ' + schema_name + '_records) VALUES (' + tbl_name_short + ', ' + records + ')'
+			query1 = 'insert INTO ' + tbl_result + ' (tbl_name, ' + schema_tbl + '_records) VALUES (' + tbl_name_short + ', ' + records + ')'
 			cursor1.execute(query1)
 			log.log_message(f'{tbl_name} row count: {records}')
 		else:
-			query1 = 'update ' + tbl_result + ' SET ' + schema_name + '_records = ' + records + ' where tbl_name = ' + tbl_name_short
+			query1 = 'update ' + tbl_result + ' SET ' + schema_tbl + '_records = ' + records + ' where tbl_name = ' + tbl_name_short
 			cursor1.execute(query1)
 			log.log_message(f'{tbl_name} row count: {records}')
-			query1 = 'update ' + tbl_result + ' SET total_records = COALESCE(source_records,0) + COALESCE(source_nok_records,0) where tbl_name = ' + tbl_name_short
+			query1 = 'update ' + tbl_result + ' SET total_records = COALESCE(' + schema_tbl_result + '_records,0) + COALESCE(' + schema_tbl_result + '_nok_records,0) where tbl_name = ' + tbl_name_short
 			cursor1.execute(query1)
 		cursor1.close()
 		cursor1 = None
@@ -204,7 +204,7 @@ def get_table_count(tbl_name, tbl_result, cnx = None):
 		if new_connection == True:
 			cnx.close()
 	return(ret)	
-
+	
 # ---------------------------------------------------------
 def get_table_count_parallel(tbl_list, tbl_records):
 # ---------------------------------------------------------
@@ -237,6 +237,7 @@ def parse_queries_file(filename, chunk_id=None):
 	source_schema = db_conf['source_schema'] if 'source_schema' in db_conf else None
 	target_schema = db_conf['target_schema'] if 'target_schema' in db_conf else None
 	vocabulary_schema = db_conf['vocabulary_schema'] if 'vocabulary_schema' in db_conf else None
+	chunk_schema = db_conf['chunk_schema'] if 'chunk_schema' in db_conf else None
 	lookup_directory = db_conf['dir_lookup'] if 'dir_lookup' in db_conf else None
 	vocabulary_directory = db_conf['dir_voc'] if 'dir_voc' in db_conf else None
 	stcm_directory = db_conf['dir_stcm'] if 'dir_stcm' in db_conf else None
@@ -251,6 +252,7 @@ def parse_queries_file(filename, chunk_id=None):
 		query = query.replace('{SOURCE_SCHEMA}', source_schema) if source_schema is not None else query
 		query = query.replace('{TARGET_SCHEMA}', target_schema) if target_schema is not None else query
 		query = query.replace('{VOCABULARY_SCHEMA}', vocabulary_schema) if vocabulary_schema is not None else query  
+		query = query.replace('{CHUNK_SCHEMA}', chunk_schema) if chunk_schema is not None else query  
 		query = query.replace('{LOOKUP_DIRECTORY}', lookup_directory) if lookup_directory is not None else query  
 		query = query.replace('{VOCABULARY_DIRECTORY}', vocabulary_directory) if vocabulary_directory is not None else query  
 		query = query.replace('{STCM_DIRECTORY}', stcm_directory) if stcm_directory is not None else query  
@@ -297,7 +299,7 @@ def execute_query(query, debug = True):
 
 # ---------------------------------------------------------
 #def execute_multiple_queries(filename, chunk_id = None, cnx = None, save_progress = False, debug = False):
-def execute_multiple_queries(filename, chunk_id = None, cnx = None, commit = True, debug = True):
+def execute_multiple_queries(filename, chunk_id = None, cnx = None, commit = True, debug = True, move_files = True):
 # ---------------------------------------------------------
 	ret 			= True
 	new_connection 	= False
@@ -331,9 +333,10 @@ def execute_multiple_queries(filename, chunk_id = None, cnx = None, commit = Tru
 						msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Finished  : ' + query.split('\n')[0] + ' in '
 						msg += calc_time(time.time() - time1) + "\n"
 						log.log_message(msg)
-			dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
-			file_processed = dir_sql_processed + os.path.basename(filename)
-			os.rename(filename, file_processed)
+			if move_files == True:
+				dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
+				file_processed = dir_sql_processed + os.path.basename(filename)
+				os.rename(filename, file_processed)
 			cursor1.close()
 			cursor1 = None
 			if new_connection == True:
@@ -349,7 +352,7 @@ def execute_multiple_queries(filename, chunk_id = None, cnx = None, commit = Tru
 	return(ret)	
 		
 # ---------------------------------------------------------
-def execute_sql_file_parallel(fname, debug = True):
+def execute_sql_file_parallel(fname, debug = True, move_files = True):
 # The queries in the file are executed in parallel
 # ---------------------------------------------------------
 	ret = True
@@ -369,6 +372,10 @@ def execute_sql_file_parallel(fname, debug = True):
 			msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] execute_sql_file_parallel execution time: '
 			msg += calc_time(time.time() - time1) + "\n"
 		log.log_message(msg)
+		if move_files == True:
+			dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
+			file_processed = dir_sql_processed + os.path.basename(fname)
+			os.rename(fname, file_processed)
 	except:
 		ret = False
 		err = sys.exc_info()
@@ -393,11 +400,6 @@ def execute_sql_files_parallel(fname_list, debug = True):
 						msg = 'execute_sql_files_parallel stopped with error at ' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
 						break
 			if ret == True:
-				processed_folder = os.path.dirname(fname_list[0]) + "\\processed\\"
-				for i in range(len(fname_list)):
-					fname = fname_list[i]
-					file_processed = processed_folder + os.path.basename(fname)
-					os.rename(fname, file_processed)
 				msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] execute_sql_files_parallel execution time: '
 				msg += calc_time(time.time() - time1) + "\n"
 			log.log_message(msg)
