@@ -298,7 +298,6 @@ def execute_query(query, debug = True):
 	return(ret)	
 
 # ---------------------------------------------------------
-#def execute_multiple_queries(filename, chunk_id = None, cnx = None, save_progress = False, debug = False):
 def execute_multiple_queries(filename, chunk_id = None, cnx = None, commit = True, debug = True, move_files = True):
 # ---------------------------------------------------------
 	ret 			= True
