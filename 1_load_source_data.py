@@ -143,25 +143,34 @@ def main():
 				sql_file_list = sorted(glob.iglob(dir_sql + '1c_' + database_type + '_pk_idx_*.sql'))
 				ret = mapping_util.execute_sql_files_parallel(sql_file_list, True)
 				if ret == True:
-					log.log_message('Finished adding ' + database_type.upper() + ' PKs/indexes')
+					task_finished = "Finished adding ' + database_type.upper() + ' PKs/indexes in {0}".format(mapping_util.calc_time(time.time() - time1))
+					log.log_message(task_finished)
 # ---------------------------------------------------------
-# Check source data if patient table has patids to remove
+# Check for curation
 # ---------------------------------------------------------
-					if database_type == 'aurum':
-						idx_patient = db_conf[tbl_db].index('patient')
-						idx_observation = db_conf[tbl_db].index('observation')
-						(ret, curation) = is_curation_needed_aurum(tbl_db_list[idx_patient], tbl_db_list[idx_observation])
-					elif database_type == 'gold':
-						idx_patient = db_conf[tbl_db].index('patient')
-						(ret, curation) = is_curation_needed_gold(tbl_db_list[idx_patient])
-					if ret == True and curation == True:
+		if ret == True:
+			load_tbls = input('Are you sure you want to CHECK/CURATE ' + database_type.upper() + ' (y/n):') 
+			while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
+				load_tbls = input('Are you sure you want to CHECK/CURATE ' + database_type.upper() + ' (y/n):') 
+			if load_tbls.lower() in ['y', 'yes']:
+				time1 = time.time()
+				if database_type == 'aurum':
+					idx_patient = db_conf[tbl_db].index('patient')
+					idx_observation = db_conf[tbl_db].index('observation')
+					(ret, curation) = is_curation_needed_aurum(tbl_db_list[idx_patient], tbl_db_list[idx_observation])
+				elif database_type == 'gold':
+					idx_patient = db_conf[tbl_db].index('patient')
+					(ret, curation) = is_curation_needed_gold(tbl_db_list[idx_patient])
+				elif database_type == 'hesapc':
+					curation = True
+				if ret == True and curation == True:
 #ANTO: ADD PARALLELISM FROM gold_202301
-						fname = dir_sql + '1d_' + database_type + '_curation.sql'
-						log.log_message('Executing ' + fname + ' ...')
-						ret = mapping_util.execute_multiple_queries(fname, None, None, True, True)
-						if ret == True:
-							task_finished = "Finished curation on  " + database_type.upper() + " data in {0}".format(mapping_util.calc_time(time.time() - time1))
-							log.log_message(task_finished)
+					fname = dir_sql + '1d_' + database_type + '_curation.sql'
+					log.log_message('Executing ' + fname + ' ...')
+					ret = mapping_util.execute_multiple_queries(fname, None, None, True, True)
+					if ret == True:
+						task_finished = "Finished curation on  " + database_type.upper() + " data in {0}".format(mapping_util.calc_time(time.time() - time1))
+						log.log_message(task_finished)
 # ---------------------------------------------------------
 # Ask the user for RECORD COUNTS confirmation
 # ---------------------------------------------------------
