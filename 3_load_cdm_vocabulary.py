@@ -262,7 +262,8 @@ def main():
 	
 	try:
 		study_directory = db_conf['dir_study']
-		schema_voc = db_conf['vocabulary_schema']
+		vocabulary_schema = db_conf['vocabulary_schema']
+		target_schema = db_conf['target_schema']
 		database_type = db_conf['database_type']
 		dir_sql = os.getcwd() + '\\sql_scripts\\'
 		dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
@@ -299,7 +300,7 @@ def main():
 					file_list = [[dir_voc + tbl + '.csv'] for tbl in tbl_cdm_voc]
 					if not os.path.exists(dir_voc_processed):
 						os.makedirs(dir_voc_processed)
-					ret = mapping_util.load_files_parallel(schema_voc, tbl_cdm_voc, file_list, dir_voc_processed)
+					ret = mapping_util.load_files_parallel(vocabulary_schema, tbl_cdm_voc, file_list, dir_voc_processed)
 					if ret == True:
 						log.log_message('Finished loading cdm vocabulary.')
 # ---------------------------------------------------------
