@@ -16,7 +16,6 @@ db_conf = dict({
 	'chunk_size': 1000,
 	'chunk_limit': 0,
 	'dir_processed': '/processed/',
-    'dir_suggest_stcm': '/suggestion/',
 	'dir_study': 'D:\\cprd\\aurum\\aurum_21_000482\\',
 	'dir_log': 'D:\\cprd\\aurum\\aurum_21_000482\\log',
 	'dir_stcm': 'D:\\cprd\\aurum\\aurum_21_000482\\source_to_concept_map',
