@@ -42,7 +42,10 @@ def export_csv(query, params, fcsv, debug):
 
 		data = cursor1.fetchall()
 		if not data:
-			print('No record has been found in table')
+			if fcsv.__contains__('_suggestion'):
+				print('All STCM target_concept_ids are standard.')
+			else:
+				print('No record has been found in table')
 		else:
 			headers = [i[0] for i in cursor1.description]
 			with open(fcsv, 'w') as csvFile:
@@ -126,8 +129,8 @@ def check_stcm(fname, stcm, debug):
 # ---------------------------------------------------------
 def update_stcm(fname, fcsv, debug):
 # ---------------------------------------------------------
-	ret = False
-	i = 0
+	updated = False
+	i = 0 #no of rows being updated
 
 	try:
 		queries = mapping_util.parse_queries_file(fname)
@@ -147,52 +150,34 @@ def update_stcm(fname, fcsv, debug):
 			d_reader = csv.DictReader(f)
 
 			for line in d_reader:
-				if line['update_as_suggested'].upper() == 'Y':
-					#update stcm target_concept_id
-					if debug:
-						time1 = time.time()
-						msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Processing: ' + queries[0]
-						log.log_message(msg)
+                #update stcm target_concept_id
+				if debug:
+					time1 = time.time()
+					msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Processing: ' + queries[0]
+					log.log_message(msg)
 
-					cursor1.execute(queries[0], (
-													line['target_concept_id'], 
-													line['vocabulary_id'],
-													line['valid_start_date'],
-													line['valid_end_date'],
-													line['source_vocabulary_id'], line['source_code']       #where clause
-												))
-					
-					if debug:
-						time1 = time.time()
-						msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Processing: ' + queries[1]
-						log.log_message(msg)
+				cursor1.execute(queries[0], (
+                                                line['target_concept_id'], 
+                                                line['vocabulary_id'],
+                                                line['valid_start_date'],
+                                                line['valid_end_date'],
+                                                line['source_vocabulary_id'], line['source_code']       #where clause
+                                            ))
+				if debug:
+					time1 = time.time()
+					msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Processing: ' + queries[1]
+					log.log_message(msg)
 
-					cursor1.execute(queries[1], (
-													line['target_concept_id'], 
-													line['concept_name'],
-													line['vocabulary_id'],
-													line['domain_id'],
-													line['concept_class_id'],
-													line['source_vocabulary_id'], line['source_code']       #where clause
-												))
+				cursor1.execute(queries[1], (line['source_vocabulary_id'], line['source_code']))
 
-					if debug:
-						time1 = time.time()
-						msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Processing: ' + queries[2]
-						log.log_message(msg)
+				if debug:
+					time1 = time.time()
+					msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Processing: ' + queries[2]
+					log.log_message(msg)
 
-					cursor1.execute(queries[2], (
-													line['target_concept_id'], 
-													line['concept_name'],
-													line['vocabulary_id'],
-													line['domain_id'],
-													line['concept_class_id'],
-													line['source_vocabulary_id'], line['source_code']       #where clause
-												))
-					i+=1
-
-				else:
-					print('Skip updating {source_code=' + line['source_code'] + ', source_vocabulary_id=' + line['source_vocabulary_id'] + '}')
+				cursor1.execute(queries[2], (line['source_vocabulary_id'], line['source_code']))
+                
+				i+=1
 
 				if debug:
 					msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Query execution time: '
@@ -205,11 +190,11 @@ def update_stcm(fname, fcsv, debug):
 		cnx.close()
 
 		f.close()
-		ret = True
+		updated = True
 		log.log_message("Finished updating stcm")
 
 	except:
-		ret = False
+		updated = False
 		err = sys.exc_info()
 		print("Function = {0}, Error = {1}, {2}".format("update_stcm", err[0], err[1]))
 		log.log_message('Transaction Rollback!!!')
@@ -219,40 +204,41 @@ def update_stcm(fname, fcsv, debug):
 # ---------------------------------------------------------
 # Completed Transaction
 # ---------------------------------------------------------
-	#move to processed
-	try:
-		dir_processed =  db_conf['dir_stcm'] + '\\suggestion'  + "\\" + db_conf['dir_processed']
-		file_processed = dir_processed + os.path.basename(fcsv)
-		os.rename(fcsv, file_processed)
-		log.log_message('Finished MOVING _suggestion.csv files')
-		ret = True
-	except:
-		ret = False
-		err = sys.exc_info()
-		print("Function = {0}, Error = {1}, {2}".format("update_stcm", err[0], err[1]))
-
-	if ret and i>0:
-		log.log_message("Generating new stcm csv...")
+	if updated:
+		#move to processed
 		try:
-
-			#rename old stcm
-			fstcm = db_conf['dir_stcm'] + '\\' + os.path.basename(fcsv).replace('_suggestion', '')
-			os.rename(fstcm,  fstcm.replace('.csv', '_old.csv'))
-			log.log_message('Renamed the stcm file')
-
-			#generate new stcm
-			dir_sql = os.getcwd() + '\\sql_scripts\\'
-			fname = dir_sql + '3h_generate_new_stcm.sql'
-
-			query = mapping_util.parse_queries_file(fname)[0]
-			ret = export_csv(query, os.path.basename(fstcm).replace('.csv', ''), fstcm, debug)			
-
+			dir_processed =  db_conf['dir_stcm'] + '\\suggestion'  + "\\" + db_conf['dir_processed']
+			file_processed = dir_processed + os.path.basename(fcsv)
+			os.rename(fcsv, file_processed)
+			log.log_message('Finished MOVING _suggestion.csv files')
+			updated = True
 		except:
-			ret = False
+			updated = False
 			err = sys.exc_info()
 			print("Function = {0}, Error = {1}, {2}".format("update_stcm", err[0], err[1]))
 
-	return(ret)	
+		if updated and i>0:
+			log.log_message("Generating new stcm csv...")
+			try:
+
+				#rename old stcm
+				fstcm = db_conf['dir_stcm'] + '\\' + os.path.basename(fcsv).replace('_suggestion', '')
+				os.rename(fstcm,  fstcm.replace('.csv', '_old.csv'))
+				log.log_message('Renamed the stcm file')
+
+				#generate new stcm
+				dir_sql = os.getcwd() + '\\sql_scripts\\'
+				fname = dir_sql + '3h_generate_new_stcm.sql'
+
+				query = mapping_util.parse_queries_file(fname)[0]
+				ret = export_csv(query, os.path.basename(fstcm).replace('.csv', ''), fstcm, debug)			
+
+			except:
+				updated = False
+				err = sys.exc_info()
+				print("Function = {0}, Error = {1}, {2}".format("update_stcm", err[0], err[1]))
+
+		return(updated)	
 
 # ---------------------------------------------------------
 # MAIN PROGRAM
