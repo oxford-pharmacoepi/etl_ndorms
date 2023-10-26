@@ -28,8 +28,9 @@ def main():
 			debug = True
 		else:
 			debug = False
-		study_directory = db_conf['dir_study']
-		dir_code = study_directory + "code\\sql_scripts\\"
+#		study_directory = db_conf['dir_study']
+#		dir_code = study_directory + "code\\sql_scripts\\"
+		dir_code = os.getcwd() + "\\sql_scripts\\"
 # ---------------------------------------------------------
 # Create/Recreate CDM tables? Parallel execution of queries in the file - Ask the user for DROP confirmation
 # ---------------------------------------------------------
@@ -194,21 +195,6 @@ def main():
 				if ret == True:
 					msg = mapping_util.calc_time(time.time() - chunks_time1)
 					log.log_message(f'Full CHUNK process completed in {msg}')
-# ---------------------------------------------------------
-# Count records per mapped table
-# ---------------------------------------------------------
-#		if ret == True:
-#			cnx.autocommit = True
-#			records_tbl = target_schema + '._records'
-#			if mapping_util.does_tbl_exist(cnx, records_tbl) == True:
-#				query1 = "TRUNCATE " + records_tbl;
-#				cursor1.execute(query1)
-#				log.log_message('Counting rows in cdm tables ...')
-##				tbl_cdm = ['LOCATION', 'CARE_SITE', 'PROVIDER', 'PERSON', 'DEATH', 'OBSERVATION_PERIOD', 'VISIT_OCCURRENCE', 'VISIT_DETAIL', 'CONDITION_OCCURRENCE', 'DRUG_EXPOSURE', 'DEVICE_EXPOSURE', 'PROCEDURE_OCCURRENCE', 'MEASUREMENT', 'OBSERVATION']
-#				tbl_cdm_list =  [tbl for tbl in db_conf['tbl_cdm']]
-#				tbl_cdm_list_full =  [target_schema + "." + tbl for tbl in tbl_cdm_list]
-#				for tbl in tbl_cdm_list_full:
-#					ret = mapping_util.get_table_count(cnx, tbl, target_schema + '._records')
 		cnx.close()
 # ---------------------------------------------------------
 # Report total time

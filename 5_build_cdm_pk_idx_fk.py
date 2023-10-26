@@ -76,8 +76,7 @@ def main():
 	
 	try:
 		time0 = time.time()
-		study_directory = db_conf['dir_study']
-		dir_code = study_directory + "code\\sql_scripts\\"
+		dir_code = os.getcwd() + "\\sql_scripts\\"
 # ---------------------------------------------------------
 # Build PKs & IDXs
 # ---------------------------------------------------------
