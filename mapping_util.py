@@ -9,10 +9,37 @@ import sqlparse
 from io import StringIO
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures import as_completed
-from importlib import import_module
+import importlib.util 
 
-log = import_module('write_log', os.getcwd() + '\\write_log.py').Log('mapping_util')
-db_conf = import_module('__postgres_db_conf', os.getcwd() +'\\__postgres_db_conf.py').db_conf
+# ---------------------------------------------------------
+def get_parameters():
+	"Read user parameters"
+# ---------------------------------------------------------
+	ret = True
+	
+	try:
+		dir_study = ''
+		debug = False
+		arg_num = len(sys.argv)
+		if arg_num < 2:
+			print("Please enter the study folder after parameter -F without any space")
+		else:
+			for i in range(1, arg_num):
+				if sys.argv[i].upper()[:2] == "-F":
+					dir_study = sys.argv[i][2:]
+					module_name = '__postgres_db_conf'
+					spec = importlib.util.spec_from_file_location(module_name, dir_study + '/' + module_name + '.py')
+					module = importlib.util.module_from_spec(spec)
+					sys.modules[module_name] = module
+					spec.loader.exec_module(module)
+					db_conf = module.db_conf
+				if sys.argv[i].upper() == "-D":
+					debug = True
+	except:
+		ret = False
+		err = sys.exc_info()
+		print("Function = {0}, Error = {1}, {2}".format("get_parameters", err[0], err[1]))
+	return(ret, dir_study, db_conf, debug)	
 
 # ---------------------------------------------------------
 def calc_time(secs_tot):
@@ -57,7 +84,7 @@ def does_tbl_exist(cnx, tbl_name):
 	return(ret, exist)	
 
 # ---------------------------------------------------------
-def load_files(schema, tbl_name, file_list, dir_processed):
+def load_files(db_conf, schema, tbl_name, file_list, dir_processed):
 	"Load files into tables"
 # ---------------------------------------------------------
 	ret = True
@@ -113,7 +140,7 @@ def load_files(schema, tbl_name, file_list, dir_processed):
 	return(ret)
 
 # ---------------------------------------------------------
-def load_files_parallel(schema, tbl_list, file_list, dir_processed):
+def load_files_parallel(db_conf, schema, tbl_list, file_list, dir_processed):
 	"Load files into tables"
 # ---------------------------------------------------------
 	ret = True
@@ -125,16 +152,16 @@ def load_files_parallel(schema, tbl_list, file_list, dir_processed):
 # Load files in parallel (all tables), sequentially within each table
 # ---------------------------------------------------------
 		with ProcessPoolExecutor(int(db_conf['max_workers'])) as executor:
-			futures = [executor.submit(load_files, schema, tbl_name, file_list[idx], dir_processed) for idx, tbl_name in enumerate(tbl_list)]
+			futures = [executor.submit(load_files, db_conf, schema, tbl_name, file_list[idx], dir_processed) for idx, tbl_name in enumerate(tbl_list)]
 			for future in as_completed(futures):
 				if future.result() == False:
 					ret = False
-					log.log_message('load_files_parallel stopped with errors at ' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
+					print('load_files_parallel stopped with errors at ' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
 					break
 		if ret == True:
 			msg = '\n[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] load_files_parallel execution time: '
 			msg += calc_time(time.time() - time1) + "\n"
-			log.log_message(msg)
+			print(msg)
 # ---------------------------------------------------------
 		print("load_files_parallel 2")
 	except:
@@ -144,7 +171,7 @@ def load_files_parallel(schema, tbl_list, file_list, dir_processed):
 	return(ret)
 
 # ---------------------------------------------------------
-def get_table_count(tbl_name, tbl_result, cnx=None):
+def get_table_count(db_conf, tbl_name, tbl_result, cnx=None):
 # ---------------------------------------------------------
 	ret = True
 	new_connection = False
@@ -184,11 +211,11 @@ def get_table_count(tbl_name, tbl_result, cnx=None):
 		if present == None:
 			query1 = 'insert INTO ' + tbl_result + ' (tbl_name, ' + schema_tbl + '_records) VALUES (' + tbl_name_short + ', ' + records + ')'
 			cursor1.execute(query1)
-			log.log_message(f'{tbl_name} row count: {records}')
+			print(f'{tbl_name} row count: {records}')
 		else:
 			query1 = 'update ' + tbl_result + ' SET ' + schema_tbl + '_records = ' + records + ' where tbl_name = ' + tbl_name_short
 			cursor1.execute(query1)
-			log.log_message(f'{tbl_name} row count: {records}')
+			print(f'{tbl_name} row count: {records}')
 			query1 = 'update ' + tbl_result + ' SET total_records = COALESCE(' + schema_tbl_result + '_records,0) + COALESCE(' + schema_tbl_result + '_nok_records,0) where tbl_name = ' + tbl_name_short
 			cursor1.execute(query1)
 		cursor1.close()
@@ -206,7 +233,7 @@ def get_table_count(tbl_name, tbl_result, cnx=None):
 	return(ret)	
 	
 # ---------------------------------------------------------
-def get_table_count_parallel(tbl_list, tbl_records):
+def get_table_count_parallel(db_conf, tbl_list, tbl_records):
 # ---------------------------------------------------------
 	ret = True
 
@@ -214,7 +241,7 @@ def get_table_count_parallel(tbl_list, tbl_records):
 		time1 = time.time()
 		print(tbl_list)
 		with ProcessPoolExecutor(int(db_conf['max_workers'])) as executor:
-			futures = [executor.submit(get_table_count, tbl, tbl_records) for tbl in tbl_list]
+			futures = [executor.submit(get_table_count, db_conf, tbl, tbl_records) for tbl in tbl_list]
 			for future in as_completed(futures):
 				if future.result() == False:
 					ret = False
@@ -223,7 +250,7 @@ def get_table_count_parallel(tbl_list, tbl_records):
 		if ret == True:
 			msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] get_table_count_parallel execution time: '
 			msg += calc_time(time.time() - time1) + "\n"
-		log.log_message(msg)
+		print(msg)
 	except:
 		ret = False
 		err = sys.exc_info()
@@ -231,7 +258,7 @@ def get_table_count_parallel(tbl_list, tbl_records):
 	return(ret)	
 
 # ---------------------------------------------------------
-def parse_queries_file(filename, chunk_id=None):
+def parse_queries_file(db_conf, filename, chunk_id=None):
 # ---------------------------------------------------------
 	source_nok_schema = db_conf['source_nok_schema'] if 'source_nok_schema' in db_conf else None
 	source_schema = db_conf['source_schema'] if 'source_schema' in db_conf else None
@@ -264,7 +291,7 @@ def parse_queries_file(filename, chunk_id=None):
 	return(query_list)
 
 # ---------------------------------------------------------
-def execute_query(query, debug = True):
+def execute_query(db_conf, query, debug = True):
 # ---------------------------------------------------------
 	ret = True
 	
@@ -279,12 +306,12 @@ def execute_query(query, debug = True):
 		if debug:
 			time1 = time.time()
 			msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Processing: ' + query.split('\n')[0]
-			log.log_message(msg)
+			print(msg)
 		cursor1.execute(query)
 		if debug:
 			msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Query execution time: '
 			msg += calc_time(time.time() - time1) + "\n"
-			log.log_message(msg)
+			print(msg)
 		cursor1.close()
 		cursor1 = None
 		cnx.close()
@@ -298,15 +325,12 @@ def execute_query(query, debug = True):
 	return(ret)	
 
 # ---------------------------------------------------------
-def execute_multiple_queries(filename, chunk_id = None, cnx = None, commit = True, debug = True, move_files = True):
+def execute_multiple_queries(db_conf, filename, chunk_id = None, cnx = None, commit = True, debug = True, move_files = True):
 # ---------------------------------------------------------
 	ret 			= True
 	new_connection 	= False
 	
 	try:
-#		print(filename)
-#		print(type(filename))
-#		print("")
 		if os.path.isfile(filename):
 			if cnx == None:
 				new_connection = True
@@ -317,21 +341,18 @@ def execute_multiple_queries(filename, chunk_id = None, cnx = None, commit = Tru
 				)
 				cnx.autocommit = commit
 			cursor1 = cnx.cursor()
-			queries = parse_queries_file(filename, chunk_id)
+			queries = parse_queries_file(db_conf, filename, chunk_id)
 			for query in queries:
 				if query != '':
 					if debug:
 						time1 = time.time()
 						msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Processing: ' + query.split('\n')[0]
-						log.log_message(msg)
-	#					log.log_message(query.split('\n')[0])
-	#					log.log_message(query.replace('\r\n', ' '))
+						print(msg)
 					cursor1.execute(query)
 					if debug:
-	#					msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Query execution time: "
 						msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Finished  : ' + query.split('\n')[0] + ' in '
 						msg += calc_time(time.time() - time1) + "\n"
-						log.log_message(msg)
+						print(msg)
 			if move_files == True:
 				dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
 				file_processed = dir_sql_processed + os.path.basename(filename)
@@ -351,16 +372,16 @@ def execute_multiple_queries(filename, chunk_id = None, cnx = None, commit = Tru
 	return(ret)	
 		
 # ---------------------------------------------------------
-def execute_sql_file_parallel(fname, debug = True, move_files = True):
+def execute_sql_file_parallel(db_conf, fname, debug = True, move_files = True):
 # The queries in the file are executed in parallel
 # ---------------------------------------------------------
 	ret = True
 
 	try:
 		time1 = time.time()
-		query_list = parse_queries_file(fname)
+		query_list = parse_queries_file(db_conf, fname)
 		with ProcessPoolExecutor(int(db_conf['max_workers'])) as executor:
-			futures = [executor.submit(execute_query, query, debug) for query in query_list if query != '']
+			futures = [executor.submit(execute_query, db_conf, query, debug) for query in query_list if query != '']
 # Retrieve the results in completion order
 			for future in as_completed(futures):
 				if future.result() == False:
@@ -370,7 +391,7 @@ def execute_sql_file_parallel(fname, debug = True, move_files = True):
 		if ret == True:
 			msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] execute_sql_file_parallel execution time: '
 			msg += calc_time(time.time() - time1) + "\n"
-		log.log_message(msg)
+		print(msg)
 		if move_files == True:
 			dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
 			file_processed = dir_sql_processed + os.path.basename(fname)
@@ -382,7 +403,7 @@ def execute_sql_file_parallel(fname, debug = True, move_files = True):
 	return(ret)	
 
 # ---------------------------------------------------------
-def execute_sql_files_parallel(fname_list, debug = True): 
+def execute_sql_files_parallel(db_conf, fname_list, debug = True): 
 # The sql files are executed in parallel
 # ---------------------------------------------------------
 	ret = True
@@ -392,7 +413,7 @@ def execute_sql_files_parallel(fname_list, debug = True):
 		fname_list = [fname for fname in fname_list if os.path.isfile(fname)]
 		if len(fname_list) > 0:
 			with ProcessPoolExecutor(int(db_conf['max_workers'])) as executor:
-				futures = [executor.submit(execute_multiple_queries, fname, None, None, True, debug) for fname in fname_list]
+				futures = [executor.submit(execute_multiple_queries, db_conf, fname, None, None, True, debug) for fname in fname_list]
 				for future in as_completed(futures):
 					if future.result() == False:
 						ret = False
@@ -401,7 +422,7 @@ def execute_sql_files_parallel(fname_list, debug = True):
 			if ret == True:
 				msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] execute_sql_files_parallel execution time: '
 				msg += calc_time(time.time() - time1) + "\n"
-			log.log_message(msg)
+			print(msg)
 	except:
 		ret = False
 		err = sys.exc_info()
@@ -461,7 +482,7 @@ def execute_unzip_parallel(file_list, extraction_method, extraction_folder):
 		if ret == True:
 			msg = '\n[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Parallel execution time: '
 			msg += calc_time(time.time() - time1) + "\n"
-		log.log_message(msg)
+		print(msg)
 	except:
 		ret = False
 		err = sys.exc_info()
@@ -469,7 +490,7 @@ def execute_unzip_parallel(file_list, extraction_method, extraction_folder):
 	return(ret)	
 
 # ---------------------------------------------------------
-def load_folders(schema, folder):
+def load_folders(db_conf, schema, folder):
 	"Load files from folders into tables"
 # ---------------------------------------------------------
 	ret = True
@@ -540,7 +561,7 @@ def load_folders(schema, folder):
 	return(ret)
 
 # ---------------------------------------------------------
-def load_folders_parallel(schema, folder_list):
+def load_folders_parallel(db_conf, schema, folder_list):
 	"Load files into tables"
 # ---------------------------------------------------------
 	ret = True
@@ -552,16 +573,16 @@ def load_folders_parallel(schema, folder_list):
 # Load files in parallel (all tables), sequentially within each table
 # ---------------------------------------------------------
 		with ProcessPoolExecutor(int(db_conf['max_workers'])) as executor:
-			futures = [executor.submit(load_folders, schema, folder) for folder in folder_list]
+			futures = [executor.submit(load_folders, db_conf, schema, folder) for folder in folder_list]
 			for future in as_completed(futures):
 				if future.result() == False:
 					ret = False
-					log.log_message('load_folders_parallel stopped with errors at ' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
+					print('load_folders_parallel stopped with errors at ' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
 					break
 		if ret == True:
 			msg = '\n[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] load_folders_parallel execution time: '
 			msg += calc_time(time.time() - time1) + "\n"
-			log.log_message(msg)
+			print(msg)
 # ---------------------------------------------------------
 		print("load_folders_parallel 2")
 	except:

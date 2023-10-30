@@ -1,29 +1,26 @@
 db_conf = dict({
-	'username': 'cdm_user',
-	'password': 'cdm_user',
-	'database': 'cdm_aurum_p21_000482',
-	'data_provider': 'cprd',
-	'database_type': 'aurum',
-	'source_release_date': '2022-05-01',
-	'cdm_version': '5.3',
-	'cdm_etl_reference': 'Antonella Delmestri',
+	'username': 'user',
+	'password': 'pwd',
+	'database': 'database_name',
+	'data_provider': 'name_of_provider',	#e.g. 'cprd'
+	'database_type': 'type of database',	#e.g. 'gold, 'aurum', 'hesapc'
+	'source_release_date': 'date',			#e.g. '2022-05-01'
+	'cdm_version': '5.3',					#e.g. '5.3', '5.4'
+	'cdm_etl_reference': 'name of developer',
 	'datestyle': 'ISO,DMY',
 	'source_schema': 'source',
 	'source_nok_schema': 'source_nok',
 	'target_schema': 'public',
-	'vocabulary_schema': 'public',
+	'vocabulary_schema': 'public',			#e.g. 'public', 'vocabulary'
 	'max_workers' : 5,
 	'chunk_size': 1000,
 	'chunk_limit': 0,
 	'dir_processed': '/processed/',
-	'dir_study': 'D:\\cprd\\aurum\\aurum_21_000482\\',
-	'dir_log': 'D:\\cprd\\aurum\\aurum_21_000482\\log',
-	'dir_stcm': 'D:\\cprd\\aurum\\aurum_21_000482\\source_to_concept_map',
-	'dir_source_data': 'D:\\cprd\\aurum\\aurum_21_000482\\data',
-	'dir_lookup': 'D:\\cprd\\aurum\\aurum_21_000482\\lookups',
-	'dir_voc': 'D:\\cprd\\aurum\\aurum_21_000482\\vocabulary',
-#	'medical_dictionary_filename': '202205_EMISMedicalDictionary.txt',
-#	'product_dictionary_filename': '202205_EMISProductDictionary.txt',
+	'dir_log': '<project_directory>\\log',
+	'dir_stcm': '<project_directory>\\source_to_concept_map',
+	'dir_source_data': '<project_directory>\\data',
+	'dir_lookup': '<project_directory>\\lookups',
+	'dir_voc': '<project_directory>\\vocabulary',
 	'tbl_gold': ['additional', 'clinical', 'consultation', 'immunisation', 'patient', 'practice', 'referral', 'staff', 'test', 'therapy'],
 	'tbl_gold_lookup':['batchnumber', 'bnfcodes', 'common_dosages', 'entity', 'medical', 'packtype', 'product', 'scoremethod', 'txtfiles\\*.txt'],
 	'tbl_aurum' : ['practice', 'staff', 'patient', 'consultation', 'observation', 'problem', 'referral', 'drugissue'],
@@ -34,7 +31,4 @@ db_conf = dict({
 	'tbl_cdm_voc': ['drug_strength', 'concept', 'concept_relationship', 'concept_ancestor', 'concept_synonym', 'vocabulary', 'relationship', 'concept_class', 'domain']
 })
 
-
-
-#	'dir_voc': 'D:\\cprd\\gold\\gold_202301\\vocabularies\\',
 

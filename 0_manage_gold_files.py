@@ -8,13 +8,10 @@ import sys
 import time
 import os
 import glob
-from importlib import import_module
 from importlib.machinery import SourceFileLoader
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+#sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 # ---------------------------------------------------------
-db_conf	= import_module('__postgres_db_conf',os.getcwd() + '\\__postgres_db_conf.py').db_conf
-log = import_module('write_log', os.getcwd() + '\\write_log.py').Log('1_manage_gold_files')
-map_util = SourceFileLoader('mapping_util', os.path.dirname(os.path.realpath(__file__)) + '/mapping_util.py').load_module()
+mapping_util = SourceFileLoader('mapping_util', os.path.dirname(os.path.realpath(__file__)) + '/mapping_util.py').load_module()
 # ---------------------------------------------------------
 def sort_dirs(dir_study, dir_downloaded, dir_data):
 	"Create all the necessary directories"
@@ -64,39 +61,51 @@ def sort_dirs(dir_study, dir_downloaded, dir_data):
 # ---------------------------------------------------------
 # MAIN PROGRAM
 # ---------------------------------------------------------
-if __name__ == "__main__":
+def main():
+	ret = True
+	
+	try:
 # ---------------------------------------------------------
 # Define directories
 # ---------------------------------------------------------
-	dir_study = db_conf['dir_study']
-	dir_downloaded = dir_study + '_downloaded\\'
-	dir_data = dir_study + 'data\\'
+		(ret, dir_study, db_conf, debug) = mapping_util.get_parameters()
+		if ret == True and dir_study != '':
+			dir_downloaded = dir_study + '_downloaded\\'
+			dir_data = dir_study + 'data\\'
 # ---------------------------------------------------------
 # Create all necessary folders
 # ---------------------------------------------------------
-	ret = sort_dirs(dir_study, dir_downloaded, dir_data)
+			ret = sort_dirs(dir_study, dir_downloaded, dir_data)
 # ---------------------------------------------------------
 # Unzip files in folders
 # ---------------------------------------------------------
-	if ret == True:
+			if ret == True:
 # ---------------------------------------------------------
 # 7zip command 'e'  = Extract
 # 7zip command 'x'  = eXtract with full paths
-		file_list = sorted(glob.iglob(dir_downloaded + '*.7z'))
-		extraction_method = []
-		extraction_folder = []
-		for fname in file_list:
-			name = os.path.splitext(os.path.basename(fname))[0].lower()
-			if name in db_conf['tbl_gold']:
-				extraction_method.append('x')
-				extraction_folder.append(dir_data)
-			elif name in db_conf['tbl_cprd']:
-				extraction_method.append('x')
-				extraction_folder.append(dir_study)
-			else:
-				extraction_method.append('e')
-				for tbl in db_conf['tbl_gold']: 
-					if name.startswith(tbl):
-						extraction_folder.append(dir_data + tbl)
-						break
-		ret = map_util.execute_unzip_parallel(file_list, extraction_method, extraction_folder)
+				file_list = sorted(glob.iglob(dir_downloaded + '*.7z'))
+				extraction_method = []
+				extraction_folder = []
+				for fname in file_list:
+					name = os.path.splitext(os.path.basename(fname))[0].lower()
+					if name in db_conf['tbl_gold']:
+						extraction_method.append('x')
+						extraction_folder.append(dir_data)
+					elif name in db_conf['tbl_cprd']:
+						extraction_method.append('x')
+						extraction_folder.append(dir_study)
+					else:
+						extraction_method.append('e')
+						for tbl in db_conf['tbl_gold']: 
+							if name.startswith(tbl):
+								extraction_folder.append(dir_data + tbl)
+								break
+				ret = mapping_util.execute_unzip_parallel(file_list, extraction_method, extraction_folder)
+	except:
+		print(str(sys.exc_info()[1]))
+		
+# ---------------------------------------------------------
+# Protect entry point
+# ---------------------------------------------------------
+if __name__ == "__main__":
+	main()
