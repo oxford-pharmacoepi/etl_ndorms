@@ -39,5 +39,7 @@ Run the ETL:
 11.	Run `py 6_build_cdm_era_tbl.py` -F\<full project_directory\>
 12.	Run `py 7_count_cdm_records.py` -F\<full project_directory\>
 13.	If needed, Run `py 8_load_source_denominator.py` -F\<full project_directory\>
-14. Run Achilles
-15. Run DQD
+<br>
+Check the data
+1. Run Achilles
+2. Run DQD
