@@ -48,7 +48,7 @@ cteEndDates (person_id, condition_concept_id, end_date) AS -- the magic
 			-- pad the end dates by 30 to allow a grace period for overlapping ranges.
 			SELECT
 				person_id
-			       	, condition_concept_id
+				, condition_concept_id
 				, condition_end_date + INTERVAL '30 days'
 				, 1 AS event_type
 				, NULL
@@ -61,14 +61,14 @@ cteEndDates (person_id, condition_concept_id, end_date) AS -- the magic
 cteConditionEnds (person_id, condition_concept_id, condition_start_date, era_end_date) AS
 (
 SELECT
-        c.person_id
+	c.person_id
 	, c.condition_concept_id
 	, c.condition_start_date
 	, MIN(e.end_date) AS era_end_date
 FROM cteConditionTarget c
 JOIN cteEndDates e ON c.person_id = e.person_id AND c.condition_concept_id = e.condition_concept_id AND e.end_date >= c.condition_start_date
 GROUP BY
-        c.condition_occurrence_id
+	c.condition_occurrence_id
 	, c.person_id
 	, c.condition_concept_id
 	, c.condition_start_date
