@@ -1,0 +1,4 @@
+--hes_diagnosis_epi
+alter table {SOURCE_SCHEMA}.hes_diagnosis_epi add constraint pk_hes_diagnosis_epi primary key (patid,epikey,epistart,d_order);
+create index idx_hesapc_diagnosis_epi_patid on {SOURCE_SCHEMA}.hes_diagnosis_epi (patid,epikey,epistart,d_order);
+cluster {SOURCE_SCHEMA}.hes_diagnosis_epi using idx_hesapc_diagnosis_epi_patid;

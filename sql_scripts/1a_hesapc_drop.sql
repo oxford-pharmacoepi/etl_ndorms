@@ -1,0 +1,12 @@
+drop table if exists {SOURCE_SCHEMA}.hes_patient CASCADE;
+drop table if exists {SOURCE_SCHEMA}.hes_hospital CASCADE;
+drop table if exists {SOURCE_SCHEMA}.hes_acp CASCADE;
+drop table if exists {SOURCE_SCHEMA}.hes_ccare CASCADE;
+drop table if exists {SOURCE_SCHEMA}.hes_maternity CASCADE;
+drop table if exists {SOURCE_SCHEMA}.hes_hrg CASCADE;
+drop table if exists {SOURCE_SCHEMA}.hes_episodes CASCADE;
+drop table if exists {SOURCE_SCHEMA}.hes_diagnosis_hosp CASCADE;
+drop table if exists {SOURCE_SCHEMA}.hes_primary_diag_hosp CASCADE;
+drop table if exists {SOURCE_SCHEMA}.hes_diagnosis_epi CASCADE;
+drop table if exists {SOURCE_SCHEMA}.hes_procedures_epi CASCADE;
+drop table if exists {SOURCE_SCHEMA}._records CASCADE;
