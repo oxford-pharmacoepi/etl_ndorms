@@ -26,18 +26,17 @@ Run the ETL:
 
 2.	Move the file `__postgres_db_conf.py` to the \<project_directory\>, open it with a plain editor and customise to suit your particular ETL
 3.	Open a new command prompt where you have deployed the python code
-4.	if db_type == 'gold': Run `py 0_manage_gold_files.py` -F\<full project_directory\> 
+4.	if db_type == 'gold': Run `py 0_manage_gold_files.py` -F\<full project_directory\> <br>
 	A full project_directory (e.g. D:\dir1\dir2\dir3\dir4\hesapc) has at least the following subfolders: data, lookups, source_to_concept_map, vocabulary
 5.	Run `py 1_load_source_data.py` -F\<full project_directory\>
 6.	Run `py 2_load_lookup.py` -F\<full project_directory\>
 7.	Run `py 3_load_cdm_vocabulary.py` -F\<full project_directory\>
 8.	if db_type == 'gold': Run CREATE FILE FOR DAYSUPPLY
-9.	if db_type == 'aurum': Run `py 4_map_aurum_in_chunk.py` -F\<full project_directory\>
-	elif db_type == 'hesapc': Run `py 4_map_hesapc_in_chunk.py` -F\<full project_directory\>
+9.	if db_type == 'aurum': Run `py 4_map_aurum_in_chunk.py` -F\<full project_directory\><br>
+	elif db_type == 'hesapc': Run `py 4_map_hesapc_in_chunk.py` -F\<full project_directory\><br>
 	elif db_type == 'gold': Run C\# (Teen)
 10.	Run `py 5_build_cdm_pk_idx.py` -F\<full project_directory\>
 11.	Run `py 6_build_cdm_era_tbl.py` -F\<full project_directory\>
-	Note that you probably only need to run the first two sets of queries for condition_era and drug_era as I don't think dose_era inserts any data for this mapping.
 12.	Run `py 7_count_cdm_records.py` -F\<full project_directory\>
 13.	If needed, Run `py 8_load_source_denominator.py` -F\<full project_directory\>
 14. Run Achilles
