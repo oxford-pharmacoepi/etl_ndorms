@@ -14,7 +14,7 @@ db_conf = dict({
 	'vocabulary_schema': 'public',			#e.g. 'public', 'vocabulary'
 	'max_workers' : 5,
 	'chunk_size': 1000,
-	'chunk_limit': 0,
+	'chunk_limit': 0,						#Do not change below here
 	'dir_processed': '/processed/',
 	'dir_log': '<project_directory>\\log',
 	'dir_stcm': '<project_directory>\\source_to_concept_map',
