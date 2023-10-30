@@ -17,14 +17,14 @@ WITH ctePreDrugTarget(drug_exposure_id, person_id, ingredient_concept_id, drug_e
 	FROM {TARGET_SCHEMA}.drug_exposure d
 	JOIN {VOCABULARY_SCHEMA}.concept_ancestor ca ON ca.descendant_concept_id = d.drug_concept_id
 	JOIN {VOCABULARY_SCHEMA}.concept c ON ca.ancestor_concept_id = c.concept_id
- 	JOIN (SELECT vocabulary_id FROM (VALUES ('RxNorm'), ('RxNorm Extension')) AS voc (vocabulary_id)) as v on c.vocabulary_id = v.vocabulary_id --AD: Added 23/05/2023
-    WHERE --c.vocabulary_id in ('RxNorm', 'RxNorm Extension') --AD: Added "RxNorm Extension" and transformed in a JOIN to avoid OR which is slow 23/05/2023
+	JOIN (SELECT vocabulary_id FROM (VALUES ('RxNorm'), ('RxNorm Extension')) AS voc (vocabulary_id)) as v on c.vocabulary_id = v.vocabulary_id --AD: Added 23/05/2023
+	WHERE --c.vocabulary_id in ('RxNorm', 'RxNorm Extension') --AD: Added "RxNorm Extension" and transformed in a JOIN to avoid OR which is slow 23/05/2023
 	/*AND*/ c.concept_class_id = 'Ingredient'
 	/* Depending on the needs of your data, you can put more filters on to your code. We assign 0 to unmapped drug_concept_id's, and we found data where days_supply was negative.
 	 * We don't want different drugs put in the same era, so the code below shows how we filtered them out.
- 	 * We also don't want negative days_supply, because that will pull our end_date before the start_date due to our second parameter in the COALESCE function.
- 	 * For now, we are filtering those out as well, but this is a data quality issue that we are trying to solve.
- 	 */
+	 * We also don't want negative days_supply, because that will pull our end_date before the start_date due to our second parameter in the COALESCE function.
+	 * For now, we are filtering those out as well, but this is a data quality issue that we are trying to solve.
+	 */
 	AND d.drug_concept_id != 0
 	AND d.days_supply >= 0
 	AND position('vaccine' IN lower(c.concept_name)) = 0 -- do not add vaccines into drug_era
@@ -72,17 +72,17 @@ WITH ctePreDrugTarget(drug_exposure_id, person_id, ingredient_concept_id, drug_e
 , cteDrugExposureEnds (person_id, drug_concept_id, drug_exposure_start_date, drug_sub_exposure_end_date) AS
 (
 	SELECT 
-	       dt.person_id
-	       , dt.ingredient_concept_id
-	       , dt.drug_exposure_start_date
-	       , MIN(e.end_date) AS drug_sub_exposure_end_date
+			dt.person_id
+			, dt.ingredient_concept_id
+			, dt.drug_exposure_start_date
+			, MIN(e.end_date) AS drug_sub_exposure_end_date
 	FROM ctePreDrugTarget dt
 	JOIN cteSubExposureEndDates e ON dt.person_id = e.person_id AND dt.ingredient_concept_id = e.ingredient_concept_id AND e.end_date >= dt.drug_exposure_start_date
 	GROUP BY 
-      	      dt.drug_exposure_id
-      	      , dt.person_id
-	      , dt.ingredient_concept_id
-	      , dt.drug_exposure_start_date
+			  dt.drug_exposure_id
+			, dt.person_id
+			, dt.ingredient_concept_id
+			, dt.drug_exposure_start_date
 )
 --------------------------------------------------------------------------------------------------------------
 , cteSubExposures(row_number, person_id, drug_concept_id, drug_sub_exposure_start_date, drug_sub_exposure_end_date, drug_exposure_count) AS
@@ -168,7 +168,7 @@ SELECT
 FROM cteFinalTarget ft
 JOIN cteEndDates e ON ft.person_id = e.person_id AND ft.ingredient_concept_id = e.ingredient_concept_id AND e.end_date >= ft.drug_sub_exposure_start_date
 GROUP BY 
-      	ft.person_id
+	  	ft.person_id
 	, ft.ingredient_concept_id
 	, ft.drug_sub_exposure_start_date
 	, ft.drug_exposure_count
