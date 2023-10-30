@@ -250,6 +250,8 @@ def main():
 			database_type = db_conf['database_type']
 			dir_sql = os.getcwd() + '\\sql_scripts\\'
 			dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
+			if not os.path.exists(dir_sql_processed):
+				os.makedirs(dir_sql_processed)
 			dir_voc = db_conf['dir_voc'] + "\\"
 			dir_voc_processed = db_conf['dir_voc'] + db_conf['dir_processed']
 			dir_stcm = db_conf['dir_stcm'] + "\\"	
