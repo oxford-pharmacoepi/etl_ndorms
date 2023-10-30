@@ -13,9 +13,6 @@ def build_fk(dir_code):
 	ret = True
 
 	try:
-		processed_folder = dir_code + "processed\\"
-		if not os.path.exists(processed_folder):
-			os.makedirs(processed_folder)
 		plist = []
 		plist.append(dir_code + "5b_cdm_fk_care_site__concept.sql")
 		plist.append(dir_code + "5b_cdm_fk_person__provider.sql")
@@ -76,6 +73,9 @@ def main():
 		if ret == True and dir_study != '':
 			time0 = time.time()
 			dir_code = os.getcwd() + "\\sql_scripts\\"
+			processed_folder = dir_code + "processed\\"
+			if not os.path.exists(processed_folder):
+				os.makedirs(processed_folder)
 # ---------------------------------------------------------
 # Build PKs & IDXs
 # ---------------------------------------------------------
