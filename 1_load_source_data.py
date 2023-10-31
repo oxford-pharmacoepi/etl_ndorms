@@ -81,11 +81,13 @@ def main():
 			time0 = time.time()
 			database_type = db_conf['database_type']
 			source_schema = db_conf['source_schema']
-			dir_source_files = dir_study + 'data\\'
+			dir_source_files = dir_study + '\\data\\'
 			tbl_db = 'tbl_' + database_type
 			tbl_db_list =  [source_schema + "." + tbl for tbl in db_conf[tbl_db]]
 			dir_sql = os.getcwd() + '\\sql_scripts\\'
 			dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
+			if not os.path.exists(dir_sql_processed):
+				os.makedirs(dir_sql_processed)
 # ---------------------------------------------------------
 # Create the schemas
 # ---------------------------------------------------------
@@ -143,7 +145,7 @@ def main():
 					sql_file_list = sorted(glob.iglob(dir_sql + '1c_' + database_type + '_pk_idx_*.sql'))
 					ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, True)
 					if ret == True:
-						task_finished = "Finished adding ' + database_type.upper() + ' PKs/indexes in {0}".format(mapping_util.calc_time(time.time() - time1))
+						task_finished = 'Finished adding PKs/indexes to ' + database_type.upper() + ' in {0}'.format(mapping_util.calc_time(time.time() - time1))
 						print(task_finished)
 # ---------------------------------------------------------
 # Check for curation
