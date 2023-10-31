@@ -18,6 +18,7 @@ def main():
 		(ret, dir_study, db_conf, debug) = mapping_util.get_parameters()
 		if ret == True and dir_study != '':
 			time0 = time.time()
+			database_type = db_conf['database_type']
 			dir_code = os.getcwd() + "\\sql_scripts\\"
 # ---------------------------------------------------------
 # Create/Recreate CDM tables? Parallel execution of queries in the file - Ask the user for DROP confirmation
@@ -38,27 +39,28 @@ def main():
 					print('Calling ' + fname + ' ...')
 					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
 # ---------------------------------------------------------
-# Tables to load: LOCATION, CARE_SITE, PROVIDER, PERSON, DEATH, OBSERVATION_PERIOD
+# Tables to load: PERSON,OBSERVATION_PERIOD, etc.
 # ---------------------------------------------------------
 			if ret == True:
-				start_mapping = input('Do you want to map the simple tables: LOCATION, CARE_SITE, PROVIDER, PERSON, DEATH, OBSERVATION_PERIOD (y/n):').lower()
+				start_mapping = input('Do you want to map the simple tables: PERSON, OBSERVATION_PERIOD, etc. (y/n):').lower()
 				while start_mapping not in ['y', 'n', 'yes', 'no']:
 					start_mapping = input('I did not understand that. Do you want to map the simple tables: LOCATION, CARE_SITE, PROVIDER, PERSON, DEATH, OBSERVATION_PERIOD (y/n):') 
 				if start_mapping in ['y', 'yes']:
-					fname = dir_code + '4c_aurum_map_tbl_simple.sql'
-					print('Executing ' + fname + ' ... (LOCATION, CARE_SITE, PROVIDER, PERSON, DEATH, OBSERVATION_PERIOD)')
+					fname = dir_code + '4c_' + database_type + '_map_tbl_simple.sql'
+					print('Executing ' + fname + ' ... (PERSON,OBSERVATION_PERIOD, etc.)')
 					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
 # ---------------------------------------------------------
 # Tables to load: TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL
 # ---------------------------------------------------------
 			if ret == True:
-				reset_tbls_tmp = input('Do you want to CREATE/RECREATE the temp tables (temp_concept_map, temp_drug_concept_map, temp_visit_detail)? (y/n):').lower() 
-				while reset_tbls_tmp not in ['y', 'n', 'yes', 'no']:
-					reset_tbls_tmp = input('I did not understand that. Do you want to CREATE/RECREATE the temp tables (temp_concept_map, temp_drug_concept_map, temp_visit_detail? (y/n):').lower()
-				if reset_tbls_tmp in ['y', 'yes']:
-					fname = dir_code + '4d_aurum_map_tbl_tmp.sql'
-					print('Executing ' + fname + ' ... (temp_concept_map, temp_drug_concept_map, temp_visit_detail)')
-					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
+				if database_type == 'aurum':
+					reset_tbls_tmp = input('Do you want to CREATE/RECREATE the temp tables (temp_concept_map, temp_drug_concept_map, temp_visit_detail)? (y/n):').lower() 
+					while reset_tbls_tmp not in ['y', 'n', 'yes', 'no']:
+						reset_tbls_tmp = input('I did not understand that. Do you want to CREATE/RECREATE the temp tables (temp_concept_map, temp_drug_concept_map, temp_visit_detail? (y/n):').lower()
+					if reset_tbls_tmp in ['y', 'yes']:
+						fname = dir_code + '4d_' + database_type + '_map_tbl_tmp.sql'
+						print('Executing ' + fname + ' ... (temp_concept_map, temp_drug_concept_map, temp_visit_detail)')
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
 # ---------------------------------------------------------
 # Tables to load: VISIT_OCCURRENCE, VISIT_DETAIL
 # ---------------------------------------------------------
@@ -67,7 +69,7 @@ def main():
 				while reset_tbls_visit not in ['y', 'n', 'yes', 'no']:
 					reset_tbls_visit = input('I did not understand that. Do you want to CREATE/RECREATE the visit tables (visit_occurrence, visit_detail)? (y/n):').lower()
 				if reset_tbls_visit in ['y', 'yes']:
-					fname = dir_code + '4e_aurum_map_tbl_visit.sql'
+					fname = dir_code + '4e_' + database_type + '_map_tbl_visit.sql'
 					print('Executing ' + fname + ' ... (visit_occurrence, visit_detail)')
 					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
 # ---------------------------------------------------------
@@ -87,6 +89,7 @@ def main():
 # ---------------------------------------------------------
 				vocabulary_schema = db_conf['vocabulary_schema']
 				target_schema = db_conf['target_schema']
+				chunk_schema = db_conf['chunk_schema']
 				source_release_date = db_conf['source_release_date']
 				cdm_etl_reference = db_conf['cdm_etl_reference']
 				cdm_version = db_conf['cdm_version']
@@ -118,25 +121,29 @@ def main():
 # ---------------------------------------------------------
 # Delete possible old stem_source_x and stem_x tables
 # ---------------------------------------------------------
-					(ret, exist) = mapping_util.does_tbl_exist(cnx, "chunks.chunk")
+					(ret, exist) = mapping_util.does_tbl_exist(cnx, chunk_schema + '.chunk')
 					if ret == True and exist == True:
-						query1 = f'SELECT stem_source_tbl, stem_tbl FROM chunks.chunk WHERE completed = 1'
+						query1 = 'SELECT stem_source_tbl, stem_tbl FROM ' + chunk_schema + '.chunk WHERE completed = 1'
 						cursor1.execute(query1)
 						tbl_array = cursor1.fetchall()
 						stem_source_list = list(map(lambda x: x[0], tbl_array))
 						stem_list = list(map(lambda x: x[1], tbl_array))
 						for tbl_id in range(0,len(stem_source_list)):
-							query1 = f'DROP TABLE IF EXISTS chunks.' + stem_source_list[tbl_id];
+							query1 = 'DROP TABLE IF EXISTS ' + chunk_schema + '.' + stem_source_list[tbl_id];
 							cursor1.execute(query1)
 							if stem_list[tbl_id] != None:
-								query1 = f'DROP TABLE IF EXISTS chunks.' + stem_list[tbl_id];
+								query1 = 'DROP TABLE IF EXISTS ' + chunk_schema + '.' + stem_list[tbl_id];
 								cursor1.execute(query1)
-					fname = dir_code + '4f_aurum_map_tbl_chunk.sql'
+					fname = dir_code + '4f_' + database_type + '_map_tbl_chunk.sql'
 					print('Executing ' + fname + ' ... (CHUNK)')
 					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
 # Necessary to recall 4b here if the CDM tables were deleted
 					if ret == True:
-						fname = dir_code + '4b_OMOP CDM postgresql v5_3_1 ddl.sql'
+						cdm_version = db_conf['cdm_version']
+						if cdm_version == '5.3':
+							fname = dir_code + '4b_OMOPCDM_postgresql_5_3_ddl.sql'
+						elif cdm_version == '5.4':
+							fname = dir_code + '4b_OMOPCDM_postgresql_5_4_ddl.sql'
 						print('Calling ' + fname + ' ...')
 						ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
 # ---------------------------------------------------------
@@ -152,7 +159,7 @@ def main():
 # ---------------------------------------------------------
 					cnx.autocommit = False
 					chunks_time1 = time.time()
-					query1 = f'SELECT distinct chunk_id FROM chunks.chunk where completed = 0 order by chunk_id'
+					query1 = 'SELECT distinct chunk_id FROM ' + chunk_schema + '.chunk where completed = 0 order by chunk_id'
 					chunk_limit = db_conf['chunk_limit']
 					if chunk_limit > 0:
 						query1 += ' limit ' + str(chunk_limit)
@@ -163,24 +170,29 @@ def main():
 # ---------------------------------------------------------
 # Loop through the chunks executing 4g, 4h and 4i each time before commit
 # ---------------------------------------------------------
+					move_files = False
 					for chunk_id in chunk_id_list:
 						print(f'Executing chunk {str(chunk_id)} / {str(chunk_id_list[-1])}')
 						chunk_time1 = time.time()
-						fname = dir_code + '4g_aurum_map_tbl_stem_source.sql'
+						if chunk_id == chunk_id_list[-1]:
+							move_files = True
+						fname = dir_code + '4g_' + database_type + '_map_tbl_stem_source.sql'
 						print('Executing ' + fname + ' ... (STEM_SOURCE)')
-						ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug)
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
 						if ret == True:
-							fname = dir_code + '4h_aurum_map_tbl_stem.sql'
+							fname = dir_code + '4h_' + database_type + '_map_tbl_stem.sql'
 							print('Executing ' + fname + ' ... (STEM)')
-							ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug)
+							ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
 						if ret == True:
-							fname = dir_code + '4i_aurum_map_tbl_cdm.sql'
+							fname = dir_code + '4i_' + database_type + '_map_tbl_cdm.sql'
 							print('Executing ' + fname + ' ... (CONDITION_OCCURRENCE, DRUG_EXPOSURE, DEVICE_EXPOSURE, PROCEDURE_OCCURRENCE, MEASUREMENT, OBSERVATION)')
-							ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug)
+							ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
 						if ret == True:
 							cnx.commit()
 							msg = mapping_util.calc_time(time.time() - chunk_time1)
 							print(f'Chunk {str(chunk_id)} finished in {msg}')
+						if ret == False:
+							break
 					if ret == True:
 						msg = mapping_util.calc_time(time.time() - chunks_time1)
 						print(f'Full CHUNK process completed in {msg}')
