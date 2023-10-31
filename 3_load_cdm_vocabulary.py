@@ -263,16 +263,16 @@ def main():
 	
 	try:
 		(ret, dir_study, db_conf, debug) = mapping_util.get_parameters()
-		if ret == True and dir_study != '':                                     
-		vocabulary_schema = db_conf['vocabulary_schema']
-		database_type = db_conf['database_type']
-		dir_sql = os.getcwd() + '\\sql_scripts\\'
-		dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
-        if not os.path.exists(dir_sql_processed):
+		if ret == True and dir_study != '':
+			vocabulary_schema = db_conf['vocabulary_schema']
+			database_type = db_conf['database_type']
+			dir_sql = os.getcwd() + '\\sql_scripts\\'
+			dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
+			if not os.path.exists(dir_sql_processed):
 				os.makedirs(dir_sql_processed)                                                           
-		dir_voc = db_conf['dir_voc'] + "\\"		#study_directory + "vocabulary\\"
-		dir_voc_processed = db_conf['dir_voc'] + db_conf['dir_processed']
-		dir_stcm = db_conf['dir_stcm'] + "\\"	
+			dir_voc = db_conf['dir_voc'] + "\\"		#study_directory + "vocabulary\\"
+			dir_voc_processed = db_conf['dir_voc'] + db_conf['dir_processed']
+			dir_stcm = db_conf['dir_stcm'] + "\\"	
 # ---------------------------------------------------------
 # Drop vocabularies tables - Parallel execution of queries in the file - Ask the user for DROP confirmation
 # ---------------------------------------------------------
