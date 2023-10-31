@@ -87,6 +87,7 @@ def populate_tbl_lookup_gold(dir_files):
 # ---------------------------------------------------------
 def main():
 	ret = True
+	global db_conf
 
 	try:
 		(ret, dir_study, db_conf, debug) = mapping_util.get_parameters()

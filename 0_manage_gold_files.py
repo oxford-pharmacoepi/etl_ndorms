@@ -63,6 +63,7 @@ def sort_dirs(dir_study, dir_downloaded, dir_data):
 # ---------------------------------------------------------
 def main():
 	ret = True
+	global db_conf
 	
 	try:
 # ---------------------------------------------------------

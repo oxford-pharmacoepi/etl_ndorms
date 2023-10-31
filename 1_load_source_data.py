@@ -73,6 +73,7 @@ def is_curation_needed_gold(tbl_patient):
 # ---------------------------------------------------------
 def main():
 	ret = True
+	global db_conf
 
 	try:
 		(ret, dir_study, db_conf, debug) = mapping_util.get_parameters()

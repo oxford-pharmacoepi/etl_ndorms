@@ -67,6 +67,7 @@ def build_fk(dir_code):
 # ---------------------------------------------------------
 def main():
 	ret = True
+	global db_conf
 	
 	try:
 		(ret, dir_study, db_conf, debug) = mapping_util.get_parameters()
