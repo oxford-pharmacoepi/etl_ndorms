@@ -376,7 +376,7 @@ def main():
 				while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
 					load_tbls = input('I did not understand that. Are you sure you want to update STCM including deletion (y/n):') 
 				if load_tbls.lower() in ['y', 'yes']:
-					fname = dir_sql + '3f_check_stcm.sql'
+					fname = dir_sql + '3g_update_stcm.sql'
 					print('Calling ' + fname + ' ...')
 					for fcsv in glob.iglob(dir_stcm + "suggestion\\" + '*_update.csv'):
 						ret = update_stcm(fname, fcsv, False)
