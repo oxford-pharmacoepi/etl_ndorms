@@ -268,9 +268,16 @@ def main():
 			database_type = db_conf['database_type']
 			dir_sql = os.getcwd() + '\\sql_scripts\\'
 			dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
+			if not os.path.exists(dir_sql_processed):
+				os.makedirs(dir_sql_processed)
 			dir_voc = db_conf['dir_voc'] + "\\"
 			dir_voc_processed = db_conf['dir_voc'] + db_conf['dir_processed']
+			if not os.path.exists(dir_voc_processed):
+				os.makedirs(dir_voc_processed)
 			dir_stcm = db_conf['dir_stcm'] + "\\"	
+			dir_stcm_processed = db_conf['dir_stcm'] + db_conf['dir_processed']
+			if not os.path.exists(dir_stcm_processed):
+				os.makedirs(dir_stcm_processed)
 # ---------------------------------------------------------
 # Drop vocabularies tables - Parallel execution of queries in the file - Ask the user for DROP confirmation
 # ---------------------------------------------------------
@@ -298,8 +305,6 @@ def main():
 					if ret == True:
 						tbl_cdm_voc = [tbl for tbl in db_conf['tbl_cdm_voc']]
 						file_list = [[dir_voc + tbl + '.csv'] for tbl in tbl_cdm_voc]
-						if not os.path.exists(dir_voc_processed):
-							os.makedirs(dir_voc_processed)
 						ret = mapping_util.load_files_parallel(db_conf, vocabulary_schema, tbl_cdm_voc, file_list, dir_voc_processed)
 						if ret == True:
 							print('Finished loading cdm vocabulary.')
@@ -348,7 +353,7 @@ def main():
 # CHECK STCM 
 # ---------------------------------------------------------
 		if ret == True:
-			load_tbls = input('Are you sure you want to CHECKING ALL STCMs (y/n):') 
+			load_tbls = input('Are you sure you want to CHECK ALL STCMs (y/n):') 
 			while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
 				load_tbls = input('I did not understand that. Are you sure you want to CHECKING ALL STCMs (y/n):') 
 			if load_tbls.lower() in ['y', 'yes']:
@@ -372,9 +377,9 @@ def main():
 				break
 	
 			if found == True:
-				load_tbls = input('Are you sure you want to update STCM including deletion (y/n):') 
+				load_tbls = input('Are you sure you want to UPDATE STCMs including deletion (y/n):') 
 				while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-					load_tbls = input('I did not understand that. Are you sure you want to update STCM including deletion (y/n):') 
+					load_tbls = input('I did not understand that. Are you sure you want to UPDATE STCMs including deletion (y/n):') 
 				if load_tbls.lower() in ['y', 'yes']:
 					fname = dir_sql + '3g_update_stcm.sql'
 					print('Calling ' + fname + ' ...')
@@ -382,16 +387,15 @@ def main():
 						ret = update_stcm(fname, fcsv, False)
 						if ret == False:
 							break
-
-					fname = dir_sql + '3h_delete_stcm.sql'
-					print('Calling ' + fname + ' ...')
-					for fcsv in glob.iglob(dir_stcm + "suggestion\\" + '*_delete.csv'):
-						ret = update_stcm(fname, fcsv, False)
-						if ret == False:
-							break
-
 					if ret == True:
-						print('Finished updating STCM (including deletion).')
+						fname = dir_sql + '3h_delete_stcm.sql'
+						print('Calling ' + fname + ' ...')
+						for fcsv in glob.iglob(dir_stcm + "suggestion\\" + '*_delete.csv'):
+							ret = update_stcm(fname, fcsv, False)
+							if ret == False:
+								break
+					if ret == True:
+						print('Finished updating STCMs (including deletion).')
 # ---------------------------------------------------------
 # RENAME OLD STCM
 # ---------------------------------------------------------
@@ -402,12 +406,11 @@ def main():
 				dist_csv_file_list.append(re.sub("_update.csv|_delete.csv\Z", "", os.path.basename(f)))
 
 			dist_csv_file_list = dict.fromkeys(dist_csv_file_list) #remove duplicated stcm fname
-
 			if dist_csv_file_list:
 				for fstcm in dist_csv_file_list:
-					stcm_file = db_conf['dir_stcm'] + '\\' + fstcm + ".csv"
-					old_stcm_file = db_conf['dir_stcm'] + '\\old\\' + fstcm + "_old.csv"
-					os.rename(stcm_file,  old_stcm_file)
+					stcm_file = dir_stcm + fstcm + ".csv"
+					old_stcm_file = dir_stcm + 'old\\' + fstcm + "_old.csv"
+					os.rename(stcm_file, old_stcm_file)
 					print('Renamed and moved ' + fstcm)
 # ---------------------------------------------------------
 # GENERATE NEW STCM 
@@ -418,7 +421,11 @@ def main():
 					ret = generate_new_stcm(fname, fstcm, True)
 					if ret == False:
 						break
-				print('Finished generating new STCM')
+				if ret == True:
+					for fstcm in glob.iglob(dir_stcm + '*_STCM.csv'):
+						file_processed = dir_stcm_processed + os.path.basename(fstcm)
+						os.rename(fstcm, file_processed)
+					print('Finished generating new STCM')
 # ---------------------------------------------------------
 # Move CODE to the processed directory?
 # ---------------------------------------------------------
