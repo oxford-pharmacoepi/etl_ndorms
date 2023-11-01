@@ -93,6 +93,8 @@ def main():
 		(ret, dir_study, db_conf, debug) = mapping_util.get_parameters()
 		if ret == True and dir_study != '':
 			database_type = db_conf['database_type']
+			if database_type[:3].upper() == 'HES':
+				database_type = 'hes'
 			source_schema = db_conf['source_schema']
 			dir_sql = os.getcwd() + '\\sql_scripts\\'
 			dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
@@ -104,7 +106,7 @@ def main():
 				os.makedirs(dir_lookup_processed)
 			fname = dir_sql + '2a_' + database_type + '_lookup_drop.sql'
 			if os.path.isfile(fname) == False:
-				print('No lookup files to process for ' + database_type + ' dataset')
+				print('No lookup files to process for ' + database_type.upper() + ' dataset')
 			else:
 # ---------------------------------------------------------
 # Drop LOOKUP tables - Parallel execution of queries in the file - Ask the user for DROP confirmation
@@ -133,7 +135,7 @@ def main():
 						if ret == True:
 							tbl_lookup = 'tbl_' + database_type + '_lookup'
 							tbl_lookup_list =  [tbl for tbl in db_conf[tbl_lookup]]
-							file_lookup_list = [[dir_lookup + '*' + tbl + '.txt'] for tbl in tbl_lookup_list]
+							file_lookup_list = [[dir_lookup + '*' + tbl + '*.txt'] for tbl in tbl_lookup_list]
 							if not os.path.exists(dir_lookup_processed):
 								os.makedirs(dir_lookup_processed)
 							ret = mapping_util.load_files_parallel(db_conf, source_schema, tbl_lookup_list, file_lookup_list, dir_lookup_processed)
