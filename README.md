@@ -1,4 +1,4 @@
-How to run the ETL for OMOP CDM with Python and Postgresql
+How to run the ETL for OMOP CDM 5.3 for Windows in Python (v. 3.2 onwards) using Postgresql
 
 First time setup:
 1. If you don't already have it, download the latest version of python 3.x from https://www.python.org/downloads/ and add the path to the directory containing the python executables to your environment variables.
@@ -32,9 +32,8 @@ Run the ETL:
 6.	Run `py 2_load_lookup.py` -F\<full project_directory\>
 7.	Run `py 3_load_cdm_vocabulary.py` -F\<full project_directory\>
 8.	if db_type == 'gold': Run CREATE FILE FOR DAYSUPPLY
-9.	if db_type == 'aurum': Run `py 4_map_aurum_in_chunk.py` -F\<full project_directory\><br>
-	elif db_type == 'hesapc': Run `py 4_map_hesapc_in_chunk.py` -F\<full project_directory\><br>
-	elif db_type == 'gold': Run C\# (Teen)
+9.	if db_type == 'gold': Run C\# (Teen)<br>
+	else Run `py 4_map_source_in_chunk.py` -F\<full project_directory\><br>
 10.	Run `py 5_build_cdm_pk_idx.py` -F\<full project_directory\>
 11.	Run `py 6_build_cdm_era_tbl.py` -F\<full project_directory\>
 12.	Run `py 7_count_cdm_records.py` -F\<full project_directory\>
