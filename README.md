@@ -25,7 +25,7 @@ Run the ETL:
 	CONNECTION LIMIT = -1
 	IS_TEMPLATE = False;-->
 
-2.	Move the file `__postgres_db_conf.py` to the \<project_directory\>, open it with a plain editor and customise to suit your particular ETL
+2.	Move the file `__postgres_db_conf.py` to the \<full project_directory\>, open it with a plain editor and customise to suit your particular ETL
 3.	Open a new command prompt where you have deployed the python code
 4.	if db_type == 'gold': Run `py 0_manage_gold_files.py` -F\<full project_directory\> <br><br>
 	A full project_directory (e.g. D:\dir1\dir2\dir3\dir4\hesapc) has at least the following subfolders: data, lookups, source_to_concept_map, vocabulary
