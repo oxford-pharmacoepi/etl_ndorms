@@ -111,10 +111,10 @@ def main():
 # ---------------------------------------------------------
 # Drop LOOKUP tables - Parallel execution of queries in the file - Ask the user for DROP confirmation
 # ---------------------------------------------------------
-				drop_tbls = input('Are you sure you want to DROP all the ' + database_type.upper() + ' LOOKUP tables (y/n):') 
-				while drop_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-					drop_tbls = input('I did not understand that. Are you sure you want to DROP all the ' + database_type.upper() + ' LOOKUP tables (y/n):') 
-				if drop_tbls.lower() in ['y', 'yes']:
+				qa = input('Are you sure you want to DROP all the ' + database_type.upper() + ' LOOKUP tables (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Are you sure you want to DROP all the ' + database_type.upper() + ' LOOKUP tables (y/n):') 
+				if qa.lower() in ['y', 'yes']:
 					fname = dir_sql + '2a_' + database_type + '_lookup_drop.sql'
 					print('Calling ' + fname + ' ...')
 					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
@@ -122,10 +122,10 @@ def main():
 # Create LOOKUP tables - Parallel execution of queries in the file - Ask the user for CREATE/LOAD confirmation
 # ---------------------------------------------------------
 				if ret == True:
-					load_tbls = input('Are you sure you want to CREATE/LOAD all the ' + database_type.upper() + ' LOOKUP tables (y/n):') 
-					while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-						load_tbls = input('I did not understand that. Are you sure you want to CREATE/LOAD all the ' + database_type.upper() + ' LOOKUP tables (y/n):') 
-					if load_tbls.lower() in ['y', 'yes']:
+					qa = input('Are you sure you want to CREATE/LOAD all the ' + database_type.upper() + ' LOOKUP tables (y/n):') 
+					while qa.lower() not in ['y', 'n', 'yes', 'no']:
+						qa = input('I did not understand that. Are you sure you want to CREATE/LOAD all the ' + database_type.upper() + ' LOOKUP tables (y/n):') 
+					if qa.lower() in ['y', 'yes']:
 						fname = dir_sql + '2b_' + database_type + '_lookup_create.sql'
 						print('Calling ' + fname + ' ...')
 						ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
@@ -152,10 +152,10 @@ def main():
 # Create LOOKUP PK, indexes - Sequential execution (could be parallel, but the time saving would be irrilevant)
 # ---------------------------------------------------------
 				if ret == True:
-					load_tbls = input('Are you sure you want to CREATE PK/IDXs for all the LOOKUP tables (y/n):') 
-					while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-						load_tbls = input('I did not understand that. Are you sure you want to CREATE PK/IDXs for all the LOOKUP tables (y/n):') 
-					if load_tbls.lower() in ['y', 'yes']:
+					qa = input('Are you sure you want to CREATE PK/IDXs for all the LOOKUP tables (y/n):') 
+					while qa.lower() not in ['y', 'n', 'yes', 'no']:
+						qa = input('I did not understand that. Are you sure you want to CREATE PK/IDXs for all the LOOKUP tables (y/n):') 
+					if qa.lower() in ['y', 'yes']:
 						fname = dir_sql + '2c_' + database_type + '_lookup_pk_idx.sql'
 						print(fname + ' ...')
 						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
@@ -165,10 +165,10 @@ def main():
 # Move CODE to the processed directory?
 # ---------------------------------------------------------
 				if ret == True:
-					load_tbls = input('Are you sure you want to MOVE all the lookup CODE in the "processed" folder (y/n):') 
-					while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-						load_tbls = input('I did not understand that. Are you sure you want to MOVE all the lookup CODE in the "processed" folder (y/n):') 
-					if load_tbls.lower() in ['y', 'yes']:
+					qa = input('Are you sure you want to MOVE all the lookup CODE in the "processed" folder (y/n):') 
+					while qa.lower() not in ['y', 'n', 'yes', 'no']:
+						qa = input('I did not understand that. Are you sure you want to MOVE all the lookup CODE in the "processed" folder (y/n):') 
+					if qa.lower() in ['y', 'yes']:
 						for f in glob.iglob(dir_sql + '2*.sql'):
 							file_processed = dir_sql_processed + os.path.basename(f)
 							os.rename(f, file_processed)

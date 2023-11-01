@@ -73,30 +73,30 @@ def main():
 		(ret, dir_study, db_conf, debug) = mapping_util.get_parameters()
 		if ret == True and dir_study != '':
 			time0 = time.time()
-			dir_code = os.getcwd() + "\\sql_scripts\\"
-			processed_folder = dir_code + "processed\\"
+			dir_sql = os.getcwd() + "\\sql_scripts\\"
+			processed_folder = dir_sql + "processed\\"
 			if not os.path.exists(processed_folder):
 				os.makedirs(processed_folder)
 # ---------------------------------------------------------
 # Build PKs & IDXs
 # ---------------------------------------------------------
-			pk_idx_tbls = input('Are you sure you want to CREATE PK/IDX on all cdm tables (y/n):') 
-			while pk_idx_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-				pk_idx_tbls = input('I did not understand that. Are you sure you want to CREATE PK/IDX on all cdm tables (y/n):') 
-			if pk_idx_tbls.lower() in ['y', 'yes']:
+			qa = input('Are you sure you want to CREATE PK/IDX on all cdm tables (y/n):') 
+			while qa.lower() not in ['y', 'n', 'yes', 'no']:
+				qa = input('I did not understand that. Are you sure you want to CREATE PK/IDX on all cdm tables (y/n):') 
+			if qa.lower() in ['y', 'yes']:
 				print('Build PKs and IDXs ...')
-				sql_file_list = sorted(glob.iglob(dir_code + '5a_cdm_pk_idx_*.sql'))
+				sql_file_list = sorted(glob.iglob(dir_sql + '5a_cdm_pk_idx_*.sql'))
 				ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, True)
 			if ret == True:
 # ---------------------------------------------------------
 # Build FK
 # ---------------------------------------------------------
-				fk_tbls = input('Are you sure you want to CREATE FK on all cdm tables (y/n):') 
-				while fk_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-					fk_tbls = input('I did not understand that. Are you sure you want to CREATE FK on all cdm tables (y/n):') 
-				if fk_tbls.lower() in ['y', 'yes']:
+				qa = input('Are you sure you want to CREATE FK on all cdm tables (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Are you sure you want to CREATE FK on all cdm tables (y/n):') 
+				if qa.lower() in ['y', 'yes']:
 					print('Build FKs ...')
-					ret = build_fk(dir_code)
+					ret = build_fk(dir_sql)
 					if ret == True:
 						print('Finished building FK')	
 # ---------------------------------------------------------

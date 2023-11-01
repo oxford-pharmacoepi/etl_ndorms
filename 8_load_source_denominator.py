@@ -28,10 +28,10 @@ def main():
 # ---------------------------------------------------------
 # Ask the user for DROP confirmation
 # ---------------------------------------------------------
-			drop_tbls = input('Are you sure you want to DROP the ' + database_type.upper() + ' denominators tables (y/n):') 
-			while drop_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-				drop_tbls = input('I did not understand that. Are you sure you want to DROP the ' + database_type.upper() + ' denominators tables (y/n):') 
-			if drop_tbls.lower() in ['y', 'yes']:
+			qa = input('Are you sure you want to DROP the ' + database_type.upper() + ' denominators tables (y/n):') 
+			while qa.lower() not in ['y', 'n', 'yes', 'no']:
+				qa = input('I did not understand that. Are you sure you want to DROP the ' + database_type.upper() + ' denominators tables (y/n):') 
+			if qa.lower() in ['y', 'yes']:
 				fname = dir_sql + '7a_' + database_type + '_denom_drop.sql'
 				print('Calling ' + fname + ' ...')
 				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
@@ -39,10 +39,10 @@ def main():
 # ---------------------------------------------------------
 # Ask the user for LOAD confirmation
 # ---------------------------------------------------------
-				load_tbls = input('Are you sure you want to CREATE/LOAD the ' + database_type.upper() + ' denominators tables (y/n):') 
-				while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-					load_tbls = input('I did not understand that. Are you sure you want to CREATE/LOAD all the ' + database_type.upper() + ' denominators tables (y/n):') 
-				if load_tbls.lower() in ['y', 'yes']:
+				qa = input('Are you sure you want to CREATE/LOAD the ' + database_type.upper() + ' denominators tables (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Are you sure you want to CREATE/LOAD all the ' + database_type.upper() + ' denominators tables (y/n):') 
+				if qa.lower() in ['y', 'yes']:
 # ---------------------------------------------------------
 # Create denominators tables
 # ---------------------------------------------------------
@@ -65,10 +65,10 @@ def main():
 # Ask the user for PK/IDX creation confirmation
 # ---------------------------------------------------------
 			if ret == True:
-				load_tbls = input('Are you sure you want to CREATE PK/IDXs on the ' + database_type.upper() + ' denominators tables (y/n):') 
-				while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-					load_tbls = input('Are you sure you want to CREATE PK/IDXs on all the ' + database_type.upper() + ' denominators tables (y/n):') 
-				if load_tbls.lower() in ['y', 'yes']:
+				qa = input('Are you sure you want to CREATE PK/IDXs on the ' + database_type.upper() + ' denominators tables (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('Are you sure you want to CREATE PK/IDXs on all the ' + database_type.upper() + ' denominators tables (y/n):') 
+				if qa.lower() in ['y', 'yes']:
 # ---------------------------------------------------------
 # Build PKs & IDXs
 # ---------------------------------------------------------
@@ -81,10 +81,10 @@ def main():
 # Ask the user for RECORD COUNTS confirmation
 # ---------------------------------------------------------
 			if ret == True:
-				load_tbls = input('Are you sure you want to COUNT the records for all the ' + database_type.upper() + ' tables (y/n):') 
-				while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-					load_tbls = input('Are you sure you want to COUNT the records for all the ' + database_type.upper() + ' tables (y/n):') 
-				if load_tbls.lower() in ['y', 'yes']:
+				qa = input('Are you sure you want to COUNT the records for all the ' + database_type.upper() + ' tables (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('Are you sure you want to COUNT the records for all the ' + database_type.upper() + ' tables (y/n):') 
+				if qa.lower() in ['y', 'yes']:
 					source_nok_schema = db_conf['source_nok_schema']
 					tbl_list_count = tbl_db_list + [source_nok_schema + "." + tbl for tbl in db_conf[tbl_db] if tbl not in ('practice', 'staff')]
 					ret = mapping_util.get_table_count_parallel(db_conf, tbl_list_count, source_schema + '._records')
@@ -94,10 +94,10 @@ def main():
 # Move CODE to the processed directory?
 # ---------------------------------------------------------
 			if ret == True:
-				load_tbls = input('Are you sure you want to MOVE all the source CODE in the "processed" folder (y/n):') 
-				while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-					load_tbls = input('I did not understand that. Are you sure you want to MOVE all the source CODE in the "processed" folder (y/n):') 
-				if load_tbls.lower() in ['y', 'yes']:
+				qa = input('Are you sure you want to MOVE all the source CODE in the "processed" folder (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Are you sure you want to MOVE all the source CODE in the "processed" folder (y/n):') 
+				if qa.lower() in ['y', 'yes']:
 					for f in glob.iglob(dir_sql + '1*.sql'):
 						file_processed = dir_sql_processed + os.path.basename(f)
 						os.rename(f, file_processed)

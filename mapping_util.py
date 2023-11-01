@@ -239,7 +239,6 @@ def get_table_count_parallel(db_conf, tbl_list, tbl_records):
 
 	try:
 		time1 = time.time()
-		print(tbl_list)
 		with ProcessPoolExecutor(int(db_conf['max_workers'])) as executor:
 			futures = [executor.submit(get_table_count, db_conf, tbl, tbl_records) for tbl in tbl_list]
 			for future in as_completed(futures):

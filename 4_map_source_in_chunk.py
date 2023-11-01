@@ -19,34 +19,37 @@ def main():
 		if ret == True and dir_study != '':
 			time0 = time.time()
 			database_type = db_conf['database_type']
-			dir_code = os.getcwd() + "\\sql_scripts\\"
+			dir_sql = os.getcwd() + "\\sql_scripts\\"
+			dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
+			if not os.path.exists(dir_sql_processed):
+				os.makedirs(dir_sql_processed)
 # ---------------------------------------------------------
 # Create/Recreate CDM tables? Parallel execution of queries in the file - Ask the user for DROP confirmation
 # ---------------------------------------------------------
-			drop_tbls = input('Are you sure you want to DROP/CREATE all the CDM tables (y/n):') 
-			while drop_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-				drop_tbls = input('I did not understand that. Are you sure you want to DROP/CREATE all the CDM tables (y/n):') 
-			if drop_tbls.lower() in ['y', 'yes']:
-				fname = dir_code + '4a_cdm_drop_tbl.sql'
+			qa = input('Are you sure you want to DROP/CREATE all the CDM tables (y/n):') 
+			while qa.lower() not in ['y', 'n', 'yes', 'no']:
+				qa = input('I did not understand that. Are you sure you want to DROP/CREATE all the CDM tables (y/n):') 
+			if qa.lower() in ['y', 'yes']:
+				fname = dir_sql + '4a_cdm_drop_tbl.sql'
 				print('Calling ' + fname + ' ...')
 				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
 				if ret == True:
 					cdm_version = db_conf['cdm_version']
 					if cdm_version == '5.3':
-						fname = dir_code + '4b_OMOPCDM_postgresql_5_3_ddl.sql'
+						fname = dir_sql + '4b_OMOPCDM_postgresql_5_3_ddl.sql'
 					elif cdm_version == '5.4':
-						fname = dir_code + '4b_OMOPCDM_postgresql_5_4_ddl.sql'
+						fname = dir_sql + '4b_OMOPCDM_postgresql_5_4_ddl.sql'
 					print('Calling ' + fname + ' ...')
 					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
 # ---------------------------------------------------------
 # Tables to load: PERSON,OBSERVATION_PERIOD, etc.
 # ---------------------------------------------------------
 			if ret == True:
-				start_mapping = input('Do you want to map the simple tables: PERSON, OBSERVATION_PERIOD, etc. (y/n):').lower()
-				while start_mapping not in ['y', 'n', 'yes', 'no']:
-					start_mapping = input('I did not understand that. Do you want to map the simple tables: LOCATION, CARE_SITE, PROVIDER, PERSON, DEATH, OBSERVATION_PERIOD (y/n):') 
-				if start_mapping in ['y', 'yes']:
-					fname = dir_code + '4c_' + database_type + '_map_tbl_simple.sql'
+				qa = input('Do you want to map the simple tables: PERSON, OBSERVATION_PERIOD, etc. (y/n):').lower()
+				while qa not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Do you want to map the simple tables: LOCATION, CARE_SITE, PROVIDER, PERSON, DEATH, OBSERVATION_PERIOD (y/n):') 
+				if qa in ['y', 'yes']:
+					fname = dir_sql + '4c_' + database_type + '_map_tbl_simple.sql'
 					print('Executing ' + fname + ' ... (PERSON,OBSERVATION_PERIOD, etc.)')
 					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
 # ---------------------------------------------------------
@@ -54,22 +57,22 @@ def main():
 # ---------------------------------------------------------
 			if ret == True:
 				if database_type == 'aurum':
-					reset_tbls_tmp = input('Do you want to CREATE/RECREATE the temp tables (temp_concept_map, temp_drug_concept_map, temp_visit_detail)? (y/n):').lower() 
-					while reset_tbls_tmp not in ['y', 'n', 'yes', 'no']:
-						reset_tbls_tmp = input('I did not understand that. Do you want to CREATE/RECREATE the temp tables (temp_concept_map, temp_drug_concept_map, temp_visit_detail? (y/n):').lower()
-					if reset_tbls_tmp in ['y', 'yes']:
-						fname = dir_code + '4d_' + database_type + '_map_tbl_tmp.sql'
+					qa = input('Do you want to CREATE/RECREATE the temp tables (temp_concept_map, temp_drug_concept_map, temp_visit_detail)? (y/n):').lower() 
+					while qa not in ['y', 'n', 'yes', 'no']:
+						qa = input('I did not understand that. Do you want to CREATE/RECREATE the temp tables (temp_concept_map, temp_drug_concept_map, temp_visit_detail? (y/n):').lower()
+					if qa in ['y', 'yes']:
+						fname = dir_sql + '4d_' + database_type + '_map_tbl_tmp.sql'
 						print('Executing ' + fname + ' ... (temp_concept_map, temp_drug_concept_map, temp_visit_detail)')
 						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
 # ---------------------------------------------------------
 # Tables to load: VISIT_OCCURRENCE, VISIT_DETAIL
 # ---------------------------------------------------------
 			if ret == True:
-				reset_tbls_visit = input('Do you want to CREATE/RECREATE the visit tables (visit_occurrence, visit_detail)? (y/n):').lower() 
-				while reset_tbls_visit not in ['y', 'n', 'yes', 'no']:
-					reset_tbls_visit = input('I did not understand that. Do you want to CREATE/RECREATE the visit tables (visit_occurrence, visit_detail)? (y/n):').lower()
-				if reset_tbls_visit in ['y', 'yes']:
-					fname = dir_code + '4e_' + database_type + '_map_tbl_visit.sql'
+				qa = input('Do you want to CREATE/RECREATE the visit tables (visit_occurrence, visit_detail)? (y/n):').lower() 
+				while qa not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Do you want to CREATE/RECREATE the visit tables (visit_occurrence, visit_detail)? (y/n):').lower()
+				if qa in ['y', 'yes']:
+					fname = dir_sql + '4e_' + database_type + '_map_tbl_visit.sql'
 					print('Executing ' + fname + ' ... (visit_occurrence, visit_detail)')
 					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
 # ---------------------------------------------------------
@@ -117,10 +120,10 @@ def main():
 # ---------------------------------------------------------
 # Create/Recreate CHUNK table and any chunk job previously done?
 # ---------------------------------------------------------
-				reset_tbls_chunk = input('Do you want to CREATE/RECREATE the chunk table and remove any chunk work previously done? (y/n):').lower() 
-				while reset_tbls_chunk not in ['y', 'n', 'yes', 'no']:
-					reset_tbls_chunk = input('I did not understand that. Do you want to CREATE/RECREATE the chunk table and remove any chunk work previously done? (y/n):').lower()
-				if reset_tbls_chunk in ['y', 'yes']:
+				qa = input('Do you want to CREATE/RECREATE the chunk table and remove any chunk work previously done? (y/n):').lower() 
+				while qa not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Do you want to CREATE/RECREATE the chunk table and remove any chunk work previously done? (y/n):').lower()
+				if qa in ['y', 'yes']:
 # ---------------------------------------------------------
 # Delete possible old stem_source_x and stem_x tables
 # ---------------------------------------------------------
@@ -137,26 +140,26 @@ def main():
 							if stem_list[tbl_id] != None:
 								query1 = 'DROP TABLE IF EXISTS ' + chunk_schema + '.' + stem_list[tbl_id];
 								cursor1.execute(query1)
-					fname = dir_code + '4f_' + database_type + '_map_tbl_chunk.sql'
+					fname = dir_sql + '4f_' + database_type + '_map_tbl_chunk.sql'
 					print('Executing ' + fname + ' ... (CHUNK)')
 					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
 # Necessary to recall 4b here if the CDM tables were deleted
 					if ret == True:
 						cdm_version = db_conf['cdm_version']
 						if cdm_version == '5.3':
-							fname = dir_code + '4b_OMOPCDM_postgresql_5_3_ddl.sql'
+							fname = dir_sql + '4b_OMOPCDM_postgresql_5_3_ddl.sql'
 						elif cdm_version == '5.4':
-							fname = dir_code + '4b_OMOPCDM_postgresql_5_4_ddl.sql'
+							fname = dir_sql + '4b_OMOPCDM_postgresql_5_4_ddl.sql'
 						print('Calling ' + fname + ' ...')
 						ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
 # ---------------------------------------------------------
 # Start/Restart chunking
 # ---------------------------------------------------------
 			if ret == True:
-				start_chunking = input('Would you like to progress with chunking? (y/n):').lower()
-				while start_chunking not in ['y', 'n', 'yes', 'no']:
-					start_chunking = input('I did not understand that. Would you like to progress with chunking? (y/n):').lower()
-				if start_chunking in ['y', 'yes']:
+				qa = input('Would you like to progress with chunking? (y/n):').lower()
+				while qa not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Would you like to progress with chunking? (y/n):').lower()
+				if qa in ['y', 'yes']:
 # ---------------------------------------------------------
 # Select not completed chunk ids
 # ---------------------------------------------------------
@@ -179,15 +182,15 @@ def main():
 						chunk_time1 = time.time()
 						if chunk_id == chunk_id_list[-1]:
 							move_files = True
-						fname = dir_code + '4g_' + database_type + '_map_tbl_stem_source.sql'
+						fname = dir_sql + '4g_' + database_type + '_map_tbl_stem_source.sql'
 						print('Executing ' + fname + ' ... (STEM_SOURCE)')
 						ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
 						if ret == True:
-							fname = dir_code + '4h_' + database_type + '_map_tbl_stem.sql'
+							fname = dir_sql + '4h_' + database_type + '_map_tbl_stem.sql'
 							print('Executing ' + fname + ' ... (STEM)')
 							ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
 						if ret == True:
-							fname = dir_code + '4i_' + database_type + '_map_tbl_cdm.sql'
+							fname = dir_sql + '4i_' + database_type + '_map_tbl_cdm.sql'
 							print('Executing ' + fname + ' ... (CONDITION_OCCURRENCE, DRUG_EXPOSURE, DEVICE_EXPOSURE, PROCEDURE_OCCURRENCE, MEASUREMENT, OBSERVATION)')
 							ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
 						if ret == True:
@@ -206,6 +209,18 @@ def main():
 			if ret == True:
 				process_finished = "{0} completed in {1}".format(os.path.basename(__file__), mapping_util.calc_time(time.time() - time0))
 				print(process_finished)
+# ---------------------------------------------------------
+# Move CODE to the processed directory?
+# ---------------------------------------------------------
+			if ret == True:
+				qa = input('Are you sure you want to MOVE all the vocabulary CODE in the "processed" folder (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Are you sure you want to MOVE all the vocabulary CODE in the "processed" folder (y/n):') 
+				if qa.lower() in ['y', 'yes']:
+					for f in glob.iglob(dir_sql + '3*.sql'):
+						file_processed = dir_sql_processed + os.path.basename(f)
+						os.rename(f, file_processed)
+					print('Finished MOVING code files')	
 	except:
 		if cnx != None:
 			cnx.rollback()

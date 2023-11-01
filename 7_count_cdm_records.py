@@ -20,10 +20,10 @@ def main():
 # ---------------------------------------------------------
 # Count records per table
 # ---------------------------------------------------------
-			rec_tbl = input('Are you sure you want to build the _RECORDS table (y/n):') 
-			while rec_tbl.lower() not in ['y', 'n', 'yes', 'no']:
-				rec_tbl = input('I did not understand that. Are you sure you want to build the _RECORDS table (y/n):') 
-			if rec_tbl.lower() in ['y', 'yes']:
+			qa = input('Are you sure you want to build the _RECORDS table (y/n):') 
+			while qa.lower() not in ['y', 'n', 'yes', 'no']:
+				qa = input('I did not understand that. Are you sure you want to build the _RECORDS table (y/n):') 
+			if qa.lower() in ['y', 'yes']:
 				time1 = time.time()
 				tbl_list_count = [target_schema + "." + tbl for tbl in db_conf['tbl_cdm']]
 				tbl_list_count.extend([target_schema + "." + tbl for tbl in db_conf['tbl_cdm_voc']])
