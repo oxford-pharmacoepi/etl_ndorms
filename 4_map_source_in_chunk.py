@@ -91,6 +91,9 @@ def main():
 				target_schema = db_conf['target_schema']
 				chunk_schema = db_conf['chunk_schema']
 				source_release_date = db_conf['source_release_date']
+				source_description = db_conf['data_provider'] + ' ' + database_type
+				cdm_holder = 'NDORMS'
+				source_documentation_reference = 'https://github.com/oxford-pharmacoepi/etl_ndorms' 
 				cdm_etl_reference = db_conf['cdm_etl_reference']
 				cdm_version = db_conf['cdm_version']
 				query1 = 'select 1 from ' + target_schema + '.cdm_source'
@@ -98,16 +101,15 @@ def main():
 				rec_found = cursor1.fetchone()
 				if rec_found == None:
 					query1 = 'INSERT INTO ' + target_schema + '.cdm_source \
-						select \'' + \
-						database + '\', \'' + \
-						database + '\', \
-						\'NDORMS\', \
-						\'CPRD AURUM\', \
-						\'https://ohdsi.github.io/ETL-LambdaBuilder/docs/CPRD_Aurum\', \'' + \
-						cdm_etl_reference + '\', \
+						select \
+						\'' + database + '\', \
+						\'' + database + '\', \
+						\'' + cdm_holder + '\', \
+						\'' + source_description + '\', \
+						\'' + source_documentation_reference + '\', \
+						\'' + cdm_etl_reference + '\', \
 						TO_DATE(\'' + source_release_date + '\',\'YYYY-MM-DD\'), \
-						case when \'' + cdm_version + '\' = \'5.3\' then TO_DATE(\'2021-09-25\', \'YYYY-MM-DD\') \
-							when \'' + cdm_version + '\' = \'5.4\' then TO_DATE(\'2023-02-08\', \'YYYY-MM-DD\') end, \'' + \
+						CURRENT_DATE, \'' + \
 						cdm_version + '\', \
 						(SELECT vocabulary_version FROM ' + vocabulary_schema + '.vocabulary WHERE vocabulary_id = \'None\')'
 					cursor1.execute(query1)
