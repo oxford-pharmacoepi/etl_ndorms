@@ -352,20 +352,28 @@ def main():
 # ---------------------------------------------------------
 # CHECK STCM 
 # ---------------------------------------------------------
-		if ret == True:
-			load_tbls = input('Are you sure you want to CHECK ALL STCMs (y/n):') 
-			while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-				load_tbls = input('I did not understand that. Are you sure you want to CHECKING ALL STCMs (y/n):') 
-			if load_tbls.lower() in ['y', 'yes']:
-				fname = dir_sql + '3f_check_stcm.sql'
-				print('Calling ' + fname + ' ...')
-				for fcsv in glob.iglob(dir_stcm + '*_STCM.csv'):
-					stcm = os.path.basename(fcsv).replace('.csv', '')
-					ret = check_stcm(fname, stcm, False)
-					if ret == False:
-						break
-				if ret == True:
-					print('Finished checking ALL STCMs.')
+			if ret == True:
+				load_tbls = input('Are you sure you want to CHECK ALL STCMs (y/n):') 
+				while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
+					load_tbls = input('I did not understand that. Are you sure you want to CHECKING ALL STCMs (y/n):') 
+				if load_tbls.lower() in ['y', 'yes']:
+
+					if not list(glob.iglob(dir_stcm + '*_STCM.csv')):
+						print('NO STCM file found in ' + dir_stcm)
+						ret = False #stop the function if no STCM is found
+					else:
+
+						fname = dir_sql + '3f_check_stcm.sql'
+						print('Calling ' + fname + ' ...')
+
+						for fcsv in glob.iglob(dir_stcm + '*_STCM.csv'):		# iterator can't loop twice
+							stcm = os.path.basename(fcsv).replace('.csv', '')
+							ret = check_stcm(fname, stcm, False)
+							if ret == False:
+								break
+
+					if ret == True:
+						print('Finished checking ALL STCMs.')
 # ---------------------------------------------------------
 # UPDATE STCM 
 # ---------------------------------------------------------
@@ -406,26 +414,27 @@ def main():
 				dist_csv_file_list.append(re.sub("_update.csv|_delete.csv\Z", "", os.path.basename(f)))
 
 			dist_csv_file_list = dict.fromkeys(dist_csv_file_list) #remove duplicated stcm fname
-			if dist_csv_file_list:
-				for fstcm in dist_csv_file_list:
-					stcm_file = dir_stcm + fstcm + ".csv"
-					old_stcm_file = dir_stcm + 'old\\' + fstcm + "_old.csv"
-					os.rename(stcm_file, old_stcm_file)
-					print('Renamed and moved ' + fstcm)
+
+			for fstcm in dist_csv_file_list:
+				stcm_file = dir_stcm + fstcm + ".csv"
+				old_stcm_file = dir_stcm + 'old\\' + fstcm + "_old.csv"
+				os.rename(stcm_file, old_stcm_file)
+				print('Renamed and moved ' + fstcm)
 # ---------------------------------------------------------
 # GENERATE NEW STCM 
 # ---------------------------------------------------------
-				fname = dir_sql + '3i_generate_new_stcm.sql'
-				print('Calling ' + fname + ' ...')
-				for fstcm in dist_csv_file_list:
-					ret = generate_new_stcm(fname, fstcm, True)
-					if ret == False:
-						break
-				if ret == True:
-					for fstcm in glob.iglob(dir_stcm + '*_STCM.csv'):
-						file_processed = dir_stcm_processed + os.path.basename(fstcm)
-						os.rename(fstcm, file_processed)
-					print('Finished generating new STCM')
+			fname = dir_sql + '3i_generate_new_stcm.sql'
+			print('Calling ' + fname + ' ...')
+			for fstcm in dist_csv_file_list:
+				ret = generate_new_stcm(fname, fstcm, True)
+				if ret == False:
+					break
+
+			if ret == True:
+				for fstcm in glob.iglob(dir_stcm + '*_STCM.csv'):
+					file_processed = dir_stcm_processed + os.path.basename(fstcm)
+					os.rename(fstcm, file_processed)	#move to dir_stcm/processed
+				print('Finished generating new STCM and moved ALL STCM csv files to processed')
 # ---------------------------------------------------------
 # Move CODE to the processed directory?
 # ---------------------------------------------------------
@@ -438,6 +447,7 @@ def main():
 						file_processed = dir_sql_processed + os.path.basename(f)
 						os.rename(f, file_processed)
 					print('Finished MOVING code files')	
+
 	except:
 		print(str(sys.exc_info()[1]))
 
