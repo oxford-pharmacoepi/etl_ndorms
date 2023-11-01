@@ -100,10 +100,11 @@ def main():
 				cursor1.execute(query1)
 				rec_found = cursor1.fetchone()
 				if rec_found == None:
+					print('Inserting record in CDM_SOURCE ...')
 					query1 = 'INSERT INTO ' + target_schema + '.cdm_source \
 						select \
 						\'' + database + '\', \
-						\'' + database + '\', \
+						\'' + database[:25] + '\', \
 						\'' + cdm_holder + '\', \
 						\'' + source_description + '\', \
 						\'' + source_documentation_reference + '\', \
@@ -147,7 +148,7 @@ def main():
 						elif cdm_version == '5.4':
 							fname = dir_code + '4b_OMOPCDM_postgresql_5_4_ddl.sql'
 						print('Calling ' + fname + ' ...')
-						ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+						ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
 # ---------------------------------------------------------
 # Start/Restart chunking
 # ---------------------------------------------------------
