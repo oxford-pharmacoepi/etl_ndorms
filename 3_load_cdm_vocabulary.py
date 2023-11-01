@@ -278,13 +278,17 @@ def main():
 			dir_stcm_processed = db_conf['dir_stcm'] + db_conf['dir_processed']
 			if not os.path.exists(dir_stcm_processed):
 				os.makedirs(dir_stcm_processed)
+			dir_stcm_old = db_conf['dir_stcm'] + "\\old\\"
+			if not os.path.exists(dir_stcm_old):
+				os.makedirs(dir_stcm_old)
+
 # ---------------------------------------------------------
 # Drop vocabularies tables - Parallel execution of queries in the file - Ask the user for DROP confirmation
 # ---------------------------------------------------------
-			drop_tbls = input('Are you sure you want to DROP all the CDM vocabulary tables (y/n):') 
-			while drop_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-				drop_tbls = input('I did not understand that. Are you sure you want to DROP all the CDM vocabulary tables (y/n):') 
-			if drop_tbls.lower() in ['y', 'yes']:
+			qa = input('Are you sure you want to DROP all the CDM vocabulary tables (y/n):') 
+			while qa.lower() not in ['y', 'n', 'yes', 'no']:
+				qa = input('I did not understand that. Are you sure you want to DROP all the CDM vocabulary tables (y/n):') 
+			if qa.lower() in ['y', 'yes']:
 				fname = dir_sql + '3a_cdm_drop_vocabulary.sql'
 				print('Calling ' + fname + ' ...')
 				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
@@ -292,10 +296,10 @@ def main():
 # Create vocabularies tables - Parallel execution of queries in the file - Ask the user for CREATE/LOAD confirmation
 # ---------------------------------------------------------
 			if ret == True:
-				load_tbls = input('Are you sure you want to CREATE/LOAD all the vocabulary tables (y/n):') 
-				while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-					load_tbls = input('I did not understand that. Are you sure you want to CREATE/LOAD all the vocabulary tables (y/n):') 
-				if load_tbls.lower() in ['y', 'yes']:
+				qa = input('Are you sure you want to CREATE/LOAD all the vocabulary tables (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Are you sure you want to CREATE/LOAD all the vocabulary tables (y/n):') 
+				if qa.lower() in ['y', 'yes']:
 					fname = dir_sql + '3b_cdm_create_vocabulary.sql'
 					print('Calling ' + fname + ' ...')
 					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
@@ -312,10 +316,10 @@ def main():
 # Create vocabularies PK, indexes - Parallel execution
 # ---------------------------------------------------------
 			if ret == True:
-				load_tbls = input('Are you sure you want to CREATE PK/IDXs for all the vocabulary tables (y/n):') 
-				while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-					load_tbls = input('I did not understand that. Are you sure you want to CREATE PK/IDXs for all the vocabulary tables (y/n):') 
-				if load_tbls.lower() in ['y', 'yes']:
+				qa = input('Are you sure you want to CREATE PK/IDXs for all the vocabulary tables (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Are you sure you want to CREATE PK/IDXs for all the vocabulary tables (y/n):') 
+				if qa.lower() in ['y', 'yes']:
 					print('Build PKs and IDXs ...')
 					sql_file_list = sorted(glob.iglob(dir_sql + '3c_cdm_pk_idx_*.sql'))
 					ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, True)
@@ -323,10 +327,10 @@ def main():
 # CREATE/LOAD source_to_concept_vocab_map
 # ---------------------------------------------------------
 			if ret == True:
-				load_tbls = input('Are you sure you want to CREATE/LOAD source_to_..._map tables (y/n):') 
-				while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-					load_tbls = input('I did not understand that. Are you sure you want to CREATE/LOAD source_to_..._map tables tables (y/n):') 
-				if load_tbls.lower() in ['y', 'yes']:
+				qa = input('Are you sure you want to CREATE/LOAD source_to_..._map tables (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Are you sure you want to CREATE/LOAD source_to_..._map tables tables (y/n):') 
+				if qa.lower() in ['y', 'yes']:
 					csv_file_list = sorted(glob.iglob(dir_stcm + '*_STCM.csv'))
 					for fname in csv_file_list:
 						query = 'COPY ' + vocabulary_schema + '.source_to_concept_map FROM \'' + fname + '\' WITH DELIMITER E\',\' CSV HEADER QUOTE E\'"\'';
@@ -353,10 +357,10 @@ def main():
 # CHECK STCM 
 # ---------------------------------------------------------
 			if ret == True:
-				load_tbls = input('Are you sure you want to CHECK ALL STCMs (y/n):') 
-				while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-					load_tbls = input('I did not understand that. Are you sure you want to CHECKING ALL STCMs (y/n):') 
-				if load_tbls.lower() in ['y', 'yes']:
+				qa = input('Are you sure you want to CHECK ALL STCMs (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Are you sure you want to CHECKING ALL STCMs (y/n):') 
+				if qa.lower() in ['y', 'yes']:
 
 					if not list(glob.iglob(dir_stcm + '*_STCM.csv')):
 						print('NO STCM file found in ' + dir_stcm)
@@ -385,10 +389,10 @@ def main():
 				break
 	
 			if found == True:
-				load_tbls = input('Are you sure you want to UPDATE STCMs including deletion (y/n):') 
-				while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-					load_tbls = input('I did not understand that. Are you sure you want to UPDATE STCMs including deletion (y/n):') 
-				if load_tbls.lower() in ['y', 'yes']:
+				qa = input('Are you sure you want to UPDATE STCMs including deletion (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Are you sure you want to UPDATE STCMs including deletion (y/n):') 
+				if qa.lower() in ['y', 'yes']:
 					fname = dir_sql + '3g_update_stcm.sql'
 					print('Calling ' + fname + ' ...')
 					for fcsv in glob.iglob(dir_stcm + "suggestion\\" + '*_update.csv'):
@@ -417,32 +421,40 @@ def main():
 
 			for fstcm in dist_csv_file_list:
 				stcm_file = dir_stcm + fstcm + ".csv"
-				old_stcm_file = dir_stcm + 'old\\' + fstcm + "_old.csv"
-				os.rename(stcm_file, old_stcm_file)
-				print('Renamed and moved ' + fstcm)
+				f = list(glob.glob(stcm_file))
+				if f:
+					old_stcm_file = dir_stcm_old + fstcm + "_old.csv"
+					os.rename(stcm_file, old_stcm_file)
+					print('Renamed and moved ' + fstcm)
 # ---------------------------------------------------------
 # GENERATE NEW STCM 
 # ---------------------------------------------------------
-			fname = dir_sql + '3i_generate_new_stcm.sql'
-			print('Calling ' + fname + ' ...')
-			for fstcm in dist_csv_file_list:
-				ret = generate_new_stcm(fname, fstcm, True)
-				if ret == False:
-					break
+			if dist_csv_file_list:
+				fname = dir_sql + '3i_generate_new_stcm.sql'
+				print('Calling ' + fname + ' ...')
+				for fstcm in dist_csv_file_list:
+					ret = generate_new_stcm(fname, fstcm, True)
+					if ret == False:
+						break
+				if ret:
+					print('Finished generating new STCM')
 
+# ---------------------------------------------------------
+# MOVE ALL STCM TO PROCESSED 
+# ---------------------------------------------------------
 			if ret == True:
 				for fstcm in glob.iglob(dir_stcm + '*_STCM.csv'):
 					file_processed = dir_stcm_processed + os.path.basename(fstcm)
 					os.rename(fstcm, file_processed)	#move to dir_stcm/processed
-				print('Finished generating new STCM and moved ALL STCM csv files to processed')
+				print('Finished moving ALL STCM csv files to processed')
 # ---------------------------------------------------------
 # Move CODE to the processed directory?
 # ---------------------------------------------------------
 			if ret == True:
-				load_tbls = input('Are you sure you want to MOVE all the vocabulary CODE in the "processed" folder (y/n):') 
-				while load_tbls.lower() not in ['y', 'n', 'yes', 'no']:
-					load_tbls = input('I did not understand that. Are you sure you want to MOVE all the vocabulary CODE in the "processed" folder (y/n):') 
-				if load_tbls.lower() in ['y', 'yes']:
+				qa = input('Are you sure you want to MOVE all the vocabulary CODE in the "processed" folder (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Are you sure you want to MOVE all the vocabulary CODE in the "processed" folder (y/n):') 
+				if qa.lower() in ['y', 'yes']:
 					for f in glob.iglob(dir_sql + '3*.sql'):
 						file_processed = dir_sql_processed + os.path.basename(f)
 						os.rename(f, file_processed)
