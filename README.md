@@ -13,8 +13,9 @@ Download ATHENA Vocabularies:
 3. Run	"java -Dumls-apikey=YOUR_EPI_KEY -jar cpt4.jar 5"
 
 Run the ETL:
-1. In postgres, create a database with this comand
-	<!--CREATE DATABASE \<db_name\>
+1. In postgres, create a database 
+	<!--
+	with this comand CREATE DATABASE \<db_name\>
 	WITH
 	OWNER = postgres
 	ENCODING = 'UTF8'
