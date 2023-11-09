@@ -90,7 +90,7 @@ def load_files(db_conf, schema, tbl_name, file_list, dir_processed):
 	ret = True
 	
 	try:
-		print("load_files 1")
+#		print("load_files 1")
 # ---------------------------------------------------------
 # Connect to db
 # ---------------------------------------------------------
@@ -132,7 +132,7 @@ def load_files(db_conf, schema, tbl_name, file_list, dir_processed):
 			processing_time = "Files loaded in {0}".format(calc_time(time.time() - time1))
 			print(processing_time)
 # ---------------------------------------------------------
-		print("load_files 2")
+#		print("load_files 2")
 	except:
 		ret = False
 		err = sys.exc_info()
