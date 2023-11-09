@@ -1,0 +1,1 @@
+ALTER TABLE {VOCABULARY_SCHEMA}.VOCABULARY ADD CONSTRAINT fpk_vocabulary_vocabulary_concept_id FOREIGN KEY (vocabulary_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id);

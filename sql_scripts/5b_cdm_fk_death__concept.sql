@@ -1,0 +1,3 @@
+ALTER TABLE {TARGET_SCHEMA}.death ADD CONSTRAINT fpk_death_death_type_concept_id FOREIGN KEY (death_type_concept_id) REFERENCES {TARGET_SCHEMA}.concept (concept_id);
+ALTER TABLE {TARGET_SCHEMA}.death ADD CONSTRAINT fpk_death_cause_concept_id FOREIGN KEY (cause_concept_id) REFERENCES {TARGET_SCHEMA}.concept (concept_id);
+ALTER TABLE {TARGET_SCHEMA}.death ADD CONSTRAINT fpk_death_cause_source_concept_id FOREIGN KEY (cause_source_concept_id) REFERENCES {TARGET_SCHEMA}.concept (concept_id);

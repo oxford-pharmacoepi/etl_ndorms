@@ -118,7 +118,7 @@ ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person
 CREATE UNIQUE INDEX idx_person_id ON {TARGET_SCHEMA}.person (person_id ASC);
 CLUSTER {TARGET_SCHEMA}.person USING xpk_person;
 
-CREATE INDEX idx_gender ON {TARGET_SCHEMA}.person (gender_concept_id ASC); -- Added by Teen
+CREATE INDEX idx_gender ON {TARGET_SCHEMA}.person (gender_concept_id ASC);
 
 --------------------------------
 -- DEATH
