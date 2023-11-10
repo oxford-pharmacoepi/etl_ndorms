@@ -1,0 +1,1 @@
+ALTER TABLE {TARGET_SCHEMA}.death ADD CONSTRAINT fpk_death_person_id FOREIGN KEY (person_id) REFERENCES {TARGET_SCHEMA}.person (person_id);

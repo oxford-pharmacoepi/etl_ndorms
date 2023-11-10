@@ -30,32 +30,49 @@ def build_fk(dir_code):
 			plist.append(dir_code + "5b_cdm_fk_observation_period__concept.sql")
 			ret = mapping_util.execute_sql_files_parallel(db_conf, plist, True)
 		if ret == True:
-			fname = dir_code + "5b_cdm_fk_person__care_site.sql"
-			ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
+#			fname = dir_code + "5b_cdm_fk_person__care_site.sql"
+#			ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
+			plist.clear()
+			plist.append(dir_code + "5b_cdm_fk_person__care_site.sql")
+			plist.append(dir_code + "5b_cdm_fk_death__concept.sql")
+			ret = mapping_util.execute_sql_files_parallel(db_conf, plist, True)
 		if ret == True:
-			fname = dir_code + "5b_cdm_fk_visit_occurrence__care_site.sql"
-			ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
+#			fname = dir_code + "5b_cdm_fk_visit_occurrence__care_site.sql"
+#			ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
+			plist.clear()
+			plist.append(dir_code + "5b_cdm_fk_visit_occurrence__care_site.sql")
+			plist.append(dir_code + "5b_cdm_fk_death__person.sql")
+			plist.append(dir_code + "5b_cdm_fk_metadata__concept.sql")
+			ret = mapping_util.execute_sql_files_parallel(db_conf, plist, True)
 		if ret == True:
 			plist.clear()
 			plist.append(dir_code + "5b_cdm_fk_person__concept.sql")
 			plist.append(dir_code + "5b_cdm_fk_visit_detail__care_site.sql")
 			ret = mapping_util.execute_sql_files_parallel(db_conf, plist, True)
 		if ret == True:
-			sql_file_list = sorted(glob.iglob(dir_code + '5b_cdm_fk_*.sql'))
+			sql_file_list1 = sorted(glob.iglob(dir_code + '5b_cdm_fk_*.sql'))
+			sql_file_list2 = sorted(glob.iglob(dir_code + '5b' + db_conf['cdm_version'][2] + '_cdm_fk_*.sql'))
 			list1 = ['condition_occurrence','device_exposure','drug_exposure','measurement','observation','procedure_occurrence','visit_detail','visit_occurrence']
 			list2 = ['concept','person','provider','visit_detail','visit_occurrence']
 			for i in range(len(list1)):
 				plist.clear()
 				for j in range(len(list2)):
-					fname = dir_code + "5b_cdm_fk_" + list1[j] + "__" + list2[j] + ".sql"
-					if fname in sql_file_list:
+					fname = dir_code + '5b_cdm_fk_' + list1[j] + '__' + list2[j] + '.sql'
+					if fname in sql_file_list1:
 						plist.append(fname)
+					else:
+						fname = dir_code + '5b'+ db_conf['cdm_version'][2] + '_cdm_fk_' + list1[j] + '__' + list2[j] + '.sql'
+						if fname in sql_file_list2:
+							plist.append(fname)
 				if plist != []:
 					ret = mapping_util.execute_sql_files_parallel(db_conf, plist, True)
 					if ret == False:
 						break
 					plist.clear()
 				list1.append(list1.pop(0))
+		if ret == True and db_conf['cdm_version'] == '5.4':
+			fname = dir_code + "5c4_cdm_fk.sql"
+			ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
 	except:
 		ret = False
 		err = sys.exc_info()
@@ -86,11 +103,16 @@ def main():
 			if qa.lower() in ['y', 'yes']:
 				print('Build PKs and IDXs ...')
 				sql_file_list = sorted(glob.iglob(dir_sql + '5a_cdm_pk_idx_*.sql'))
+				if ret == True:
+					if db_conf['cdm_version'] == '5.3':
+						sql_file_list.append(dir_sql + '5a1_cdm_pk_idx_*.sql')
+					elif db_conf['cdm_version'] == '5.4':
+						sql_file_list.append(dir_sql + '5a2_cdm_pk_idx_*.sql')
 				ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, True)
-			if ret == True:
 # ---------------------------------------------------------
 # Build FK
 # ---------------------------------------------------------
+			if ret == True:
 				qa = input('Are you sure you want to CREATE FK on all cdm tables (y/n):') 
 				while qa.lower() not in ['y', 'n', 'yes', 'no']:
 					qa = input('I did not understand that. Are you sure you want to CREATE FK on all cdm tables (y/n):') 

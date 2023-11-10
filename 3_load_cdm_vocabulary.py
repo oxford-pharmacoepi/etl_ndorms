@@ -324,7 +324,15 @@ def main():
 					sql_file_list = sorted(glob.iglob(dir_sql + '3c_cdm_pk_idx_*.sql'))
 					ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, True)
 # ---------------------------------------------------------
-# CREATE/LOAD source_to_concept_vocab_map
+# Build FKs 
+# ---------------------------------------------------------
+					if ret == True:
+						fname = dir_sql + '3d_cdm_fk_voc.sql'
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
+						if ret == True:
+							print('Finished building FKs')
+# ---------------------------------------------------------
+# CREATE/LOAD source_to_..._map
 # ---------------------------------------------------------
 			if ret == True:
 				qa = input('Are you sure you want to CREATE/LOAD source_to_..._map tables (y/n):') 
@@ -338,10 +346,17 @@ def main():
 						if ret == False:
 							break
 # ---------------------------------------------------------
+# CREATE/LOAD source_to_concept_map PK, IDXs, FKs
+# ---------------------------------------------------------
+					if ret == True:
+						fname = dir_sql + '3e_cdm_source_to_concept_map.sql'
+						print('Calling ' + fname + ' ...')
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
+# ---------------------------------------------------------
 # CREATE/LOAD source_to_source_vocab_map
 # ---------------------------------------------------------
 					if ret == True:
-						fname = dir_sql + '3d_cdm_source_to_source_vocab_map.sql'
+						fname = dir_sql + '3e_cdm_source_to_source_vocab_map.sql'
 						print('Calling ' + fname + ' ...')
 						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
 # ---------------------------------------------------------
@@ -352,7 +367,7 @@ def main():
 						print('Calling ' + fname + ' ...')
 						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
 						if ret == True:
-							print('Finished CDM vocabularies processing')                        
+							print('Finished loading source_to_..._map tables')
 # ---------------------------------------------------------
 # CHECK STCM 
 # ---------------------------------------------------------
@@ -438,7 +453,6 @@ def main():
 						break
 				if ret:
 					print('Finished generating new STCM')
-
 # ---------------------------------------------------------
 # MOVE ALL STCM TO PROCESSED 
 # ---------------------------------------------------------

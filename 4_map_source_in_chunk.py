@@ -1,5 +1,6 @@
 import os
 import sys
+import glob
 import time
 import datetime
 import psycopg2 as sql
@@ -32,7 +33,7 @@ def main():
 			if qa.lower() in ['y', 'yes']:
 				fname = dir_sql + '4a_cdm_drop_tbl.sql'
 				print('Calling ' + fname + ' ...')
-				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+				ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
 				if ret == True:
 					cdm_version = db_conf['cdm_version']
 					if cdm_version == '5.3':
@@ -40,7 +41,7 @@ def main():
 					elif cdm_version == '5.4':
 						fname = dir_sql + '4b_OMOPCDM_postgresql_5_4_ddl.sql'
 					print('Calling ' + fname + ' ...')
-					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
 # ---------------------------------------------------------
 # Tables to load: PERSON,OBSERVATION_PERIOD, etc.
 # ---------------------------------------------------------

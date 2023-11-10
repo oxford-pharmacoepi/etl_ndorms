@@ -1,0 +1,5 @@
+ALTER TABLE {VOCABULARY_SCHEMA}.drug_strength ADD CONSTRAINT fpk_drug_strength_drug_concept_id FOREIGN KEY (drug_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id);
+ALTER TABLE {VOCABULARY_SCHEMA}.drug_strength ADD CONSTRAINT fpk_drug_strength_ingredient_concept_id FOREIGN KEY (ingredient_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id);
+ALTER TABLE {VOCABULARY_SCHEMA}.drug_strength ADD CONSTRAINT fpk_drug_strength_amount_unit_concept_id FOREIGN KEY (amount_unit_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id);
+ALTER TABLE {VOCABULARY_SCHEMA}.drug_strength ADD CONSTRAINT fpk_drug_strength_numerator_unit_concept_id FOREIGN KEY (numerator_unit_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id);
+ALTER TABLE {VOCABULARY_SCHEMA}.drug_strength ADD CONSTRAINT fpk_drug_strength_denominator_unit_concept_id FOREIGN KEY (denominator_unit_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id);
