@@ -71,7 +71,7 @@ def build_fk(dir_code):
 					plist.clear()
 				list1.append(list1.pop(0))
 		if ret == True and db_conf['cdm_version'] == '5.4':
-			fname = dir_code + "5c_cdm_fk.sql"
+			fname = dir_code + "5c4_cdm_fk.sql"
 			ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
 	except:
 		ret = False
