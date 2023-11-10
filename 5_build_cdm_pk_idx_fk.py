@@ -30,15 +30,11 @@ def build_fk(dir_code):
 			plist.append(dir_code + "5b_cdm_fk_observation_period__concept.sql")
 			ret = mapping_util.execute_sql_files_parallel(db_conf, plist, True)
 		if ret == True:
-#			fname = dir_code + "5b_cdm_fk_person__care_site.sql"
-#			ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
 			plist.clear()
 			plist.append(dir_code + "5b_cdm_fk_person__care_site.sql")
 			plist.append(dir_code + "5b_cdm_fk_death__concept.sql")
 			ret = mapping_util.execute_sql_files_parallel(db_conf, plist, True)
 		if ret == True:
-#			fname = dir_code + "5b_cdm_fk_visit_occurrence__care_site.sql"
-#			ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
 			plist.clear()
 			plist.append(dir_code + "5b_cdm_fk_visit_occurrence__care_site.sql")
 			plist.append(dir_code + "5b_cdm_fk_death__person.sql")
@@ -61,7 +57,7 @@ def build_fk(dir_code):
 					if fname in sql_file_list1:
 						plist.append(fname)
 					else:
-						fname = dir_code + '5b'+ db_conf['cdm_version'][2] + '_cdm_fk_' + list1[j] + '__' + list2[j] + '.sql'
+						fname = dir_code + '5b' + db_conf['cdm_version'][2] + '_cdm_fk_' + list1[j] + '__' + list2[j] + '.sql'
 						if fname in sql_file_list2:
 							plist.append(fname)
 				if plist != []:
@@ -104,10 +100,7 @@ def main():
 				print('Build PKs and IDXs ...')
 				sql_file_list = sorted(glob.iglob(dir_sql + '5a_cdm_pk_idx_*.sql'))
 				if ret == True:
-					if db_conf['cdm_version'] == '5.3':
-						sql_file_list.append(dir_sql + '5a1_cdm_pk_idx_*.sql')
-					elif db_conf['cdm_version'] == '5.4':
-						sql_file_list.append(dir_sql + '5a2_cdm_pk_idx_*.sql')
+					sql_file_list.append(dir_sql + '5a' + db_conf['cdm_version'][2] + '_cdm_pk_idx_*.sql')
 				ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, True)
 # ---------------------------------------------------------
 # Build FK
