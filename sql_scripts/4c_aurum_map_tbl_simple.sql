@@ -18,8 +18,6 @@ SELECT cte1.regionid,
 		cte1."description"
 FROM cte1;
 
---ALTER TABLE {TARGET_SCHEMA}.location ADD CONSTRAINT xpk_location PRIMARY KEY (location_id);
-
 --------------------------------
 -- CARE_SITE 
 --------------------------------
@@ -32,8 +30,6 @@ SELECT pracid,
 		pracid::varchar,
 		NULL
 FROM {SOURCE_SCHEMA}.practice;
-
---ALTER TABLE {TARGET_SCHEMA}.care_site ADD CONSTRAINT xpk_care_site PRIMARY KEY (care_site_id);
 
 --------------------------------
 -- PROVIDER
@@ -63,8 +59,6 @@ SELECT cte2.staffid,
 		0
 FROM cte2
 LEFT JOIN {TARGET_SCHEMA}.SOURCE_TO_CONCEPT_MAP as stcm on stcm.source_code = cte2."description" and lower(stcm.source_vocabulary_id) = 'aurum_jobcat';
-
---ALTER TABLE {TARGET_SCHEMA}.provider ADD CONSTRAINT xpk_provider PRIMARY KEY (provider_id);
 
 --------------------------------
 -- PERSON
@@ -134,8 +128,6 @@ SELECT patid,
 	0
 FROM {SOURCE_SCHEMA}.patient
 where cprd_ddate is not NULL;
-
---ALTER TABLE {TARGET_SCHEMA}.death ADD CONSTRAINT xpk_death PRIMARY KEY (person_id);
 
 --------------------------------
 -- OBSERVATION_PERIOD
