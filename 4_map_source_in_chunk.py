@@ -43,40 +43,6 @@ def main():
 					print('Calling ' + fname + ' ...')
 					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
 # ---------------------------------------------------------
-# Tables to load: PERSON,OBSERVATION_PERIOD, etc.
-# ---------------------------------------------------------
-			if ret == True:
-				qa = input('Do you want to map the simple tables: PERSON, OBSERVATION_PERIOD, etc. (y/n):').lower()
-				while qa not in ['y', 'n', 'yes', 'no']:
-					qa = input('I did not understand that. Do you want to map the simple tables: LOCATION, CARE_SITE, PROVIDER, PERSON, DEATH, OBSERVATION_PERIOD (y/n):') 
-				if qa in ['y', 'yes']:
-					fname = dir_sql + '4c_' + database_type + '_map_tbl_simple.sql'
-					print('Executing ' + fname + ' ... (PERSON,OBSERVATION_PERIOD, etc.)')
-					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
-# ---------------------------------------------------------
-# Tables to load: TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL
-# ---------------------------------------------------------
-			if ret == True:
-				if database_type == 'aurum':
-					qa = input('Do you want to CREATE/RECREATE the temp tables (temp_concept_map, temp_drug_concept_map, temp_visit_detail)? (y/n):').lower() 
-					while qa not in ['y', 'n', 'yes', 'no']:
-						qa = input('I did not understand that. Do you want to CREATE/RECREATE the temp tables (temp_concept_map, temp_drug_concept_map, temp_visit_detail? (y/n):').lower()
-					if qa in ['y', 'yes']:
-						fname = dir_sql + '4d_' + database_type + '_map_tbl_tmp.sql'
-						print('Executing ' + fname + ' ... (temp_concept_map, temp_drug_concept_map, temp_visit_detail)')
-						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
-# ---------------------------------------------------------
-# Tables to load: VISIT_OCCURRENCE, VISIT_DETAIL
-# ---------------------------------------------------------
-			if ret == True:
-				qa = input('Do you want to CREATE/RECREATE the visit tables (visit_occurrence, visit_detail)? (y/n):').lower() 
-				while qa not in ['y', 'n', 'yes', 'no']:
-					qa = input('I did not understand that. Do you want to CREATE/RECREATE the visit tables (visit_occurrence, visit_detail)? (y/n):').lower()
-				if qa in ['y', 'yes']:
-					fname = dir_sql + '4e_' + database_type + '_map_tbl_visit.sql'
-					print('Executing ' + fname + ' ... (visit_occurrence, visit_detail)')
-					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
-# ---------------------------------------------------------
 # Connect to db
 # ---------------------------------------------------------
 			if ret == True:
@@ -118,6 +84,65 @@ def main():
 						cdm_version + '\', \
 						(SELECT vocabulary_version FROM ' + vocabulary_schema + '.vocabulary WHERE vocabulary_id = \'None\')'
 					cursor1.execute(query1)
+# ---------------------------------------------------------
+# If this is a linked dataset, create/recreate _max_ids table
+# ---------------------------------------------------------
+			if ret == True:
+				if 'target_schema_to_link' in db_conf and db_conf['target_schema_to_link'] != '':
+					target_schema_to_link = db_conf['target_schema_to_link']
+					qa = input('Do you want to CREATE/RECREATE the _max_ids table in ' + target_schema_to_link + '? (y/n):').lower() 
+					while qa not in ['y', 'n', 'yes', 'no']:
+						qa = input('I did not understand that. Do you want to CREATE/RECREATE the _max_ids table in ' + db_conf['target_schema_to_link'] + '? (y/n):').lower()
+					if qa in ['y', 'yes']:
+						tbl_max_ids = target_schema_to_link + '._max_ids'
+						query1 = 'DROP TABLE IF EXISTS ' + tbl_max_ids + ' CASCADE';
+						cursor1.execute(query1)
+						query1 = 'CREATE TABLE ' + tbl_max_ids + ' \
+								(tbl_name varchar(25) NOT NULL, \
+								max_id bigint DEFAULT 0);'
+						cursor1.execute(query1)
+						time1 = time.time()
+						tbl_list_count = [target_schema_to_link + "." + tbl for tbl in db_conf['tbl_cdm']]
+						ret = mapping_util.get_table_max_ids_parallel(db_conf, tbl_list_count, tbl_max_ids)
+						if ret == True:
+							query1 = 'ALTER TABLE ' + tbl_max_ids + ' ADD CONSTRAINT pk_max_ids PRIMARY KEY (tbl_name);'
+							cursor1.execute(query1)
+							msg = 'Finished calculating max_ids in ' + target_schema_to_link.upper() + ' data in ' + mapping_util.calc_time(time.time() - time1) + '\n'
+							print(msg)
+# ---------------------------------------------------------
+# Tables to load: PERSON,OBSERVATION_PERIOD, etc.
+# ---------------------------------------------------------
+			if ret == True:
+				qa = input('Do you want to map the simple tables: PERSON, OBSERVATION_PERIOD, etc. (y/n):').lower()
+				while qa not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Do you want to map the simple tables: LOCATION, CARE_SITE, PROVIDER, PERSON, DEATH, OBSERVATION_PERIOD (y/n):') 
+				if qa in ['y', 'yes']:
+					fname = dir_sql + '4c_' + database_type + '_map_tbl_simple.sql'
+					print('Executing ' + fname + ' ... (PERSON,OBSERVATION_PERIOD, etc.)')
+					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
+# ---------------------------------------------------------
+# Tables to load: TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL
+# ---------------------------------------------------------
+			if ret == True:
+				if database_type == 'aurum':
+					qa = input('Do you want to CREATE/RECREATE the temp tables (temp_concept_map, temp_drug_concept_map, temp_visit_detail)? (y/n):').lower() 
+					while qa not in ['y', 'n', 'yes', 'no']:
+						qa = input('I did not understand that. Do you want to CREATE/RECREATE the temp tables (temp_concept_map, temp_drug_concept_map, temp_visit_detail? (y/n):').lower()
+					if qa in ['y', 'yes']:
+						fname = dir_sql + '4d_' + database_type + '_map_tbl_tmp.sql'
+						print('Executing ' + fname + ' ... (temp_concept_map, temp_drug_concept_map, temp_visit_detail)')
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
+# ---------------------------------------------------------
+# Tables to load: VISIT_OCCURRENCE, VISIT_DETAIL
+# ---------------------------------------------------------
+			if ret == True:
+				qa = input('Do you want to CREATE/RECREATE the visit tables (visit_occurrence, visit_detail)? (y/n):').lower() 
+				while qa not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Do you want to CREATE/RECREATE the visit tables (visit_occurrence, visit_detail)? (y/n):').lower()
+				if qa in ['y', 'yes']:
+					fname = dir_sql + '4e_' + database_type + '_map_tbl_visit.sql'
+					print('Executing ' + fname + ' ... (visit_occurrence, visit_detail)')
+					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
 # ---------------------------------------------------------
 # Create/Recreate CHUNK table and any chunk job previously done?
 # ---------------------------------------------------------

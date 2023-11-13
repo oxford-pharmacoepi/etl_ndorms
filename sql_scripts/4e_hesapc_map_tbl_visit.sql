@@ -3,7 +3,8 @@
 --------------------------------
 DROP SEQUENCE IF EXISTS sequence_vo;
 CREATE SEQUENCE sequence_vo INCREMENT 1;
-SELECT setval('sequence_vo', (SELECT COALESCE(public_records,0) FROM public._records WHERE lower(tbl_name) = 'visit_occurrence'));
+--SELECT setval('sequence_vo', (SELECT MAX(visit_occurrence_id) FROM public.visit_occurrence));
+SELECT setval('sequence_vo', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'visit_occurrence'));
 
 with cte1 AS (
 	SELECT person_id
@@ -120,7 +121,8 @@ CREATE INDEX idx_visit_source_value ON {TARGET_SCHEMA}.visit_occurrence (visit_s
 --------------------------------
 DROP SEQUENCE IF EXISTS sequence_vd;
 CREATE SEQUENCE sequence_vd INCREMENT 1; 
-SELECT setval('sequence_vd', (SELECT COALESCE(public_records,0) FROM public._records WHERE lower(tbl_name) = 'visit_detail'));
+--SELECT setval('sequence_vd', (SELECT MAX(visit_detail_id) from public.visit_detail));
+SELECT setval('sequence_vd', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'visit_detail'));
 
 WITH cte1 AS (
 	SELECT 

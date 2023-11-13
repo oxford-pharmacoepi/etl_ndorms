@@ -257,11 +257,87 @@ def get_table_count_parallel(db_conf, tbl_list, tbl_records):
 	return(ret)	
 
 # ---------------------------------------------------------
+def get_table_max_ids(db_conf, tbl_name, tbl_result, cnx=None):
+# ---------------------------------------------------------
+	ret = True
+	new_connection = False
+	cursor1 = None
+
+	try:
+		if cnx == None:
+			new_connection = True
+			cnx = sql.connect(
+				user=db_conf['username'],
+				password=db_conf['password'],
+				database=db_conf['database']
+			)
+			cnx.autocommit = True
+		schema_tbl, tbl_name_short = tbl_name.split(".")
+		cursor1 = cnx.cursor()
+# Check if table exists
+		query1 = 'SELECT to_regclass(\'' + tbl_name + '\')';
+		cursor1.execute(query1)
+		present = cursor1.fetchone()[0]
+		if present == None:
+			query1 = 'INSERT INTO ' + tbl_result + ' (tbl_name, max_id) \
+			VALUES (\'' + tbl_name_short + '\', 0)'
+			cursor1.execute(query1)
+# Calculate maxid
+		else: 
+			query1 = 'INSERT INTO ' + tbl_result + ' (tbl_name, max_id) \
+			VALUES (\'' + tbl_name_short + '\', \
+			(select MAX(col1) from (select col1 from ' + tbl_name + ' as t1(col1)) as max_id))'
+			cursor1.execute(query1)
+
+#VALUES ('provider', 
+#			(select MAX(col1) from (select col1 from location as t1(col1)) as tt) )
+
+		print(f'{tbl_name} max_id calculated')
+		cursor1.close()
+		cursor1 = None
+		if new_connection == True:
+			cnx.close()
+	except:
+		ret = False
+		err = sys.exc_info()
+		print("Function = {0}, Error = {1}, {2}".format("get_table_max_ids", err[0], err[1]))
+		if cursor1 != None:
+			cursor1.close()
+		if new_connection == True:
+			cnx.close()
+	return(ret)	
+	
+# ---------------------------------------------------------
+def get_table_max_ids_parallel(db_conf, tbl_list, tbl_result):
+# ---------------------------------------------------------
+	ret = True
+
+	try:
+		time1 = time.time()
+		with ProcessPoolExecutor(int(db_conf['max_workers'])) as executor:
+			futures = [executor.submit(get_table_max_ids, db_conf, tbl, tbl_result) for tbl in tbl_list]
+			for future in as_completed(futures):
+				if future.result() == False:
+					ret = False
+					msg = 'get_table_max_ids_parallel stopped with error at ' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
+					break
+		if ret == True:
+			msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] get_table_max_ids_parallel execution time: '
+			msg += calc_time(time.time() - time1) + "\n"
+		print(msg)
+	except:
+		ret = False
+		err = sys.exc_info()
+		print("Function = {0}, Error = {1}, {2}".format("get_table_max_ids_parallel", err[0], err[1]))
+	return(ret)	
+	
+# ---------------------------------------------------------
 def parse_queries_file(db_conf, filename, chunk_id=None):
 # ---------------------------------------------------------
 	source_nok_schema = db_conf['source_nok_schema'] if 'source_nok_schema' in db_conf else None
 	source_schema = db_conf['source_schema'] if 'source_schema' in db_conf else None
 	target_schema = db_conf['target_schema'] if 'target_schema' in db_conf else None
+	target_schema_to_link = db_conf['target_schema_to_link'] if 'target_schema_to_link' in db_conf else None
 	vocabulary_schema = db_conf['vocabulary_schema'] if 'vocabulary_schema' in db_conf else None
 	chunk_schema = db_conf['chunk_schema'] if 'chunk_schema' in db_conf else None
 	lookup_directory = db_conf['dir_lookup'] if 'dir_lookup' in db_conf else None
@@ -277,6 +353,7 @@ def parse_queries_file(db_conf, filename, chunk_id=None):
 		query = query.replace('{SOURCE_NOK_SCHEMA}', source_nok_schema) if source_nok_schema is not None else query
 		query = query.replace('{SOURCE_SCHEMA}', source_schema) if source_schema is not None else query
 		query = query.replace('{TARGET_SCHEMA}', target_schema) if target_schema is not None else query
+		query = query.replace('{TARGET_SCHEMA_TO_LINK}', target_schema_to_link) if target_schema_to_link is not None else query
 		query = query.replace('{VOCABULARY_SCHEMA}', vocabulary_schema) if vocabulary_schema is not None else query  
 		query = query.replace('{CHUNK_SCHEMA}', chunk_schema) if chunk_schema is not None else query  
 		query = query.replace('{LOOKUP_DIRECTORY}', lookup_directory) if lookup_directory is not None else query  

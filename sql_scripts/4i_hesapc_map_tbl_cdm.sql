@@ -2,8 +2,7 @@
 -- insert into condition_occurrence from stem_{CHUNK_ID}
 --------------------------------
 with cte0 AS (
-	SELECT COALESCE(public_records,0) as start_id
-	FROM public._records
+	SELECT max_id as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
 	WHERE lower(tbl_name) = 'condition_occurrence'
 ),
 cte1 as (
@@ -42,8 +41,7 @@ select * from cte1;
 --insert into drug_exposure from stem
 --------------------------------
 with cte0 AS (
-	SELECT COALESCE(public_records,0) as start_id
-	FROM public._records
+	SELECT max_id as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
 	WHERE lower(tbl_name) = 'drug_exposure'
 ),
 cte2 as (
@@ -93,8 +91,7 @@ select * from cte2;
 --insert into device_exposure from stem
 --------------------------------
 with cte0 AS (
-	SELECT COALESCE(public_records,0) as start_id
-	FROM public._records
+	SELECT max_id as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
 	WHERE lower(tbl_name) = 'device_exposure'
 ),
 cte4 as (
@@ -133,8 +130,7 @@ select * from cte4;
 --insert into procedure_occurrence from stem
 --------------------------------
 with cte0 AS (
-	SELECT COALESCE(public_records,0) as start_id
-	FROM public._records
+	SELECT max_id as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
 	WHERE lower(tbl_name) = 'procedure_occurrence'
 ),
 cte5 as (
@@ -171,8 +167,7 @@ select * from cte5;
 --insert into measurement from stem
 --------------------------------
 with cte0 AS (
-	SELECT COALESCE(public_records,0) as start_id
-	FROM public._records
+	SELECT max_id as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
 	WHERE lower(tbl_name) = 'measurement'
 ), cte6 as (
 	SELECT cte0.start_id + s.id as measurement_id,
@@ -221,8 +216,7 @@ select * FROM cte6;
 --insert into observation from stem. To increase performance, could we change the "not in" into "in" ?
 --------------------------------
 with cte0 AS (
-	SELECT COALESCE(public_records,0) as start_id
-	FROM public._records
+	SELECT max_id as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
 	WHERE lower(tbl_name) = 'observation'
 ), cte7 as (
 	SELECT cte0.start_id + s.id as observation_id,

@@ -44,6 +44,7 @@ create table {TARGET_SCHEMA}._records (
 	total_records bigint DEFAULT 0
 );
 
+
 --------------------------------
 -- DROP TABLES CREATED BY CHUNKING
 --------------------------------

@@ -173,10 +173,18 @@ GROUP BY
 	, ft.drug_sub_exposure_start_date
 	, ft.drug_exposure_count
 	, ft.days_exposed
+),
+cte0 AS (
+	SELECT CASE WHEN ('{TARGET_SCHEMA_TO_LINK}' = '') IS NOT FALSE 
+		THEN 0 ELSE (SELECT COALESCE(max_id,0) from {TARGET_SCHEMA_TO_LINK}._max_ids 
+		WHERE lower(tbl_name) = 'drug_era') 
+		END as start_id
 )
 INSERT INTO {TARGET_SCHEMA}.drug_era(drug_era_id, person_id, drug_concept_id, drug_era_start_date, drug_era_end_date, drug_exposure_count, gap_days)
-SELECT
-	row_number() over (order by person_id, drug_concept_id) 
+SELECT drug_era_id + cte0.start_id as drug_era_id, person_id, drug_concept_id,
+	drug_era_start_date, drug_era_end_date, drug_exposure_count, gap_days
+	FROM cte0, (SELECT
+	row_number() over (order by person_id, drug_concept_id) as drug_era_id
 	, person_id
 	, drug_concept_id
 	, MIN(drug_sub_exposure_start_date) AS drug_era_start_date
@@ -185,7 +193,7 @@ SELECT
 	, EXTRACT(EPOCH FROM drug_era_end_date - MIN(drug_sub_exposure_start_date) - SUM(days_exposed)) / 86400 AS gap_days
 FROM cteDrugEraEnds
 GROUP BY person_id, drug_concept_id, drug_era_end_date
-ORDER BY person_id, drug_concept_id;
+ORDER BY person_id, drug_concept_id) as t;
 
 --------------------------------
 -- Add PK / IDX / FK to DRUG_ERA

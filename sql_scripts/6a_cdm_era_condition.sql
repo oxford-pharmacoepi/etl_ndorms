@@ -72,19 +72,29 @@ GROUP BY
 	, c.person_id
 	, c.condition_concept_id
 	, c.condition_start_date
+),
+cte0 AS (
+	SELECT CASE WHEN ('{TARGET_SCHEMA_TO_LINK}' = '') IS NOT FALSE 
+		THEN 0 ELSE (SELECT COALESCE(max_id,0) from {TARGET_SCHEMA_TO_LINK}._max_ids 
+		WHERE lower(tbl_name) = 'condition_era' ) 
+		END as start_id
 )
 --------------------------------------------------------------------------------------------------------------
-INSERT INTO {TARGET_SCHEMA}.condition_era(condition_era_id, person_id, condition_concept_id, condition_era_start_date, condition_era_end_date, condition_occurrence_count)
-SELECT
-	row_number() over (order by person_id, condition_concept_id) 
-	, person_id
-	, condition_concept_id
-	, MIN(condition_start_date) AS condition_era_start_date
-	, era_end_date AS condition_era_end_date
-	, COUNT(*) AS condition_occurrence_count
-FROM cteConditionEnds
-GROUP BY person_id, condition_concept_id, era_end_date
-ORDER BY person_id, condition_concept_id;
+INSERT INTO {TARGET_SCHEMA}.condition_era(condition_era_id, person_id, condition_concept_id, 
+condition_era_start_date, condition_era_end_date, condition_occurrence_count)
+SELECT condition_era_id + cte0.start_id as condition_era_id, person_id, condition_concept_id,
+	condition_era_start_date, condition_era_end_date, condition_occurrence_count
+	FROM cte0, (
+	SELECT
+		row_number() over (order by person_id, condition_concept_id) as condition_era_id
+		, person_id
+		, condition_concept_id
+		, MIN(condition_start_date) AS condition_era_start_date
+		, era_end_date AS condition_era_end_date
+		, COUNT(*) AS condition_occurrence_count
+	FROM cteConditionEnds
+	GROUP BY person_id, condition_concept_id, era_end_date
+	ORDER BY person_id, condition_concept_id) as t;
 
 -----------------------
 -- Add PK / IDX / FK

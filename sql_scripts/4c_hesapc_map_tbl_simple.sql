@@ -54,7 +54,7 @@ CLUSTER {TARGET_SCHEMA}.person USING xpk_person;
 --------------------------------
 DROP SEQUENCE IF EXISTS sequence_pro;
 CREATE SEQUENCE sequence_pro INCREMENT 1;
-SELECT setval('sequence_pro', (SELECT MAX(provider_id) FROM public.PROVIDER));
+SELECT setval('sequence_pro', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'provider'));
 
 -- We have duplicated people with more than 1 speciality to save that information and use in episodes
 with cte1 AS (
@@ -135,3 +135,8 @@ select
 	32880
 from cte, {SOURCE_SCHEMA}.linkage_coverage as t3 
 where t3.data_source = 'hes_apc'; 
+
+ALTER TABLE {TARGET_SCHEMA}.observation_period ADD CONSTRAINT xpk_observation_period PRIMARY KEY (observation_period_id);
+
+CREATE INDEX idx_observation_period_id ON {TARGET_SCHEMA}.observation_period (person_id ASC);
+CLUSTER {TARGET_SCHEMA}.observation_period USING idx_observation_period_id;
