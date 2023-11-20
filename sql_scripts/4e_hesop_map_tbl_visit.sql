@@ -22,7 +22,7 @@ cte3 AS (
 	9202 AS visit_concept_id,
 	t3.date_min AS visit_start_date, 
 	NULL::timestamp AS visit_start_datetime,
-	t3.date_max, t3.date_min) AS visit_end_date,
+	COALESCE(t3.date_max, t3.date_min) AS visit_end_date,
 	NULL::timestamp AS visit_end_datetime,
 	32818 AS visit_type_concept_id,
 	NULL::bigint AS provider_id,
@@ -32,7 +32,7 @@ cte3 AS (
 	NULL::varchar AS admitting_source_value,
 	NULL::int AS admitting_source_concept_id,
 	NULL::varchar AS discharge_to_source_value,
-	NULL::varchar AS discharge_to_concept_id,
+	NULL::int AS discharge_to_concept_id,
 	NULL::int AS preceding_visit_occurrence_id
 	FROM {SOURCE_SCHEMA}.hesop_appointment AS t1
 	INNER JOIN cte1 as t2 ON t1.patid = t2.person_id
@@ -140,7 +140,8 @@ WITH cte1 AS (
 	NULL::int AS discharge_to_concept_id,			
 	NULL::int AS preceding_visit_detail_id, 					-- ANTO: to be filled in later when the table is all filled in
 	NULL::int AS visit_detail_parent_id,
-	NULL::int as visit_occurrence_id
+	NULL::int as visit_occurrence_id,
+	t1.attendkey
 	FROM {SOURCE_SCHEMA}.hesop_appointment AS t1
 ),
 cte2 AS (
@@ -183,7 +184,6 @@ cte3 AS (
 	FROM cte1 AS t1
 	INNER JOIN cte2 AS t2 ON t1.person_id = t2.person_id AND t1.visit_detail_source_value = t2.visit_detail_source_value
 ),
-
 cte4 AS (
 	SELECT * FROM cte3
 	ORDER BY person_id, visit_detail_source_value, visit_detail_start_datetime
@@ -218,8 +218,7 @@ cte6 AS (
 	INNER JOIN cte5 AS t2 ON t1.person_id = t2.person_id
 	WHERE t1.visit_detail_id > t2.visit_detail_id
 	GROUP BY t1.person_id, t1.visit_detail_id
-),
-
+)
 INSERT INTO {TARGET_SCHEMA}.VISIT_DETAIL (
 	visit_detail_id,
 	person_id,
@@ -262,7 +261,7 @@ SELECT
 	t1.visit_detail_parent_id,
 	t1.visit_occurrence_id
 FROM cte5 as t1
-LEFT JOIN cte6 AS t2 ON t1.visit_detail_id = t2.visit_detail_id
+LEFT JOIN cte6 AS t2 ON t1.visit_detail_id = t2.visit_detail_id;
 
 
 DROP SEQUENCE IF EXISTS sequence_vd;

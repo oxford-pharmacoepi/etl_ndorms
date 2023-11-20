@@ -42,7 +42,7 @@ SELECT
 	0 AS ethnicity_source_concept_id
 FROM {SOURCE_SCHEMA}.hesop_patient as t1
 LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t1.gen_ethnicity = t2.source_code 
-	and t2.source_vocabulary_id = 'HESAPC_ETHNIC_STCM';
+	and t2.source_vocabulary_id = 'HESOP_ETHNIC_STCM';
 
 ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person_id);
 
