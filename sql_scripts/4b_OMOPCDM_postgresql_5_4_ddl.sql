@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.PERSON (
 			race_source_value varchar(50) NULL,
 			race_source_concept_id integer NULL,
 			ethnicity_source_value varchar(50) NULL,
-			ethnicity_source_concept_id integer NULL );
+			ethnicity_source_concept_id integer NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.OBSERVATION_PERIOD (
@@ -27,7 +28,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.OBSERVATION_PERIOD (
 			person_id bigint NOT NULL,
 			observation_period_start_date date NOT NULL,
 			observation_period_end_date date NOT NULL,
-			period_type_concept_id integer NOT NULL );
+			period_type_concept_id integer NOT NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.VISIT_OCCURRENCE (
@@ -47,7 +49,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.VISIT_OCCURRENCE (
 			admitted_from_source_value varchar(50) NULL,
 			discharged_to_concept_id integer NULL,
 			discharged_to_source_value varchar(50) NULL,
-			preceding_visit_occurrence_id bigint NULL );
+			preceding_visit_occurrence_id bigint NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.VISIT_DETAIL (
@@ -69,7 +72,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.VISIT_DETAIL (
 			discharged_to_concept_id integer NULL,
 			preceding_visit_detail_id bigint NULL,
 			parent_visit_detail_id bigint NULL,
-			visit_occurrence_id bigint NOT NULL );
+			visit_occurrence_id bigint NOT NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.CONDITION_OCCURRENCE (
@@ -88,7 +92,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.CONDITION_OCCURRENCE (
 			visit_detail_id bigint NULL,
 			condition_source_value varchar(250) NULL,
 			condition_source_concept_id integer NULL,
-			condition_status_source_value varchar(50) NULL );
+			condition_status_source_value varchar(50) NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DRUG_EXPOSURE (
@@ -114,7 +119,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DRUG_EXPOSURE (
 			drug_source_value varchar(250) NULL,
 			drug_source_concept_id integer NULL,
 			route_source_value varchar(50) NULL,
-			dose_unit_source_value varchar(50) NULL );
+			dose_unit_source_value varchar(50) NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.PROCEDURE_OCCURRENCE (
@@ -133,7 +139,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.PROCEDURE_OCCURRENCE (
 			visit_detail_id bigint NULL,
 			procedure_source_value varchar(250) NULL,
 			procedure_source_concept_id integer NULL,
-			modifier_source_value varchar(50) NULL );
+			modifier_source_value varchar(50) NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DEVICE_EXPOSURE (
@@ -155,7 +162,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DEVICE_EXPOSURE (
 			device_source_concept_id integer NULL,
 			unit_concept_id integer NULL,
 			unit_source_value varchar(50) NULL,
-			unit_source_concept_id integer NULL );
+			unit_source_concept_id integer NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.MEASUREMENT (
@@ -181,7 +189,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.MEASUREMENT (
 			unit_source_concept_id integer NULL,
 			value_source_value varchar(50) NULL,
 			measurement_event_id integer NULL,
-			meas_event_field_concept_id integer NULL );
+			meas_event_field_concept_id integer NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.OBSERVATION (
@@ -205,7 +214,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.OBSERVATION (
 			qualifier_source_value varchar(50) NULL,
 			value_source_value varchar(50) NULL,
 			observation_event_id integer NULL,
-			obs_event_field_concept_id integer NULL );
+			obs_event_field_concept_id integer NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DEATH (
@@ -215,7 +225,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DEATH (
 			death_type_concept_id integer NULL,
 			cause_concept_id integer NULL,
 			cause_source_value varchar(50) NULL,
-			cause_source_concept_id integer NULL );
+			cause_source_concept_id integer NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.NOTE (
@@ -234,7 +245,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.NOTE (
 			visit_detail_id bigint NULL,
 			note_source_value varchar(50) NULL,
 			note_event_id integer NULL,
-			note_event_field_concept_id integer NULL );
+			note_event_field_concept_id integer NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON RANDOM
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.NOTE_NLP (
@@ -251,7 +263,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.NOTE_NLP (
 			nlp_datetime TIMESTAMP NULL,
 			term_exists varchar(1) NULL,
 			term_temporal varchar(50) NULL,
-			term_modifiers varchar(2000) NULL );
+			term_modifiers varchar(2000) NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.SPECIMEN (
@@ -269,7 +282,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.SPECIMEN (
 			specimen_source_value varchar(50) NULL,
 			unit_source_value varchar(50) NULL,
 			anatomic_site_source_value varchar(50) NULL,
-			disease_status_source_value varchar(50) NULL );
+			disease_status_source_value varchar(50) NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON RANDOM
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.FACT_RELATIONSHIP (
@@ -277,7 +291,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.FACT_RELATIONSHIP (
 			fact_id_1 integer NOT NULL,
 			domain_concept_id_2 integer NOT NULL,
 			fact_id_2 integer NOT NULL,
-			relationship_concept_id integer NOT NULL );
+			relationship_concept_id integer NOT NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON RANDOM
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.LOCATION (
@@ -292,7 +307,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.LOCATION (
 			country_concept_id integer NULL,
 			country_source_value varchar(80) NULL,
 			latitude NUMERIC NULL,
-			longitude NUMERIC NULL );
+			longitude NUMERIC NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON RANDOM
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.CARE_SITE (
@@ -301,7 +317,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.CARE_SITE (
 			place_of_service_concept_id integer NULL,
 			location_id bigint NULL,
 			care_site_source_value varchar(50) NULL,
-			place_of_service_source_value varchar(50) NULL );
+			place_of_service_source_value varchar(50) NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON RANDOM
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.PROVIDER (
@@ -317,7 +334,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.PROVIDER (
 			specialty_source_value varchar(250) NULL,
 			specialty_source_concept_id integer NULL,
 			gender_source_value varchar(50) NULL,
-			gender_source_concept_id integer NULL );
+			gender_source_concept_id integer NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.PAYER_PLAN_PERIOD (
@@ -337,7 +355,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.PAYER_PLAN_PERIOD (
 			family_source_value varchar(50) NULL,
 			stop_reason_concept_id integer NULL,
 			stop_reason_source_value varchar(50) NULL,
-			stop_reason_source_concept_id integer NULL );
+			stop_reason_source_concept_id integer NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON RANDOM
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.COST (
@@ -362,7 +381,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.COST (
 			revenue_code_concept_id integer NULL,
 			revenue_code_source_value varchar(50) NULL,
 			drg_concept_id integer NULL,
-			drg_source_value varchar(3) NULL );
+			drg_source_value varchar(3) NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DRUG_ERA (
@@ -372,7 +392,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DRUG_ERA (
 			drug_era_start_date date NOT NULL,
 			drug_era_end_date date NOT NULL,
 			drug_exposure_count integer NULL,
-			gap_days integer NULL );
+			gap_days integer NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DOSE_ERA (
@@ -382,7 +403,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DOSE_ERA (
 			unit_concept_id integer NOT NULL,
 			dose_value NUMERIC NOT NULL,
 			dose_era_start_date date NOT NULL,
-			dose_era_end_date date NOT NULL );
+			dose_era_end_date date NOT NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.CONDITION_ERA (
@@ -391,7 +413,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.CONDITION_ERA (
 			condition_concept_id integer NOT NULL,
 			condition_era_start_date date NOT NULL,
 			condition_era_end_date date NOT NULL,
-			condition_occurrence_count integer NULL );
+			condition_occurrence_count integer NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.EPISODE (
@@ -407,13 +430,15 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.EPISODE (
 			episode_object_concept_id integer NOT NULL,
 			episode_type_concept_id integer NOT NULL,
 			episode_source_value varchar(50) NULL,
-			episode_source_concept_id integer NULL );
+			episode_source_concept_id integer NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON RANDOM
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.EPISODE_EVENT (
 			episode_id integer NOT NULL,
 			event_id integer NOT NULL,
-			episode_event_field_concept_id integer NOT NULL );
+			episode_event_field_concept_id integer NOT NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON RANDOM
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.METADATA (
@@ -425,7 +450,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.METADATA (
 			value_as_concept_id integer NULL,
 			value_as_number NUMERIC NULL,
 			metadata_date date NULL,
-			metadata_datetime TIMESTAMP NULL );
+			metadata_datetime TIMESTAMP NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON RANDOM
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.CDM_SOURCE (
@@ -439,7 +465,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.CDM_SOURCE (
 			cdm_release_date date NOT NULL,
 			cdm_version varchar(10) NULL,
 			cdm_version_concept_id integer NOT NULL,
-			vocabulary_version varchar(20) NOT NULL );
+			vocabulary_version varchar(20) NOT NULL )
+			TABLESPACE pg_default;
 			
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem_source
 (
@@ -487,8 +514,8 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem_source
     disease_status_source_value character varying(50) COLLATE pg_catalog."default",
     modifier_concept_id integer,
     stem_source_table character varying(255) COLLATE pg_catalog."default",
-    stem_source_id character varying(255) COLLATE pg_catalog."default"
-);
+    stem_source_id character varying(255) COLLATE pg_catalog."default")
+	TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem
 (
@@ -536,22 +563,24 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem
     disease_status_source_value character varying(50) COLLATE pg_catalog."default",
     modifier_concept_id integer,
     stem_source_table character varying(255) COLLATE pg_catalog."default",
-    stem_source_id character varying(255) COLLATE pg_catalog."default"
-);
+    stem_source_id character varying(255) COLLATE pg_catalog."default")
+	TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON RANDOM
 CREATE TABLE IF NOT EXISTS results.COHORT (
 			cohort_definition_id integer NOT NULL,
 			subject_id integer NOT NULL,
 			cohort_start_date date NOT NULL,
-			cohort_end_date date NOT NULL );
+			cohort_end_date date NOT NULL )
+			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON RANDOM
-CREATE TABLE IF NOT EXISTS results.COHORT_DEFINITION (
-			cohort_definition_id integer NOT NULL,
-			cohort_definition_name varchar(255) NOT NULL,
-			cohort_definition_description TEXT NULL,
-			definition_type_concept_id integer NOT NULL,
-			cohort_definition_syntax TEXT NULL,
-			subject_concept_id integer NOT NULL,
-			cohort_initiation_date date NULL );
+--CREATE TABLE IF NOT EXISTS results.COHORT_DEFINITION (
+--			cohort_definition_id integer NOT NULL,
+--			cohort_definition_name varchar(255) NOT NULL,
+--			cohort_definition_description TEXT NULL,
+--			definition_type_concept_id integer NOT NULL,
+--			cohort_definition_syntax TEXT NULL,
+--			subject_concept_id integer NOT NULL,
+--			cohort_initiation_date date NULL )
+--			TABLESPACE pg_default;
