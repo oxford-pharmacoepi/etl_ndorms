@@ -46,9 +46,19 @@ def build_fk(dir_code):
 			plist.append(dir_code + "5b_cdm_fk_visit_detail__care_site.sql")
 			ret = mapping_util.execute_sql_files_parallel(db_conf, plist, True)
 		if ret == True:
+			plist.clear()
+			plist.append(dir_code + "5b_cdm_fk_specimen__person.sql")
+			plist.append(dir_code + "5b_cdm_fk_dose_era__concept.sql")
+			ret = mapping_util.execute_sql_files_parallel(db_conf, plist, True)
+		if ret == True:
+			plist.clear()
+			plist.append(dir_code + "5b_cdm_fk_dose_era__person.sql")
+			plist.append(dir_code + "5b_cdm_fk_specimen__concept.sql")
+			ret = mapping_util.execute_sql_files_parallel(db_conf, plist, True)
+		if ret == True:
 			sql_file_list1 = sorted(glob.iglob(dir_code + '5b_cdm_fk_*.sql'))
 			sql_file_list2 = sorted(glob.iglob(dir_code + '5b' + db_conf['cdm_version'][2] + '_cdm_fk_*.sql'))
-			list1 = ['condition_occurrence','device_exposure','drug_exposure','measurement','observation','procedure_occurrence','visit_detail','visit_occurrence']
+			list1 = ['condition_occurrence','device_exposure','drug_exposure','measurement','note','observation','procedure_occurrence','visit_detail','visit_occurrence']
 			list2 = ['concept','person','provider','visit_detail','visit_occurrence']
 			for i in range(len(list1)):
 				plist.clear()
@@ -100,9 +110,9 @@ def main():
 				print('Build PKs and IDXs ...')
 				sql_file_list = sorted(glob.iglob(dir_sql + '5a_cdm_pk_idx_*.sql'))
 				if ret == True:
-					sql_file_list.append(dir_sql + '5a' + db_conf['cdm_version'][2] + '_cdm_pk_idx_*.sql')
+					sql_file_list.extend(sorted(glob.iglob(dir_sql + '5a' + db_conf['cdm_version'][2] + '_cdm_pk_idx_*.sql')))
 				if db_conf['source_schema'] == '': # For data provided already mapped
-					sql_file_list.append(dir_sql + '5a__cdm_pk_idx_*.sql')
+					sql_file_list.extend(sorted(glob.iglob(dir_sql + '5a__cdm_pk_idx_*.sql')))
 				ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, True)
 # ---------------------------------------------------------
 # Build FK
