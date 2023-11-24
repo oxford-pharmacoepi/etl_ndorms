@@ -288,10 +288,6 @@ def get_table_max_ids(db_conf, tbl_name, tbl_result, cnx=None):
 			VALUES (\'' + tbl_name_short + '\', \
 			(select MAX(col1) from (select col1 from ' + tbl_name + ' as t1(col1)) as max_id))'
 			cursor1.execute(query1)
-
-#VALUES ('provider', 
-#			(select MAX(col1) from (select col1 from location as t1(col1)) as tt) )
-
 		print(f'{tbl_name} max_id calculated')
 		cursor1.close()
 		cursor1 = None
