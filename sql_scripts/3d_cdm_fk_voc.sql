@@ -19,4 +19,12 @@ ALTER TABLE {VOCABULARY_SCHEMA}.CONCEPT_SYNONYM ADD CONSTRAINT fpk_CONCEPT_SYNON
 
 ALTER TABLE {VOCABULARY_SCHEMA}.DOMAIN ADD CONSTRAINT fpk_domain_domain_concept_id FOREIGN KEY (domain_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id);
 
+ALTER TABLE {VOCABULARY_SCHEMA}.drug_strength ADD CONSTRAINT fpk_drug_strength_drug_concept_id FOREIGN KEY (drug_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id);
+ALTER TABLE {VOCABULARY_SCHEMA}.drug_strength ADD CONSTRAINT fpk_drug_strength_ingredient_concept_id FOREIGN KEY (ingredient_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id);
+ALTER TABLE {VOCABULARY_SCHEMA}.drug_strength ADD CONSTRAINT fpk_drug_strength_amount_unit_concept_id FOREIGN KEY (amount_unit_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id);
+ALTER TABLE {VOCABULARY_SCHEMA}.drug_strength ADD CONSTRAINT fpk_drug_strength_numerator_unit_concept_id FOREIGN KEY (numerator_unit_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id);
+ALTER TABLE {VOCABULARY_SCHEMA}.drug_strength ADD CONSTRAINT fpk_drug_strength_denominator_unit_concept_id FOREIGN KEY (denominator_unit_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id);
+
+ALTER TABLE {VOCABULARY_SCHEMA}.RELATIONSHIP ADD CONSTRAINT fpk_relationship_concept_id FOREIGN KEY (relationship_concept_id) REFERENCES {VOCABULARY_SCHEMA}.CONCEPT (CONCEPT_ID);
+
 ALTER TABLE {VOCABULARY_SCHEMA}.VOCABULARY ADD CONSTRAINT fpk_vocabulary_vocabulary_concept_id FOREIGN KEY (vocabulary_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id);
