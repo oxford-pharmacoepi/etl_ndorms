@@ -1,0 +1,20 @@
+title: HES CDM Documentation
+description: A starter template for a Jeykll site using the Just the Docs theme!
+theme: just-the-docs
+
+url: https://just-the-docs.github.io
+
+aux_links:
+  Ndorms ETL Builder: https://github.com/oxford-pharmacoepi/etl_ndorms
+
+plugins:
+  - jekyll-default-layout
+  
+# Enable or disable the site search
+search_enabled: true
+
+# Set the search token separator for hyphenated-word search:
+search_tokenizer_separator: /[\s/]+/
+  
+# Footer content appears at the bottom of every page's main content
+footer_content: "Please contact Ndorms Data science team if you have any questions"
