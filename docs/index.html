@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+  body{
+  font-family: system-ui,-apple-system,blinkmacsystemfont,"Segoe UI",roboto,"Helvetica Neue",arial,sans-serif,"Segoe UI Emoji";
+  }
+    .sidenav {
+      height: 100%;
+      width: 200px;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background-color: #F0F0F0;
+      overflow-x: hidden;
+      padding-left: 20px;
+    }
+
+    .sidenav a, .dropdown-btn {
+      padding: 8px;
+      text-decoration: none;
+      font-size: 15px;
+      color: #6666dd;
+      display: block;
+      width: 100%;
+      text-align: left;
+    }
+
+    .sidenav a:hover, .dropdown-btn:hover {
+      color: #6666dd;
+	  background-color: #DCDCDC;
+    }
+
+    .main {
+      margin-left: 200px;
+	  width: 60%;
+      font-size: 15px;
+      padding: 0px 10px 10px;
+      padding-top: 10px;
+    }
+	table {
+      width: 90%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      overflow-x: auto;
+    }
+ 
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+ 
+    th {
+      background-color: #f2f2f2;
+    }
+ 
+    tbody {
+      display: block;
+      overflow-x: auto;
+    }
+ 
+    tr {
+      display: table;
+      width: 100%;
+      box-sizing: border-box;
+    }
+ 
+    @media (min-width: 600px) {
+      tbody {
+        display: table-row-group;
+        overflow-x: hidden;
+      }
+ 
+      tr {
+        display: table-row;
+      }
+    }
+
+    .active {
+      background-color:#D0D0D0;
+      color: #6666dd;
+    }
+
+    .dropdown-container {
+      display: none;
+      background-color: #F0F0F0;
+      padding-left: 8px;
+    }
+
+    .fa-caret-down {
+      float: right;
+      padding-right: 8px;
+    }
+
+    @media screen and (max-width: 800px) {
+      .sidenav { display: none; }
+      .main { margin-left: 0; }
+      .navbar-toggler {
+        order: -1;
+      }
+      .close-icon {
+        display: block;
+        font-size: 24px;
+        margin-right: 20px;
+        cursor: pointer;
+      }
+    }
+  </style>
+  <title>Home | HES CDM Documentation</title>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="close-icon" onclick="toggleSidebar()">&#10006;</div>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <div class="sidenav" id="mySidebar">
+		<a href="#section1" onclick="closeNav()" style="color:black; font-weight: 500;">HES CDM Documentation</a>
+	  <hr>
+	  <a href="#section1" onclick="closeNav()" style="color:#6666dd;">Home</a>
+      <button class="dropdown-btn" style="border: none;" onclick="scrollToSection('section2')">
+		<a href="HESAPC.html" style="text-decoration: none;">HES APC<i class="fa fa-caret-down"></i></a>  
+      </button>
+      <div class="dropdown-container">
+        <a href="#subsection1">PERSON</a>
+		<a href="#subsection2">PROVIDER</a>
+        <a href="#subsection3">VISIT_OCCURRENCE</a>
+        <a href="#subsection4">VISIT_DETAIL</a>
+		<a href="#subsection5">STEM</a>
+      </div>
+     </div>
+  </div>
+</nav>
+
+<div class="main">
+    <section id="section1">
+      <h2>Hospital Episode Statistics (HES) ETL Documentation</h2>
+      <p>This documentation and references outline the ETL process undertaken for the conversion of the 
+	  <a href="https://digital.nhs.uk/data-and-information/data-tools-and-services/data-services/hospital-episode-statistics">
+	  Hospital Episode Statistics (HES)</a> datasets to the <a href="https://ohdsi.github.io/CommonDataModel/">OMOP Common Data Model (CDM)</a>.
+	  </p>
+	  <h4>HES Source data Mappings</h4>
+	  <ul>
+	  <li><a href="HESAPC.html">Hospital Episode Statistics (HES) Admitted Patient Care (APC)</a></li>
+	  <li><a href="#">Hospital Episode Statistics (HES) Accident and Emergency</a></li>
+	  <li><a href="#">Hospital Episode Statistics (HES) Outpatients</a></li>
+	  </ul>  
+	  <hr>
+    </section>
+</div>
+<!-- Bootstrap JS and Popper.js (required for Bootstrap) -->
+<script src="https://code.jquery.com/jquery-3.6.4.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var dropdownButtons = document.querySelectorAll(".dropdown-btn");
+
+    dropdownButtons.forEach(function (button) {
+      button.addEventListener("click", function () {
+        this.classList.toggle("active");
+        var dropdownContent = this.nextElementSibling;
+        if (dropdownContent.style.display === "block") {
+          dropdownContent.style.display = "none";
+        } else {
+          dropdownContent.style.display = "block";
+        }
+      });
+    });
+
+    // Add the event listener to the navbar-toggler button
+    document.querySelector(".navbar-toggler").addEventListener("click", function () {
+      toggleSidebar();
+    });
+
+    // Add the event listener to the close-icon button
+    document.querySelector(".close-icon").addEventListener("click", function () {
+      toggleSidebar();
+    });
+
+  });
+</script>
+
+</body>
+</html>
