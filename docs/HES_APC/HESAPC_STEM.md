@@ -1,6 +1,6 @@
 ---
 layout: default
-title: HESAPC to STEM
+title: HES APC to STEM
 nav_order: 8
 parent: HES APC
 has_children: true
