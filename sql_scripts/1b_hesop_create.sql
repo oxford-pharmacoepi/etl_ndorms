@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesop_clinical(
 	opertn_23		varchar(8),
 	opertn_24		varchar(8),
 	operstat		varchar(8),
-	tretspef		varchar(8),
-	mainspef		varchar(8),
+	tretspef		varchar(3),
+	mainspef		varchar(3),
 	HES_yr			int
 );
