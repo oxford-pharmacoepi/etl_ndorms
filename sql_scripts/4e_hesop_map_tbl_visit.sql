@@ -104,7 +104,7 @@ SELECT
 	FROM cte3 AS t1
 	INNER JOIN cte4 AS t2 ON t1.visit_occurrence_id = t2.visit_occurrence_id
 	LEFT JOIN cte5 AS t3 ON t1.visit_occurrence_id = t3.visit_occurrence_id
-	WHERE t1.attended in (5);
+	WHERE t1.attended in (5); -- Mandi: This is intended to retrieve only those appointments that were attended, specifically those with a corresponding value of 5.
 
 DROP SEQUENCE IF EXISTS sequence_vo;
 
@@ -189,7 +189,7 @@ cte3 AS (
 	t1.attendkey
 	FROM cte1 AS t1
 	INNER JOIN cte2 AS t2 ON t1.person_id = t2.person_id AND t1.visit_detail_source_value = t2.visit_detail_source_value
-	WHERE t1.attended in (5)
+	WHERE t1.attended in (5) -- Mandi: This is intended to retrieve only those appointments that were attended, specifically those with a corresponding value of 5.
 ),
 cte4 AS (
 	SELECT * FROM cte3
