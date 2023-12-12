@@ -17,3 +17,8 @@ The image below (Figure.1) shows a high-level diagram of how the native tables i
 
 ![](images/image1.png)
 **Figure.1**
+
+## Change log
+
+### 12-Nov-2023
+- Creation of documentation

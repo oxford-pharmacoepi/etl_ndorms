@@ -23,10 +23,10 @@ description: "Visit_occurrence v5.3 description"
 | visit_end_date | discharged | If discharged is null, use the last epiend in episode, and if also those are null, use admidate or the first of epistart | COALESCE(discharged, MAX(epiend), admidate, MIN(epistart)) |
 | visit_end_datetime | discharged |If discharged is null, use the last epiend in episode, and if also those are null, use admidate or the first of epistart| COALESCE(discharged, MAX(epiend), admidate, MIN(epistart)) |
 | visit_type_concept_id |  | 32818 = EHR administration record |  |
-| provider_id | | |  |
-| care_site_id | | |  |
+| provider_id |NULL | |  |
+| care_site_id | NULL| |  |
 | visit_source_value | spno | This will allow us to retrieve Visit_occurrence_id. |  |
-| visit_source_concept_id |  |  |  |
+| visit_source_concept_id |NULL  |  |  |
 | admitting_source_concept_id | admimeth |  | Check for OMOP codes from admimeth |
 | admitting_source_value | admimeth |  | Definition to be added instead of number |
 | discharge_to_concept_id | dismeth |  | Check for OMOP codes from dismeth |
