@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesae_patient (
     patid			bigint,
     pracid			int,
-    gen_hesid		int,
+    gen_hesid		bigint,
     n_patid_hes		int,
     gen_ethnicity	varchar(10),
     match_rank		int
