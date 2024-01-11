@@ -18,15 +18,15 @@ Use the hes_episodes table to populate the provider table. In HES APC, the Pcons
 | Destination Field | Source field | Logic | Comment field |
 | --- | --- | :---: | --- |
 | provider_id | pconsult | Autogenerate |  |
-| provider_name |  |  |  |
-| npi |  |  |  |
-| dea |  |  |  |
+| provider_name | NULL |  |  |
+| npi | NULL |  |  |
+| dea | NULL |  |  |
 | specialty_concept_id | tretspef | 	If tretspef is not null then concept_id (tretspef) else 0, domain_id='provider' and Vocabulary_id='HES Specialty' and standard_concept='s' | Mainspef are not unique per consultant, so better to record pairs of (consultatnt,soecialty) to be used across the episodes |
-| care_site_id | | | |
-| year_of_birth |  |  |  |
-| gender_concept_id |  | |  |
+| care_site_id |NULL | | |
+| year_of_birth | NULL |  |  |
+| gender_concept_id | NULL | |  |
 | provider_source_value | pconsult |  |  |
 | specialty_source_value | tretspef | | |
-| specialty_source_concept_id |  |  | |
-| gender_source_value | | |  |
-| gender_source_concept_id |  |  | |
+| specialty_source_concept_id | NULL |  | |
+| gender_source_value | NULL| |  |
+| gender_source_concept_id | NULL |  | |

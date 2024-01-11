@@ -22,22 +22,22 @@ The patients mapped to the CDM from HES APC in this instance were restricted to 
 | Destination Field | Source field | Logic | Comment field |
 | --- | --- | :---: | --- |
 | person_id | patid |  	If match_rank >= 3 discard patient (we accept only match_rank = 1 or match_rank = 2)|  If a patient has no entry in source_hesapc.hes_hospital, disregard it.Data like gender, year_of_birth, location_id, Care_site_id comes from AURUM/GOLD as the data are linked to them.|
-| gender_concept_id | | | |
-| year_of_birth | | | |
-| month_of_birth | |  | |
-| day_of_birth |  |  |  |
-| birth_datetime |  |  |  |
-| race_concept_id | gen_ethnicity | | In OMOP, use "race" instead of "ethnicity", but at a later stage|
-| ethnicity_concept_id |  |  |   |
-| location_id |  |  |  |
-| provider_id |  |  |  |
-| care_site_id | | |  |
+| gender_concept_id |NULL | | |
+| year_of_birth | NULL| | |
+| month_of_birth |NULL |  | |
+| day_of_birth | NULL |  |  |
+| birth_datetime | NULL |  |  |
+| race_concept_id | gen_ethnicity | | race_concept_id will be mapped to SNOMED Concept_id by using gen_ethnicity to retrieve the target_concept_id from source_to_standard_vocab_map where source_vocabulary_id = "CPRD_ETHIC_STCM"|
+| ethnicity_concept_id | NULL |  |   |
+| location_id | NULL |  |  |
+| provider_id | NULL |  |  |
+| care_site_id |NULL | |  |
 | person_source_value | patid |  |  |
-| gender_source_value | |  | |
-| gender_source_concept_id |  |  |  |
-| race_source_value | gen_ethnicity| | In OMOP, use "race" instead of "ethnicity", but at a later stage|
-| race_source_concept_id |  | |
-| ethnicity_source_value |  |  |  | 
+| gender_source_value | NULL|  | |
+| gender_source_concept_id |NULL  |  |  |
+| race_source_value | gen_ethnicity| | race_concept_id will be mapped to SNOMED Concept_id by using gen_ethnicity to retrieve the target_concept_id from source_to_standard_vocab_map where source_vocabulary_id = "CPRD_ETHIC_STCM"|
+| race_source_concept_id | NULL | |
+| ethnicity_source_value | NULL |  |  | 
 
 ## Change log
 
