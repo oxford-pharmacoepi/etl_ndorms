@@ -5,8 +5,9 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesae_patient (
     gen_hesid		bigint,
     n_patid_hes		int,
     gen_ethnicity	varchar(10),
-    match_rank		int
-);
+    match_rank		int)
+	TABLESPACE pg_default;
+	
 -----------------------------------------------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesae_attendance (
@@ -24,8 +25,9 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesae_attendance (
     tretdur			int,
     concldur		int,
     depdur			int,
-    ethnos			varchar(10)
-);
+    ethnos			varchar(10))
+	TABLESPACE pg_default;
+	
 ---------------------------------------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesae_diagnosis (
     patid			bigint,
@@ -36,8 +38,9 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesae_diagnosis (
     diaga			varchar(2),
     diags			varchar(1),
     diag_order		int,
-	diagscheme		int
-);
+	diagscheme		int)
+	TABLESPACE pg_default;
+	
 ---------------------------------------------------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesae_investigation (
@@ -45,8 +48,9 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesae_investigation (
     aekey			bigint,
     invest			varchar(6),
     invest2			varchar(2),
-    invest_order	int
-);
+    invest_order	int)
+	TABLESPACE pg_default;
+	
 ---------------------------------------------------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesae_treatment (
@@ -55,8 +59,9 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesae_treatment (
     treat			varchar(6),
     treat2			varchar(2),
     treat3			varchar(3),
-    treat_order		int
-);
+    treat_order		int)
+	TABLESPACE pg_default;
+	
 ----------------------------------------------------------------------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesae_hrg (
@@ -66,12 +71,13 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesae_hrg (
     hrgnhs			varchar(3),
     hrgnhsvn		varchar(3),
     sushrg			varchar(6),
-    sushrgvers		numeric
-);
+    sushrgvers		numeric)
+	TABLESPACE pg_default;
+	
 --------------------------------------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesae_pathway (
     patid			bigint,
     aekey			bigint,
     rttperstart		date,
-    rttperend		date
-);
+    rttperend		date)
+	TABLESPACE pg_default;

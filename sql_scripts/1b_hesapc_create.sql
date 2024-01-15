@@ -5,8 +5,9 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_patient (
 	gen_hesid 		bigint,
 	n_patid_hes 	int,
 	gen_ethnicity 	varchar(10),
-	match_rank 		int
-);
+	match_rank 		int)
+	TABLESPACE pg_default;
+	
 ---------------Creating Hospitalisations Table---------------------------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_hospital (
 	patid		bigint,
@@ -19,8 +20,9 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_hospital (
 	dismeth		int,
 	duration	int,
 	elecdate	date,
-	elecdur		int
-);
+	elecdur		int)
+	TABLESPACE pg_default;
+	
 ------------- Creating Episodes Table---------------------------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_episodes (
 	patid		bigint,
@@ -43,8 +45,9 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_episodes (
 	intmanig	int,
 	classpat	int,
 	firstreg	varchar(2),
-	ethnos		varchar(10)
-);
+	ethnos		varchar(10))
+	TABLESPACE pg_default;
+	
 ------------Creating  Diagnoses Tables-----------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_diagnosis_epi (
 	patid		bigint,
@@ -54,8 +57,8 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_diagnosis_epi (
 	epiend		date,
 	icd			varchar(5),
 	icdx		varchar(5),
-	d_order		smallint
-);
+	d_order		smallint)
+	TABLESPACE pg_default;
 
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_diagnosis_hosp (
@@ -64,8 +67,9 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_diagnosis_hosp (
 	admidate	date,
 	discharged	date,
 	icd			varchar(5),
-	icdx		varchar(5)
-);
+	icdx		varchar(5))
+	TABLESPACE pg_default;
+	
 ----------- Creating Procedures Table --------------------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_procedures_epi (
 	patid		bigint,
@@ -77,8 +81,9 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_procedures_epi (
 	discharged	date,
 	OPCS		varchar(5),
 	evdate 		date,
-	p_order 	int
-);
+	p_order 	int)
+	TABLESPACE pg_default;
+	
 ----------- Creating  Augmented Care Periods – ACP Table ------------------------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_acp (
 	patid		bigint,
@@ -102,8 +107,9 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_acp (
 	acpplan 	char(1),
 	acpspef 	varchar(3),
 	orgsup 		int,
-	acpdqind 	char(1)
-);
+	acpdqind 	char(1))
+	TABLESPACE pg_default;
+	
 -------------Creating Critical Care Table----------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_ccare (
 	patid			bigint,
@@ -141,8 +147,9 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_ccare (
 	ccunitfun 		int,
 	unitbedconfig 	int,
 	bestmatch 		int,
-	ccapcrel 		int
-);
+	ccapcrel 		int)
+	TABLESPACE pg_default;
+	
 ------Creating Maternity Table ---------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_maternity (
 	patid			bigint,
@@ -177,8 +184,8 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_maternity (
 	matage 			int,
 	neodur 			int,
 	antedur 		int,
-	postdur 		int
-);
+	postdur 		int)
+	TABLESPACE pg_default;
 
 ------Creating source_hesapc.hes_hrg Table------------------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_hrg (
@@ -192,8 +199,9 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_hrg (
 	suscorehrg 	varchar(5),
 	sushrg 		varchar(5),
 	sushrgvers 	NUMERIC(2,1),
-	hes_yr 		smallint
-);
+	hes_yr 		smallint)
+	TABLESPACE pg_default;
+	
 ------Creating Hes_Primary_diag_hosp Table------------------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_primary_diag_hosp (
 	patid		bigint,
@@ -201,12 +209,12 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_primary_diag_hosp (
 	admidate	date,
 	discharged	date,
 	icd_primary	varchar(5),
-	icdx		varchar(5)
-);
+	icdx		varchar(5))
+	TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}._records (
 	tbl_name 					varchar(30) NOT NULL,
 	{SOURCE_SCHEMA}_records 	bigint DEFAULT 0,
 	{SOURCE_NOK_SCHEMA}_records bigint DEFAULT 0,
-	total_records 				bigint DEFAULT 0
-);
+	total_records 				bigint DEFAULT 0)
+	TABLESPACE pg_default;
