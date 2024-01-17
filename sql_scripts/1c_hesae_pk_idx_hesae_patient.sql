@@ -1,6 +1,6 @@
 --hesae_patient
-ALTER TABLE {SOURCE_SCHEMA}.hesae_patient ADD CONSTRAINT pk_hesae_patient PRIMARY KEY (patid, match_rank);
-create index idx_hesae_patient_patid on {SOURCE_SCHEMA}.hesae_patient(patid);
+ALTER TABLE {SOURCE_SCHEMA}.hesae_patient ADD CONSTRAINT pk_hesae_patient PRIMARY KEY (patid, match_rank) USING INDEX TABLESPACE pg_default;
+create index idx_hesae_patient_patid on {SOURCE_SCHEMA}.hesae_patient(patid) TABLESPACE pg_default;
 cluster {SOURCE_SCHEMA}.hesae_patient using idx_hesae_patient_patid;
-create index idx_hesae_patient_ethnicity on {SOURCE_SCHEMA}.hesae_patient(gen_ethnicity);
+create index idx_hesae_patient_ethnicity on {SOURCE_SCHEMA}.hesae_patient(gen_ethnicity) TABLESPACE pg_default;
 

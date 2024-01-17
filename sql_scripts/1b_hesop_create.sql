@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesop_patient(
 	gen_hesid		bigint,
 	n_patid_hes		int,
 	gen_ethnicity	varchar(10),
-	match_rank		int
-);
+	match_rank		int)
+	TABLESPACE pg_default;
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -17,8 +17,9 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesop_patient_pathway(
 	perend			date,
 	perstart		date,
 	subdate			date,
-	HES_yr			int
-);
+	HES_yr			int)
+	TABLESPACE pg_default;
+	
 ------------------------------------------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesop_appointment(
 	patid			bigint,
@@ -39,8 +40,9 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesop_appointment(
 	stafftyp		int,
 	wait_ind		int,
 	waiting			int,
-	HES_yr			int
-);
+	HES_yr			int)
+	TABLESPACE pg_default;
+	
 ------------------------------------------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesop_clinical(
 	patid			bigint,
@@ -84,5 +86,5 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesop_clinical(
 	operstat		varchar(8),
 	tretspef		varchar(3),
 	mainspef		varchar(3),
-	HES_yr			int
-);
+	HES_yr			int)
+	TABLESPACE pg_default;
