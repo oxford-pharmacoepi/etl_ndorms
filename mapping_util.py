@@ -408,12 +408,14 @@ def get_table_max_ids_parallel(db_conf, tbl_list, tbl_result):
 # ---------------------------------------------------------
 def parse_queries_file(db_conf, filename, chunk_id=None):
 # ---------------------------------------------------------
+	database = db_conf['database'] if 'database' in db_conf else None
 	source_nok_schema = db_conf['source_nok_schema'] if 'source_nok_schema' in db_conf else None
 	source_schema = db_conf['source_schema'] if 'source_schema' in db_conf else None
 	target_schema = db_conf['target_schema'] if 'target_schema' in db_conf else None
 	target_schema_to_link = db_conf['target_schema_to_link'] if 'target_schema_to_link' in db_conf else None
 	vocabulary_schema = db_conf['vocabulary_schema'] if 'vocabulary_schema' in db_conf else None
 	chunk_schema = db_conf['chunk_schema'] if 'chunk_schema' in db_conf else None
+	result_schema = db_conf['result_schema'] if 'result_schema' in db_conf else None
 	lookup_directory = db_conf['dir_lookup'] if 'dir_lookup' in db_conf else None
 	vocabulary_directory = db_conf['dir_voc'] if 'dir_voc' in db_conf else None
 	stcm_directory = db_conf['dir_stcm'] if 'dir_stcm' in db_conf else None
@@ -424,12 +426,14 @@ def parse_queries_file(db_conf, filename, chunk_id=None):
 	query_list = open(filename).read().split(';')
 	for idx, item in enumerate(query_list):
 		query = sqlparse.format(item, strip_comments=True).strip()
+		query = query.replace('{DATABASE}', database) if database is not None else query
 		query = query.replace('{SOURCE_NOK_SCHEMA}', source_nok_schema) if source_nok_schema is not None else query
 		query = query.replace('{SOURCE_SCHEMA}', source_schema) if source_schema is not None else query
 		query = query.replace('{TARGET_SCHEMA}', target_schema) if target_schema is not None else query
 		query = query.replace('{TARGET_SCHEMA_TO_LINK}', target_schema_to_link) if target_schema_to_link is not None else query
 		query = query.replace('{VOCABULARY_SCHEMA}', vocabulary_schema) if vocabulary_schema is not None else query  
 		query = query.replace('{CHUNK_SCHEMA}', chunk_schema) if chunk_schema is not None else query  
+		query = query.replace('{RESULT_SCHEMA}', result_schema) if result_schema is not None else query  
 		query = query.replace('{LOOKUP_DIRECTORY}', lookup_directory) if lookup_directory is not None else query  
 		query = query.replace('{VOCABULARY_DIRECTORY}', vocabulary_directory) if vocabulary_directory is not None else query  
 		query = query.replace('{STCM_DIRECTORY}', stcm_directory) if stcm_directory is not None else query  
