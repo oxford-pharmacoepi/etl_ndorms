@@ -7,7 +7,6 @@ import psycopg2 as sql
 from importlib.machinery import SourceFileLoader
 
 mapping_util = SourceFileLoader('mapping_util', os.path.dirname(os.path.realpath(__file__)) + '/mapping_util.py').load_module()
-
 # ---------------------------------------------------------
 # MAIN PROGRAM
 # ---------------------------------------------------------
@@ -21,7 +20,7 @@ def main():
 			source_schema = db_conf['source_schema']
 			tbl_db = 'tbl_' + database_type
 			tbl_db_list =  [source_schema + "." + tbl for tbl in db_conf[tbl_db]]
-			dir_denom = db_conf['dir_study'] + 'denominator\\'
+			dir_denom = dir_study + '\\denominators\\'
 			dir_denom_processed = dir_denom + db_conf['dir_processed']
 			dir_sql = os.getcwd() + '\\sql_scripts\\'
 			dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
