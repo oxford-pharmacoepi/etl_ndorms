@@ -113,7 +113,6 @@ def main():
 					sql_file_list.extend(sorted(glob.iglob(dir_sql + '5a' + db_conf['cdm_version'][2] + '_cdm_pk_idx_*.sql')))
 				if db_conf['source_schema'] == '': # For data provided already mapped
 					sql_file_list.extend(sorted(glob.iglob(dir_sql + '5a__cdm_pk_idx_*.sql')))
-				print(sql_file_list)
 				ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, True)
 # ---------------------------------------------------------
 # Build FK

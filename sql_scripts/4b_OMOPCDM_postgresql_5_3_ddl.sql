@@ -92,7 +92,7 @@
 			visit_detail_id bigint NULL,
 			condition_source_value varchar(250) NULL,
 			condition_source_concept_id integer NULL,
-			condition_status_source_value varchar(50) NULL
+			condition_status_source_value varchar(50) NULL )
 			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
