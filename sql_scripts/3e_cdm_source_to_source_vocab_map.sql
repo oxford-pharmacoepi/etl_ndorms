@@ -23,5 +23,5 @@ WITH CTE_VOCAB_MAP AS (
 
 SELECT * INTO {VOCABULARY_SCHEMA}.source_to_source_vocab_map FROM CTE_VOCAB_MAP;
 
-create index idx_source_vocab_map_source_code on {VOCABULARY_SCHEMA}.source_to_source_vocab_map (source_code);
-create index idx_source_vocab_map_source_vocab_id on {VOCABULARY_SCHEMA}.source_to_source_vocab_map (source_vocabulary_id);
+create index idx_source_vocab_map_source_code on {VOCABULARY_SCHEMA}.source_to_source_vocab_map (source_code) TABLESPACE pg_default;
+create index idx_source_vocab_map_source_vocab_id on {VOCABULARY_SCHEMA}.source_to_source_vocab_map (source_vocabulary_id) TABLESPACE pg_default;
