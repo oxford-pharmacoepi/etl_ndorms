@@ -214,7 +214,7 @@ def load_files(db_conf, schema, tbl_name, file_list, dir_processed):
 	return(ret)
 
 # ---------------------------------------------------------
-def load_files_parallel(db_conf, schema, tbl_list, file_list, dir_processed):
+def load_files_parallel(db_conf, schema, tbl_list, file_list, dir_processed, separator = '	', with_quotes = False):
 	"Load files into tables"
 # ---------------------------------------------------------
 	ret = True
@@ -226,7 +226,7 @@ def load_files_parallel(db_conf, schema, tbl_list, file_list, dir_processed):
 # Load files in parallel (all tables), sequentially within each table
 # ---------------------------------------------------------
 		with ProcessPoolExecutor(int(db_conf['max_workers'])) as executor:
-			futures = [executor.submit(load_files, db_conf, schema, tbl_name, file_list[idx], dir_processed) for idx, tbl_name in enumerate(tbl_list)]
+			futures = [executor.submit(load_files, db_conf, schema, tbl_name, file_list[idx], dir_processed, separator, with_quotes) for idx, tbl_name in enumerate(tbl_list)]
 			for future in as_completed(futures):
 				if future.result() == False:
 					ret = False
