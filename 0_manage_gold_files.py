@@ -9,7 +9,6 @@ import time
 import os
 import glob
 from importlib.machinery import SourceFileLoader
-#sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 # ---------------------------------------------------------
 mapping_util = SourceFileLoader('mapping_util', os.path.dirname(os.path.realpath(__file__)) + '/mapping_util.py').load_module()
 # ---------------------------------------------------------
@@ -71,6 +70,7 @@ def main():
 # ---------------------------------------------------------
 		(ret, dir_study, db_conf, debug) = mapping_util.get_parameters()
 		if ret == True and dir_study != '':
+			dir_study = dir_study + "\\"
 			dir_downloaded = dir_study + '_downloaded\\'
 			dir_data = dir_study + 'data\\'
 # ---------------------------------------------------------
