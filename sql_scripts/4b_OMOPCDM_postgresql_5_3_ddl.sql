@@ -54,7 +54,6 @@
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.VISIT_DETAIL (
- 
 			visit_detail_id bigint NOT NULL,
 			person_id bigint NOT NULL,
 			visit_detail_concept_id integer NOT NULL,
@@ -78,7 +77,6 @@
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.CONDITION_OCCURRENCE (
- 
 			condition_occurrence_id bigint NOT NULL,
 			person_id bigint NOT NULL,
 			condition_concept_id integer NOT NULL,
@@ -99,7 +97,6 @@
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DRUG_EXPOSURE (
- 
 			drug_exposure_id bigint NOT NULL,
 			person_id bigint NOT NULL,
 			drug_concept_id integer NOT NULL,
@@ -127,7 +124,6 @@
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.PROCEDURE_OCCURRENCE (
- 
 			procedure_occurrence_id bigint NOT NULL,
 			person_id bigint NOT NULL,
 			procedure_concept_id integer NOT NULL,
@@ -146,7 +142,6 @@
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DEVICE_EXPOSURE (
- 
 			device_exposure_id bigint NOT NULL,
 			person_id bigint NOT NULL,
 			device_concept_id integer NOT NULL,
@@ -166,7 +161,6 @@
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.MEASUREMENT (
- 
 			measurement_id bigint NOT NULL,
 			person_id bigint NOT NULL,
 			measurement_concept_id integer NOT NULL,
@@ -191,7 +185,6 @@
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.OBSERVATION (
- 
 			observation_id bigint NOT NULL,
 			person_id bigint NOT NULL,
 			observation_concept_id integer NOT NULL,
@@ -214,8 +207,7 @@
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DEATH (
- 
-			person_id bigint NOT NULL,
+ 			person_id bigint NOT NULL,
 			death_date date NOT NULL,
 			death_datetime TIMESTAMP NULL,
 			death_type_concept_id integer NULL,
@@ -226,9 +218,8 @@
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.NOTE (
- 
-			note_id integer NOT NULL,
-			person_id bigint NOT NULL,
+			note_id bigint NOT NULL,
+ 			person_id bigint NOT NULL,
 			note_date date NOT NULL,
 			note_datetime TIMESTAMP NULL,
 			note_type_concept_id integer NOT NULL,
@@ -245,7 +236,6 @@
 
 --HINT DISTRIBUTE ON RANDOM
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.NOTE_NLP (
- 
 			note_nlp_id integer NOT NULL,
 			note_id integer NOT NULL,
 			section_concept_id integer NULL,
@@ -264,8 +254,7 @@
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.SPECIMEN (
- 
-			specimen_id integer NOT NULL,
+			specimen_id bigint NOT NULL,
 			person_id bigint NOT NULL,
 			specimen_concept_id integer NOT NULL,
 			specimen_type_concept_id integer NOT NULL,
@@ -284,8 +273,7 @@
 
 --HINT DISTRIBUTE ON RANDOM
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.FACT_RELATIONSHIP (
- 
-			domain_concept_id_1 integer NOT NULL,
+ 			domain_concept_id_1 integer NOT NULL,
 			fact_id_1 integer NOT NULL,
 			domain_concept_id_2 integer NOT NULL,
 			fact_id_2 integer NOT NULL,
@@ -294,8 +282,7 @@
 
 --HINT DISTRIBUTE ON RANDOM
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.LOCATION (
- 
-			location_id bigint NOT NULL,
+ 			location_id bigint NOT NULL,
 			address_1 varchar(50) NULL,
 			address_2 varchar(50) NULL,
 			city varchar(50) NULL,
@@ -307,7 +294,6 @@
 
 --HINT DISTRIBUTE ON RANDOM
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.CARE_SITE (
- 
 			care_site_id integer NOT NULL,
 			care_site_name varchar(255) NULL,
 			place_of_service_concept_id integer NULL,
@@ -318,7 +304,6 @@
 
 --HINT DISTRIBUTE ON RANDOM
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.PROVIDER (
- 
 			provider_id bigint NOT NULL,
 			provider_name varchar(255) NULL,
 			npi varchar(20) NULL,
@@ -336,8 +321,7 @@
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.PAYER_PLAN_PERIOD (
- 
-			payer_plan_period_id integer NOT NULL,
+ 			payer_plan_period_id integer NOT NULL,
 			person_id bigint NOT NULL,
 			payer_plan_period_start_date date NOT NULL,
 			payer_plan_period_end_date date NOT NULL,
@@ -358,8 +342,7 @@
 
 --HINT DISTRIBUTE ON RANDOM
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.COST (
- 
-			cost_id integer NOT NULL,
+ 			cost_id integer NOT NULL,
 			cost_event_id integer NOT NULL,
 			cost_domain_id varchar(20) NOT NULL,
 			cost_type_concept_id integer NOT NULL,
@@ -385,7 +368,6 @@
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DRUG_ERA (
- 
 			drug_era_id bigint NOT NULL,
 			person_id bigint NOT NULL,
 			drug_concept_id integer NOT NULL,
@@ -397,7 +379,6 @@
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DOSE_ERA (
- 
 			dose_era_id bigint NOT NULL,
 			person_id bigint NOT NULL,
 			drug_concept_id integer NOT NULL,
@@ -409,7 +390,6 @@
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.CONDITION_ERA (
- 
 			condition_era_id bigint NOT NULL,
 			person_id bigint NOT NULL,
 			condition_concept_id integer NOT NULL,
@@ -420,7 +400,6 @@
 
 --HINT DISTRIBUTE ON RANDOM
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.METADATA (
- 
 			metadata_concept_id integer NOT NULL,
 			metadata_type_concept_id integer NOT NULL,
 			name varchar(250) NOT NULL,
@@ -432,7 +411,6 @@
 
 --HINT DISTRIBUTE ON RANDOM
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.CDM_SOURCE (
- 
 			cdm_source_name varchar(255) NOT NULL,
 			cdm_source_abbreviation varchar(25) NULL,
 			cdm_holder varchar(255) NULL,
@@ -491,7 +469,7 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem_source
     disease_status_source_value character varying(50) COLLATE pg_catalog."default",
     modifier_concept_id integer,
     stem_source_table character varying(255) COLLATE pg_catalog."default",
-    stem_source_id character varying(255) COLLATE pg_catalog."default") 
+    stem_source_id character varying(255) COLLATE pg_catalog."default")
 	TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem
@@ -540,7 +518,7 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem
     disease_status_source_value character varying(50) COLLATE pg_catalog."default",
     modifier_concept_id integer,
     stem_source_table character varying(255) COLLATE pg_catalog."default",
-    stem_source_id character varying(255) COLLATE pg_catalog."default") 
+    stem_source_id character varying(255) COLLATE pg_catalog."default")
 	TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON RANDOM

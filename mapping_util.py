@@ -50,6 +50,80 @@ def calc_time(secs_tot):
 	return("{0}h:{1:02d}m:{2:02d}s".format(int(hours), int(mins), int(secs)))
 
 # ---------------------------------------------------------
+def does_db_exist(db_conf):
+	"Check if a db exists"
+# ---------------------------------------------------------
+	ret 	= True
+	exist 	= False
+	cnx 	= None
+	cursor1 = None
+
+	try:
+		cnx = sql.connect(
+			user=db_conf['username'],
+			password=db_conf['password'],
+			database='postgres'
+		)
+		database = db_conf['database']
+		cursor1 = cnx.cursor()
+		query1 = "SELECT 1 from pg_database where datname = '" + database + "'"
+		cursor1.execute(query1)
+		row = cursor1.fetchone()
+		if row != None:
+			exist = True
+		cursor1.close()
+		cnx.close()
+	except:
+		ret = False
+		err = sys.exc_info()
+		print("Function = {0}, Error = {1}, {2}".format("does_db_exist", err[0], err[1]))
+		if cursor1 != None:
+			cursor1.close()
+		if cnx != None:
+			cnx.close()
+	return(ret, exist)	
+
+# ---------------------------------------------------------
+def create_db(db_conf):
+	"Create db"
+# ---------------------------------------------------------
+	ret 	= True
+	cnx 	= None
+	cursor1 = None
+
+	try:
+		cnx = sql.connect(
+			user=db_conf['username'],
+			password=db_conf['password'],
+			database='postgres'
+		)
+		cnx.autocommit = True
+		database = db_conf['database']
+		cursor1 = cnx.cursor()
+		query1 = "CREATE DATABASE " + database + " WITH \
+			OWNER = postgres \
+			ENCODING = 'UTF8' \
+			LC_COLLATE = 'English_United States.1252' \
+			LC_CTYPE = 'English_United States.1252' \
+			TABLESPACE = tablespace_e \
+			CONNECTION LIMIT = -1 \
+			IS_TEMPLATE = False;"
+		cursor1.execute(query1)
+		query1 = "GRANT ALL ON DATABASE " + database + " TO dba";
+		cursor1.execute(query1)
+		cursor1.close()
+		cnx.close()
+	except:
+		ret = False
+		err = sys.exc_info()
+		print("Function = {0}, Error = {1}, {2}".format("create_db", err[0], err[1]))
+		if cursor1 != None:
+			cursor1.close()
+		if cnx != None:
+			cnx.close()
+	return(ret)	
+
+# ---------------------------------------------------------
 def does_tbl_exist(cnx, tbl_name):
 	"Check if a table exists in he current database"
 # ---------------------------------------------------------
@@ -84,7 +158,7 @@ def does_tbl_exist(cnx, tbl_name):
 	return(ret, exist)	
 
 # ---------------------------------------------------------
-def load_files(db_conf, schema, tbl_name, file_list, dir_processed):
+def load_files(db_conf, schema, tbl_name, file_list, dir_processed, separator, with_quotes):
 	"Load files into tables"
 # ---------------------------------------------------------
 	ret = True
@@ -107,6 +181,7 @@ def load_files(db_conf, schema, tbl_name, file_list, dir_processed):
 			cursor1.execute('SET search_path TO ' + schema)
 # ---------------------------------------------------------
 			time1 = time.time()
+			data_provider = db_conf['data_provider']
 # ---------------------------------------------------------
 			file_list_full = []
 			for i in range(len(file_list)):
@@ -118,10 +193,17 @@ def load_files(db_conf, schema, tbl_name, file_list, dir_processed):
 # Load - Delimiter is TAB
 # ---------------------------------------------------------
 				stream = StringIO()
-				stream.write(open(fname, errors = 'ignore').read().replace('\\', ''))
+				if data_provider == 'ukbiobank':
+					stream.write(open(fname, encoding='cp1252', errors = 'ignore').read().replace('\\', ''))
+				else:
+					stream.write(open(fname, errors = 'ignore').read().replace('\\', ''))
+#				stream.write(open(fname, errors = 'ignore').read().replace('\\', '').replace('\u0000', ''))
 				stream.seek(0)
 				stream.readline()	#To avoid headers
-				cursor1.copy_from(stream, tbl_name, sep = '	', null = '')
+				if with_quotes == False:
+					cursor1.copy_from(stream, tbl_name, sep = separator, null = '')
+				else:
+					cursor1.copy_expert("COPY " + tbl_name + " FROM STDIN WITH (FORMAT CSV, delimiter '" + separator + "', quote '\"')", stream)
 # ---------------------------------------------------------
 # Move loaded file to PROCESSED directory
 # ---------------------------------------------------------
@@ -140,7 +222,7 @@ def load_files(db_conf, schema, tbl_name, file_list, dir_processed):
 	return(ret)
 
 # ---------------------------------------------------------
-def load_files_parallel(db_conf, schema, tbl_list, file_list, dir_processed):
+def load_files_parallel(db_conf, schema, tbl_list, file_list, dir_processed, separator = '	', with_quotes = False):
 	"Load files into tables"
 # ---------------------------------------------------------
 	ret = True
@@ -152,7 +234,7 @@ def load_files_parallel(db_conf, schema, tbl_list, file_list, dir_processed):
 # Load files in parallel (all tables), sequentially within each table
 # ---------------------------------------------------------
 		with ProcessPoolExecutor(int(db_conf['max_workers'])) as executor:
-			futures = [executor.submit(load_files, db_conf, schema, tbl_name, file_list[idx], dir_processed) for idx, tbl_name in enumerate(tbl_list)]
+			futures = [executor.submit(load_files, db_conf, schema, tbl_name, file_list[idx], dir_processed, separator, with_quotes) for idx, tbl_name in enumerate(tbl_list)]
 			for future in as_completed(futures):
 				if future.result() == False:
 					ret = False
@@ -330,12 +412,14 @@ def get_table_max_ids_parallel(db_conf, tbl_list, tbl_result):
 # ---------------------------------------------------------
 def parse_queries_file(db_conf, filename, chunk_id=None):
 # ---------------------------------------------------------
+	database = db_conf['database'] if 'database' in db_conf else None
 	source_nok_schema = db_conf['source_nok_schema'] if 'source_nok_schema' in db_conf else None
 	source_schema = db_conf['source_schema'] if 'source_schema' in db_conf else None
 	target_schema = db_conf['target_schema'] if 'target_schema' in db_conf else None
 	target_schema_to_link = db_conf['target_schema_to_link'] if 'target_schema_to_link' in db_conf else None
 	vocabulary_schema = db_conf['vocabulary_schema'] if 'vocabulary_schema' in db_conf else None
 	chunk_schema = db_conf['chunk_schema'] if 'chunk_schema' in db_conf else None
+	result_schema = db_conf['result_schema'] if 'result_schema' in db_conf else None
 	lookup_directory = db_conf['dir_lookup'] if 'dir_lookup' in db_conf else None
 	vocabulary_directory = db_conf['dir_voc'] if 'dir_voc' in db_conf else None
 	stcm_directory = db_conf['dir_stcm'] if 'dir_stcm' in db_conf else None
@@ -346,12 +430,14 @@ def parse_queries_file(db_conf, filename, chunk_id=None):
 	query_list = open(filename).read().split(';')
 	for idx, item in enumerate(query_list):
 		query = sqlparse.format(item, strip_comments=True).strip()
+		query = query.replace('{DATABASE}', database) if database is not None else query
 		query = query.replace('{SOURCE_NOK_SCHEMA}', source_nok_schema) if source_nok_schema is not None else query
 		query = query.replace('{SOURCE_SCHEMA}', source_schema) if source_schema is not None else query
 		query = query.replace('{TARGET_SCHEMA}', target_schema) if target_schema is not None else query
 		query = query.replace('{TARGET_SCHEMA_TO_LINK}', target_schema_to_link) if target_schema_to_link is not None else query
 		query = query.replace('{VOCABULARY_SCHEMA}', vocabulary_schema) if vocabulary_schema is not None else query  
 		query = query.replace('{CHUNK_SCHEMA}', chunk_schema) if chunk_schema is not None else query  
+		query = query.replace('{RESULT_SCHEMA}', result_schema) if result_schema is not None else query  
 		query = query.replace('{LOOKUP_DIRECTORY}', lookup_directory) if lookup_directory is not None else query  
 		query = query.replace('{VOCABULARY_DIRECTORY}', vocabulary_directory) if vocabulary_directory is not None else query  
 		query = query.replace('{STCM_DIRECTORY}', stcm_directory) if stcm_directory is not None else query  
@@ -574,6 +660,10 @@ def load_folders(db_conf, schema, folder):
 			file_list = sorted(glob.iglob(folder + '\\*.txt'))
 		elif data_provider == 'iqvia':
 			file_list = sorted(glob.iglob(folder + '\\*.csv')) + sorted(glob.iglob(folder + '\\*.out'))
+		elif data_provider == 'thin':
+			file_list = sorted(glob.iglob(folder + '\\*.csv'))
+		elif data_provider == 'ukbiobank':
+			file_list = sorted(glob.iglob(folder + '\\*.tsv'))
 # ---------------------------------------------------------
 # If list is not empty
 # ---------------------------------------------------------
@@ -612,6 +702,11 @@ def load_folders(db_conf, schema, folder):
 					stream.write(open(fname, errors = 'ignore').read().replace('\\', ''))
 				elif data_provider == 'iqvia':
 					stream.write(open(fname, errors = 'backslashreplace').read().replace('ò', '	').replace('ï¼', '-').replace('\\x8d', '').replace('\\x81', '').replace('\\x8f', '').replace('\\x90', '').replace('\\x9d', '').replace('\\xd9', ''))
+				elif data_provider == 'thin':
+					stream.write(open(fname, errors = 'ignore').read().replace('\\', ''))
+				elif data_provider == 'ukbiobank':
+#					stream.write(open(fname, encoding='cp1252', errors = 'ignore').read().replace('\\', ''))
+					stream.write(open(fname, errors = 'ignore').read().replace('\\', '').replace('\u0000', ''))
 				stream.seek(0)
 				stream.readline()	#To avoid headers
 				cursor1.copy_from(stream, tbl_name, sep = '	', null = '')
