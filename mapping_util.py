@@ -50,6 +50,80 @@ def calc_time(secs_tot):
 	return("{0}h:{1:02d}m:{2:02d}s".format(int(hours), int(mins), int(secs)))
 
 # ---------------------------------------------------------
+def does_db_exist(db_conf):
+	"Check if a db exists"
+# ---------------------------------------------------------
+	ret 	= True
+	exist 	= False
+	cnx 	= None
+	cursor1 = None
+
+	try:
+		cnx = sql.connect(
+			user=db_conf['username'],
+			password=db_conf['password'],
+			database='postgres'
+		)
+		database = db_conf['database']
+		cursor1 = cnx.cursor()
+		query1 = "SELECT 1 from pg_database where datname = '" + database + "'"
+		cursor1.execute(query1)
+		row = cursor1.fetchone()
+		if row != None:
+			exist = True
+		cursor1.close()
+		cnx.close()
+	except:
+		ret = False
+		err = sys.exc_info()
+		print("Function = {0}, Error = {1}, {2}".format("does_db_exist", err[0], err[1]))
+		if cursor1 != None:
+			cursor1.close()
+		if cnx != None:
+			cnx.close()
+	return(ret, exist)	
+
+# ---------------------------------------------------------
+def create_db(db_conf):
+	"Create db"
+# ---------------------------------------------------------
+	ret 	= True
+	cnx 	= None
+	cursor1 = None
+
+	try:
+		cnx = sql.connect(
+			user=db_conf['username'],
+			password=db_conf['password'],
+			database='postgres'
+		)
+		cnx.autocommit = True
+		database = db_conf['database']
+		cursor1 = cnx.cursor()
+		query1 = "CREATE DATABASE " + database + " WITH \
+			OWNER = postgres \
+			ENCODING = 'UTF8' \
+			LC_COLLATE = 'English_United States.1252' \
+			LC_CTYPE = 'English_United States.1252' \
+			TABLESPACE = tablespace_e \
+			CONNECTION LIMIT = -1 \
+			IS_TEMPLATE = False;"
+		cursor1.execute(query1)
+		query1 = "GRANT ALL ON DATABASE " + database + " TO dba";
+		cursor1.execute(query1)
+		cursor1.close()
+		cnx.close()
+	except:
+		ret = False
+		err = sys.exc_info()
+		print("Function = {0}, Error = {1}, {2}".format("create_db", err[0], err[1]))
+		if cursor1 != None:
+			cursor1.close()
+		if cnx != None:
+			cnx.close()
+	return(ret)	
+
+# ---------------------------------------------------------
 def does_tbl_exist(cnx, tbl_name):
 	"Check if a table exists in he current database"
 # ---------------------------------------------------------
