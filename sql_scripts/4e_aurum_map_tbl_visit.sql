@@ -32,10 +32,10 @@ SELECT row_number() over (order by person_id, visit_start_date, care_site_id) as
 INTO {TARGET_SCHEMA}.visit_occurrence 
 FROM cte1;
 
-alter table {TARGET_SCHEMA}.visit_occurrence add constraint xpk_visit_occurrence primary key (visit_occurrence_id);
-create index idx_visit_occ1 on {TARGET_SCHEMA}.visit_occurrence (person_id, visit_start_date, care_site_id);
+alter table {TARGET_SCHEMA}.visit_occurrence add constraint xpk_visit_occurrence primary key (visit_occurrence_id) USING INDEX TABLESPACE pg_default;;
+create index idx_visit_occ1 on {TARGET_SCHEMA}.visit_occurrence (person_id, visit_start_date, care_site_id) TABLESPACE pg_default;
 CLUSTER visit_occurrence USING idx_visit_occ1;
-CREATE INDEX idx_visit_concept_id ON visit_occurrence (visit_concept_id ASC);
+CREATE INDEX idx_visit_concept_id ON visit_occurrence (visit_concept_id ASC) TABLESPACE pg_default;
 
 --------------------------------
 -- VISIT_DETAIL
@@ -76,8 +76,8 @@ inner join {TARGET_SCHEMA}.visit_occurrence t3 --left join because some of the v
 	and cte2.visit_detail_start_date = t3.visit_start_date
 	and cte2.care_site_id = t3.care_site_id;
 
-ALTER TABLE {TARGET_SCHEMA}.visit_detail ADD CONSTRAINT xpk_visit_detail PRIMARY KEY (visit_detail_id);	
-CREATE INDEX idx_visit_detail_person_id  ON {TARGET_SCHEMA}.visit_detail (person_id);
+ALTER TABLE {TARGET_SCHEMA}.visit_detail ADD CONSTRAINT xpk_visit_detail PRIMARY KEY (visit_detail_id) USING INDEX TABLESPACE pg_default;
+CREATE INDEX idx_visit_detail_person_id  ON {TARGET_SCHEMA}.visit_detail (person_id) TABLESPACE pg_default;
 CLUSTER {TARGET_SCHEMA}.visit_detail USING idx_visit_detail_person_id;
-CREATE INDEX idx_visit_detail_concept_id ON {TARGET_SCHEMA}.visit_detail (visit_detail_concept_id ASC);
-CREATE INDEX idx_visit_det_occ_id ON {TARGET_SCHEMA}.visit_detail (visit_occurrence_id ASC);
+CREATE INDEX idx_visit_detail_concept_id ON {TARGET_SCHEMA}.visit_detail (visit_detail_concept_id ASC) TABLESPACE pg_default;
+CREATE INDEX idx_visit_det_occ_id ON {TARGET_SCHEMA}.visit_detail (visit_occurrence_id ASC) TABLESPACE pg_default;

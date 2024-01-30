@@ -19,6 +19,7 @@ with cte1 as (
 	OR gender is null 
 	OR yob < 75
 	OR frd is null
+	OR frd > to_date(CONCAT(RIGHT(current_database(), 6), '01'), 'YYYYMMDD')
 )
 INSERT INTO {SOURCE_NOK_SCHEMA}.patient
 SELECT t1.* 

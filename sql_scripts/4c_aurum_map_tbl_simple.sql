@@ -107,12 +107,10 @@ SELECT patid,
 	0
 FROM {SOURCE_SCHEMA}.patient;
 
-ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person_id);
-
-CREATE UNIQUE INDEX idx_person_id ON {TARGET_SCHEMA}.person (person_id ASC);
+ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default;
+CREATE UNIQUE INDEX idx_person_id ON {TARGET_SCHEMA}.person (person_id ASC) TABLESPACE pg_default;
 CLUSTER {TARGET_SCHEMA}.person USING xpk_person;
-
-CREATE INDEX idx_gender ON {TARGET_SCHEMA}.person (gender_concept_id ASC);
+CREATE INDEX idx_gender ON {TARGET_SCHEMA}.person (gender_concept_id ASC) TABLESPACE pg_default;
 
 --------------------------------
 -- DEATH
@@ -148,7 +146,7 @@ SELECT
 	cte3.*
 FROM cte3;
 
-ALTER TABLE {TARGET_SCHEMA}.observation_period ADD CONSTRAINT xpk_observation_period PRIMARY KEY (observation_period_id);
+ALTER TABLE {TARGET_SCHEMA}.observation_period ADD CONSTRAINT xpk_observation_period PRIMARY KEY (observation_period_id) USING INDEX TABLESPACE pg_default;
 
-CREATE INDEX idx_observation_period_id ON {TARGET_SCHEMA}.observation_period (person_id ASC);
+CREATE INDEX idx_observation_period_id ON {TARGET_SCHEMA}.observation_period (person_id ASC) TABLESPACE pg_default;
 CLUSTER {TARGET_SCHEMA}.observation_period USING idx_observation_period_id;

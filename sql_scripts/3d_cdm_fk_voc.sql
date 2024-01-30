@@ -25,6 +25,6 @@ ALTER TABLE {VOCABULARY_SCHEMA}.drug_strength ADD CONSTRAINT fpk_drug_strength_a
 ALTER TABLE {VOCABULARY_SCHEMA}.drug_strength ADD CONSTRAINT fpk_drug_strength_numerator_unit_concept_id FOREIGN KEY (numerator_unit_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id);
 ALTER TABLE {VOCABULARY_SCHEMA}.drug_strength ADD CONSTRAINT fpk_drug_strength_denominator_unit_concept_id FOREIGN KEY (denominator_unit_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id);
 
-ALTER TABLE {VOCABULARY_SCHEMA}.RELATIONSHIP ADD CONSTRAINT fpk_RELATIONSHIP_relationship_concept_id FOREIGN KEY (relationship_concept_id) REFERENCES {VOCABULARY_SCHEMA}.CONCEPT (CONCEPT_ID);
+ALTER TABLE {VOCABULARY_SCHEMA}.RELATIONSHIP ADD CONSTRAINT fpk_relationship_concept_id FOREIGN KEY (relationship_concept_id) REFERENCES {VOCABULARY_SCHEMA}.CONCEPT (CONCEPT_ID);
 
 ALTER TABLE {VOCABULARY_SCHEMA}.VOCABULARY ADD CONSTRAINT fpk_vocabulary_vocabulary_concept_id FOREIGN KEY (vocabulary_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id);

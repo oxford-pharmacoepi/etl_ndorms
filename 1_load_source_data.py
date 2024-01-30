@@ -163,7 +163,7 @@ def main():
 					elif database_type == 'gold':
 						idx_patient = db_conf[tbl_db].index('patient')
 						(ret, curation) = is_curation_needed_gold(tbl_db_list[idx_patient])
-					elif database_type == 'hesapc':
+					elif database_type[0:3].lower() == 'hes':
 						curation = True
 					if ret == True and curation == True:
 						fname = dir_sql + '1d_' + database_type + '_curation.sql'
