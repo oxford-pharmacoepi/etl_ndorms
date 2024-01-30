@@ -659,6 +659,10 @@ def load_folders(db_conf, schema, folder):
 			file_list = sorted(glob.iglob(folder + '\\*.txt'))
 		elif data_provider == 'iqvia':
 			file_list = sorted(glob.iglob(folder + '\\*.csv')) + sorted(glob.iglob(folder + '\\*.out'))
+		elif data_provider == 'thin':
+			file_list = sorted(glob.iglob(folder + '\\*.csv'))
+		elif data_provider == 'ukbiobank':
+			file_list = sorted(glob.iglob(folder + '\\*.tsv'))
 # ---------------------------------------------------------
 # If list is not empty
 # ---------------------------------------------------------
@@ -697,6 +701,11 @@ def load_folders(db_conf, schema, folder):
 					stream.write(open(fname, errors = 'ignore').read().replace('\\', ''))
 				elif data_provider == 'iqvia':
 					stream.write(open(fname, errors = 'backslashreplace').read().replace('ò', '	').replace('ï¼', '-').replace('\\x8d', '').replace('\\x81', '').replace('\\x8f', '').replace('\\x90', '').replace('\\x9d', '').replace('\\xd9', ''))
+				elif data_provider == 'thin':
+					stream.write(open(fname, errors = 'ignore').read().replace('\\', ''))
+				elif data_provider == 'ukbiobank':
+#					stream.write(open(fname, encoding='cp1252', errors = 'ignore').read().replace('\\', ''))
+					stream.write(open(fname, errors = 'ignore').read().replace('\\', '').replace('\u0000', ''))
 				stream.seek(0)
 				stream.readline()	#To avoid headers
 				cursor1.copy_from(stream, tbl_name, sep = '	', null = '')
