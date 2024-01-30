@@ -89,11 +89,18 @@ def main():
 			if not os.path.exists(dir_sql_processed):
 				os.makedirs(dir_sql_processed)
 # ---------------------------------------------------------
+# If database does not exist, create database
+# ---------------------------------------------------------
+			(ret, exist) = mapping_util.does_db_exist(db_conf)
+			if exist == False:
+				ret = mapping_util.create_db(db_conf)
+			if ret == True:
+# ---------------------------------------------------------
 # Create the schemas
 # ---------------------------------------------------------
-			fname = dir_sql + '1__schema_create.sql'
-			print('Calling ' + fname + ' ...')
-			ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+				fname = dir_sql + '1__schema_create.sql'
+				print('Calling ' + fname + ' ...')
+				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
 			if ret == True:
 # ---------------------------------------------------------
 # Ask the user for DROP confirmation
