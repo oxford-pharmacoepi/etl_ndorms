@@ -181,6 +181,7 @@ def load_files(db_conf, schema, tbl_name, file_list, dir_processed, separator, w
 			cursor1.execute('SET search_path TO ' + schema)
 # ---------------------------------------------------------
 			time1 = time.time()
+			data_provider = db_conf['data_provider']
 # ---------------------------------------------------------
 			file_list_full = []
 			for i in range(len(file_list)):
@@ -192,7 +193,11 @@ def load_files(db_conf, schema, tbl_name, file_list, dir_processed, separator, w
 # Load - Delimiter is TAB
 # ---------------------------------------------------------
 				stream = StringIO()
-				stream.write(open(fname, errors = 'ignore').read().replace('\\', ''))
+				if data_provider == 'ukbiobank':
+					stream.write(open(fname, encoding='cp1252', errors = 'ignore').read().replace('\\', ''))
+				else:
+					stream.write(open(fname, errors = 'ignore').read().replace('\\', ''))
+#				stream.write(open(fname, errors = 'ignore').read().replace('\\', '').replace('\u0000', ''))
 				stream.seek(0)
 				stream.readline()	#To avoid headers
 				if with_quotes == False:
