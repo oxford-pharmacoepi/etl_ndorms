@@ -37,7 +37,6 @@ CREATE TABLE IF NOT EXISTS {VOCABULARY_SCHEMA}.CONCEPT_RELATIONSHIP (
 			relationship_id varchar(20) NOT NULL,
 			valid_start_date date NOT NULL,
 			valid_end_date date NOT NULL,
-			invalid_reason varchar(1) NULL );
 			invalid_reason varchar(1) NULL )
 			TABLESPACE pg_default;
 
@@ -53,7 +52,8 @@ CREATE TABLE IF NOT EXISTS {VOCABULARY_SCHEMA}.RELATIONSHIP (
 CREATE TABLE IF NOT EXISTS {VOCABULARY_SCHEMA}.CONCEPT_SYNONYM (
 			concept_id integer NOT NULL,
 			concept_synonym_name varchar(1000) NOT NULL,
-			language_concept_id integer NOT NULL );
+			language_concept_id integer NOT NULL)--,
+			TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {VOCABULARY_SCHEMA}.CONCEPT_ANCESTOR (
 			ancestor_concept_id integer NOT NULL,
@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS {VOCABULARY_SCHEMA}.SOURCE_TO_CONCEPT_MAP (
 		valid_start_date date NOT NULL,
 		valid_end_date date NOT NULL,
 		invalid_reason varchar(1) NULL );
+			source_code varchar(255) NOT NULL,
 			source_concept_id integer NOT NULL,
 			source_vocabulary_id varchar(30) NOT NULL,
 			source_code_description varchar(255) NULL,
