@@ -158,7 +158,7 @@ def does_tbl_exist(cnx, tbl_name):
 	return(ret, exist)	
 
 # ---------------------------------------------------------
-def load_files(db_conf, schema, tbl_name, file_list, dir_processed):
+def load_files(db_conf, schema, tbl_name, file_list, dir_processed, separator, with_quotes):
 	"Load files into tables"
 # ---------------------------------------------------------
 	ret = True
@@ -195,7 +195,10 @@ def load_files(db_conf, schema, tbl_name, file_list, dir_processed):
 				stream.write(open(fname, errors = 'ignore').read().replace('\\', ''))
 				stream.seek(0)
 				stream.readline()	#To avoid headers
-				cursor1.copy_from(stream, tbl_name, sep = '	', null = '')
+				if with_quotes == False:
+					cursor1.copy_from(stream, tbl_name, sep = separator, null = '')
+				else:
+					cursor1.copy_expert("COPY " + tbl_name + " FROM STDIN WITH (FORMAT CSV, delimiter '" + separator + "', quote '\"')", stream)
 # ---------------------------------------------------------
 # Move loaded file to PROCESSED directory
 # ---------------------------------------------------------
