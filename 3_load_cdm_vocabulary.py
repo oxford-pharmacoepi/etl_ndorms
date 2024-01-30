@@ -281,17 +281,30 @@ def main():
 			dir_stcm_old = db_conf['dir_stcm'] + "\\old\\"
 			if not os.path.exists(dir_stcm_old):
 				os.makedirs(dir_stcm_old)
-
+# ---------------------------------------------------------
+# If database does not exist, create database
+# ---------------------------------------------------------
+			(ret, exist) = mapping_util.does_db_exist(db_conf)
+			if exist == False:
+				ret = mapping_util.create_db(db_conf)
+			if ret == True:
+# ---------------------------------------------------------
+# Create the schemas
+# ---------------------------------------------------------
+				fname = dir_sql + '4__schema_create.sql'
+				print('Calling ' + fname + ' ...')
+				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+			if ret == True:
 # ---------------------------------------------------------
 # Drop vocabularies tables - Parallel execution of queries in the file - Ask the user for DROP confirmation
 # ---------------------------------------------------------
-			qa = input('Are you sure you want to DROP all the CDM vocabulary tables (y/n):') 
-			while qa.lower() not in ['y', 'n', 'yes', 'no']:
-				qa = input('I did not understand that. Are you sure you want to DROP all the CDM vocabulary tables (y/n):') 
-			if qa.lower() in ['y', 'yes']:
-				fname = dir_sql + '3a_cdm_drop_vocabulary.sql'
-				print('Calling ' + fname + ' ...')
-				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+				qa = input('Are you sure you want to DROP all the CDM vocabulary tables (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Are you sure you want to DROP all the CDM vocabulary tables (y/n):') 
+				if qa.lower() in ['y', 'yes']:
+					fname = dir_sql + '3a_cdm_drop_vocabulary.sql'
+					print('Calling ' + fname + ' ...')
+					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
 # ---------------------------------------------------------
 # Create vocabularies tables - Parallel execution of queries in the file - Ask the user for CREATE/LOAD confirmation
 # ---------------------------------------------------------
@@ -307,20 +320,36 @@ def main():
 # Load vocabularies tables - Parallel execution
 # ---------------------------------------------------------
 					if ret == True:
+						data_provider = db_conf['data_provider']
+						prefix = ''
+						if data_provider == 'cprd':
+							extension = '.txt'
+							separator = '	'
+						elif data_provider == 'iqvia':
+							extension = '.csv' # + sorted(glob.iglob(folder + '\\*.out'))
+							separator = '	'
+						elif data_provider == 'thin':
+							extension = '.csv'
+							separator = ';'
+							prefix = 'OMOP_'
+						elif data_provider == 'ukbiobank':
+							extension = '.tsv'
+							separator = '	'
 						tbl_cdm_voc = [tbl for tbl in db_conf['tbl_cdm_voc']]
-						file_list = [[dir_voc + tbl + '.csv'] for tbl in tbl_cdm_voc]
-						ret = mapping_util.load_files_parallel(db_conf, vocabulary_schema, tbl_cdm_voc, file_list, dir_voc_processed)
+						file_list = [[dir_voc + prefix + tbl + extension] for tbl in tbl_cdm_voc]
+						with_quotes = True
+						ret = mapping_util.load_files_parallel(db_conf, vocabulary_schema, tbl_cdm_voc, file_list, dir_voc_processed, separator, with_quotes)
 						if ret == True:
 							print('Finished loading cdm vocabulary.')
 # ---------------------------------------------------------
-# Create vocabularies PK, indexes - Parallel execution
+# Create vocabularies PK, indexes, FKs - Parallel execution
 # ---------------------------------------------------------
 			if ret == True:
-				qa = input('Are you sure you want to CREATE PK/IDXs for all the vocabulary tables (y/n):') 
+				qa = input('Are you sure you want to CREATE PK/IDXs/FKs for all the vocabulary tables (y/n):') 
 				while qa.lower() not in ['y', 'n', 'yes', 'no']:
 					qa = input('I did not understand that. Are you sure you want to CREATE PK/IDXs for all the vocabulary tables (y/n):') 
 				if qa.lower() in ['y', 'yes']:
-					print('Build PKs and IDXs ...')
+					print('Build PKs, IDXs and FKs ...')
 					sql_file_list = sorted(glob.iglob(dir_sql + '3c_cdm_pk_idx_*.sql'))
 					ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, True)
 # ---------------------------------------------------------
