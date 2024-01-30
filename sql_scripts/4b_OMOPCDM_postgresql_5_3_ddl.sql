@@ -49,7 +49,7 @@
 			admitting_source_value varchar(50) NULL,
 			discharge_to_concept_id integer NULL,
 			discharge_to_source_value varchar(50) NULL,
-			preceding_visit_occurrence_id bigint NULL );
+			preceding_visit_occurrence_id bigint NULL )
 			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
@@ -96,7 +96,6 @@
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DRUG_EXPOSURE (
- 
 			drug_exposure_id bigint NOT NULL,
 			person_id bigint NOT NULL,
 			drug_concept_id integer NOT NULL,
@@ -119,7 +118,7 @@
 			drug_source_value varchar(250) NULL,
 			drug_source_concept_id integer NULL,
 			route_source_value varchar(50) NULL,
-			dose_unit_source_value varchar(50) NULL );
+			dose_unit_source_value varchar(50) NULL )
 			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
@@ -137,7 +136,7 @@
 			visit_detail_id bigint NULL,
 			procedure_source_value varchar(250) NULL,
 			procedure_source_concept_id integer NULL,
-			modifier_source_value varchar(50) NULL );
+			modifier_source_value varchar(50) NULL )
 			TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON KEY (person_id)
@@ -185,7 +184,6 @@
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.OBSERVATION (
- 
 			observation_id bigint NOT NULL,
 			person_id bigint NOT NULL,
 			observation_concept_id integer NOT NULL,
@@ -219,8 +217,8 @@
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.NOTE (
-			note_id integer NOT NULL,
-			person_id bigint NOT NULL,
+			note_id bigint NOT NULL,
+ 			person_id bigint NOT NULL,
 			note_date date NOT NULL,
 			note_datetime TIMESTAMP NULL,
 			note_type_concept_id integer NOT NULL,
@@ -274,7 +272,7 @@
 
 --HINT DISTRIBUTE ON RANDOM
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.FACT_RELATIONSHIP (
-			domain_concept_id_1 integer NOT NULL,
+ 			domain_concept_id_1 integer NOT NULL,
 			fact_id_1 integer NOT NULL,
 			domain_concept_id_2 integer NOT NULL,
 			fact_id_2 integer NOT NULL,
@@ -283,7 +281,7 @@
 
 --HINT DISTRIBUTE ON RANDOM
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.LOCATION (
-			location_id bigint NOT NULL,
+ 			location_id bigint NOT NULL,
 			address_1 varchar(50) NULL,
 			address_2 varchar(50) NULL,
 			city varchar(50) NULL,
@@ -322,7 +320,7 @@
 
 --HINT DISTRIBUTE ON KEY (person_id)
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.PAYER_PLAN_PERIOD (
-			payer_plan_period_id integer NOT NULL,
+ 			payer_plan_period_id integer NOT NULL,
 			person_id bigint NOT NULL,
 			payer_plan_period_start_date date NOT NULL,
 			payer_plan_period_end_date date NOT NULL,
@@ -343,7 +341,7 @@
 
 --HINT DISTRIBUTE ON RANDOM
  CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.COST (
-			cost_id integer NOT NULL,
+ 			cost_id integer NOT NULL,
 			cost_event_id integer NOT NULL,
 			cost_domain_id varchar(20) NOT NULL,
 			cost_type_concept_id integer NOT NULL,
