@@ -13,13 +13,16 @@ DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.patient CASCADE;
 CREATE TABLE {SOURCE_NOK_SCHEMA}.patient (LIKE {SOURCE_SCHEMA}.patient);
 
 with cte1 as (
-	SELECT patid FROM {SOURCE_SCHEMA}.patient
-	WHERE accept = 0
-	OR gender in (0,3,4)
-	OR gender is null 
-	OR yob < 75
-	OR frd is null
-	OR frd > to_date(CONCAT(RIGHT(current_database(), 6), '01'), 'YYYYMMDD')
+	SELECT t1.patid 
+	FROM {SOURCE_SCHEMA}.patient as t1
+	inner join {SOURCE_SCHEMA}.practice as t2 on MOD(t1.patid, 100000) = t2.pracid
+	WHERE t1.accept = 0
+	OR t1.gender in (0,3,4)
+	OR t1.gender is null 
+	OR t1.yob < 75
+	OR (t1.yob + 1800) > date_part('year', CURRENT_DATE)
+	OR t1.frd is null
+	OR LEAST(t1.tod, t2.lcd, t1.deathdate, to_date(CONCAT(RIGHT(current_database(), 6), '01'), 'YYYYMMDD')) < GREATEST(t1.frd, t2.uts)
 )
 INSERT INTO {SOURCE_NOK_SCHEMA}.patient
 SELECT t1.* 
