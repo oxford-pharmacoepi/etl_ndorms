@@ -293,7 +293,7 @@ def main():
 # ---------------------------------------------------------
 				fname = dir_sql + '4__schema_create.sql'
 				print('Calling ' + fname + ' ...')
-				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
 			if ret == True:
 # ---------------------------------------------------------
 # Drop vocabularies tables - Parallel execution of queries in the file - Ask the user for DROP confirmation
@@ -342,19 +342,25 @@ def main():
 						if ret == True:
 							print('Finished loading cdm vocabulary.')
 # ---------------------------------------------------------
-# Create vocabularies PK, indexes, FKs - Parallel execution
+# Build PK, indexes - Parallel execution
 # ---------------------------------------------------------
 			if ret == True:
-				qa = input('Are you sure you want to CREATE PK/IDXs/FKs for all the vocabulary tables (y/n):') 
+				qa = input('Are you sure you want to CREATE PK/IDXs for all the vocabulary tables (y/n):') 
 				while qa.lower() not in ['y', 'n', 'yes', 'no']:
 					qa = input('I did not understand that. Are you sure you want to CREATE PK/IDXs for all the vocabulary tables (y/n):') 
 				if qa.lower() in ['y', 'yes']:
-					print('Build PKs, IDXs and FKs ...')
+					print('Build PKs and IDXs ...')
 					sql_file_list = sorted(glob.iglob(dir_sql + '3c_cdm_pk_idx_*.sql'))
 					ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, True)
 # ---------------------------------------------------------
-# Build FKs 
+# Build FKs - Parallel execution
 # ---------------------------------------------------------
+			if ret == True:
+				qa = input('Are you sure you want to CREATE FKs for all the vocabulary tables (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Are you sure you want to CREATE FKs for all the vocabulary tables (y/n):') 
+				if qa.lower() in ['y', 'yes']:
+					print('Build FKs ...')
 					if ret == True:
 						fname = dir_sql + '3d_cdm_fk_voc.sql'
 						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
