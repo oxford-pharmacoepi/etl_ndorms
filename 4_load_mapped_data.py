@@ -46,7 +46,7 @@ def main():
 # ---------------------------------------------------------
 				fname = dir_sql + '4__schema_create.sql'
 				print('Calling ' + fname + ' ...')
-				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
 			if ret == True:
 # ---------------------------------------------------------
 # Create/Recreate CDM tables? Parallel execution of queries in the file - Ask the user for DROP confirmation
