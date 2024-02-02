@@ -2,13 +2,13 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.batchnumber
 (
 	batch bigint NOT NULL,
 	batch_number varchar(200) DEFAULT NULL
-);
+)TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.bnfcodes
 (
 	bnfcode	int NOT NULL,
 	bnf varchar(8) DEFAULT NULL
-);
+)TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.common_dosages
 (
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.common_dosages
 	dose_max_average smallint,
 	change_dose smallint,
 	dose_duration numeric(15,3) DEFAULT NULL
-);
+)TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.entity
 (
@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.entity
 	data11_lkup varchar(20) DEFAULT NULL,
 	data12 varchar(50) DEFAULT NULL,
 	data12_lkup varchar(20) DEFAULT NULL
-);
+)TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.lookup
 (
@@ -64,26 +64,27 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.lookup
 	lookup_type_id smallint NOT NULL,
 	code smallint NOT NULL,
 	text varchar(100) DEFAULT NULL
-);
+)TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.lookuptype
 (
 	lookup_type_id smallint NOT NULL,
 	name varchar(3) DEFAULT NULL,
 	description varchar(3) DEFAULT NULL
-);
+)TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.medical
 (
 	medcode bigint NOT NULL,
 	readcode varchar(7) DEFAULT NULL,
 	"desc" varchar(100) DEFAULT NULL
-);
+)TABLESPACE pg_default;
+
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.packtype
 (
 	packtype int NOT NULL,
 	packtype_desc varchar(21) DEFAULT NULL
-);
+)TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.product
 (
@@ -97,10 +98,10 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.product
 	route varchar(100) DEFAULT NULL,
 	bnfcode varchar(100) DEFAULT NULL,
 	bnfchapter varchar(500) DEFAULT NULL
-);
+)TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.scoremethod
 (
 	code integer NOT NULL,
 	scoringmethod varchar(20) DEFAULT NULL
-);
+)TABLESPACE pg_default;

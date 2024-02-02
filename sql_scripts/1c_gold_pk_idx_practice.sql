@@ -1,1 +1,1 @@
-ALTER TABLE {SOURCE_SCHEMA}.practice ADD CONSTRAINT pk_practice PRIMARY KEY(pracid, region);
+ALTER TABLE {SOURCE_SCHEMA}.practice ADD CONSTRAINT pk_practice PRIMARY KEY(pracid, region) USING INDEX TABLESPACE pg_default;
