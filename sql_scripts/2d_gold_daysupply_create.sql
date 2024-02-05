@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.daysupply_modes
     id SERIAL NOT NULL,
     prodcode integer NOT NULL,
     numdays smallint NOT NULL,
-    CONSTRAINT daysupply_modes_pkey PRIMARY KEY (id)
+    CONSTRAINT daysupply_modes_pkey PRIMARY KEY (id) USING TABLESPACE pg_default
 )TABLESPACE pg_default;
 
 DROP INDEX IF EXISTS {SOURCE_SCHEMA}.daysupply_modes_prodcode_idx;
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.daysupply_decodes
     qty numeric(9,2) NOT NULL,
     numpacks integer NOT NULL,
     numdays smallint NOT NULL,
-    CONSTRAINT daysupply_decodes_pkey PRIMARY KEY (id)
+    CONSTRAINT daysupply_decodes_pkey PRIMARY KEY (id) USING TABLESPACE pg_default
 )TABLESPACE pg_default;
 
 DROP INDEX IF EXISTS {SOURCE_SCHEMA}.daysupply_decodes_prodcode_idx;
