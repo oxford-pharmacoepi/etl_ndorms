@@ -322,9 +322,11 @@ def main():
 					if ret == True:
 						data_provider = db_conf['data_provider']
 						prefix = ''
+						with_quotes = True
 						if data_provider == 'cprd':
 							extension = '.csv'
 							separator = '	'
+							with_quotes = False
 						elif data_provider == 'iqvia':
 							extension = '.csv' # + sorted(glob.iglob(folder + '\\*.out'))
 							separator = '	'
@@ -337,7 +339,6 @@ def main():
 							separator = '	'
 						tbl_cdm_voc = [tbl for tbl in db_conf['tbl_cdm_voc']]
 						file_list = [[dir_voc + prefix + tbl + extension] for tbl in tbl_cdm_voc]
-						with_quotes = True
 						ret = mapping_util.load_files_parallel(db_conf, vocabulary_schema, tbl_cdm_voc, file_list, dir_voc_processed, separator, with_quotes)
 						if ret == True:
 							print('Finished loading cdm vocabulary.')
