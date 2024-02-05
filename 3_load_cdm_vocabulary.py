@@ -324,7 +324,7 @@ def main():
 						prefix = ''
 						if data_provider == 'cprd':
 							extension = '.csv'
-							separator = ','
+							separator = '	'
 						elif data_provider == 'iqvia':
 							extension = '.csv' # + sorted(glob.iglob(folder + '\\*.out'))
 							separator = '	'
