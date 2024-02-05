@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.consultation CASCADE;
 DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.patient CASCADE;
 
 -- PATIENT - remove unacceptable
-CREATE TABLE {SOURCE_NOK_SCHEMA}.patient (LIKE {SOURCE_SCHEMA}.patient);
+CREATE TABLE {SOURCE_NOK_SCHEMA}.patient (LIKE {SOURCE_SCHEMA}.patient) TABLESPACE pg_default;
 
 with cte1 as (
 	SELECT patid FROM {SOURCE_SCHEMA}.patient
@@ -22,7 +22,7 @@ INSERT INTO {SOURCE_NOK_SCHEMA}.patient
 SELECT t1.* FROM {SOURCE_SCHEMA}.patient as t1
 INNER JOIN cte1 on cte1.patid = t1.patid;
 
-alter table {SOURCE_NOK_SCHEMA}.patient add constraint pk_patient_nok primary key (patid);
+alter table {SOURCE_NOK_SCHEMA}.patient add constraint pk_patient_nok primary key (patid) USING INDEX TABLESPACE pg_default;
 
 DELETE FROM {SOURCE_SCHEMA}.patient as t1 
 using {SOURCE_NOK_SCHEMA}.patient as t2
@@ -52,7 +52,7 @@ from cte2 where t3.patid = cte2.patid;
 --POC	from t where t3.patid = t.patid;
 
 -- CONSULTATION - MOVE UNACCEPTABLE AND UNEXISTENT PATIENTS. Unacceptable patients have already been removed from {SOURCE_SCHEMA}.patient, so we can remove both unexistent and acceptable at once.
-CREATE TABLE {SOURCE_NOK_SCHEMA}.consultation (LIKE {SOURCE_SCHEMA}.consultation);
+CREATE TABLE {SOURCE_NOK_SCHEMA}.consultation (LIKE {SOURCE_SCHEMA}.consultation) TABLESPACE pg_default;
 
 with cte3 as (
 	SELECT t1.consid
@@ -89,7 +89,7 @@ from cte5 where t3.consid = cte5.consid;
 
 
 -- DRUGISSUE - MOVE UNACCEPTABLE AND UNEXISTENT PATIENTS. Unacceptable patients have already been removed from {SOURCE_SCHEMA}.patient, so we can remove both unexistent and acceptable at once.
-CREATE TABLE {SOURCE_NOK_SCHEMA}.drugissue (LIKE {SOURCE_SCHEMA}.drugissue);
+CREATE TABLE {SOURCE_NOK_SCHEMA}.drugissue (LIKE {SOURCE_SCHEMA}.drugissue) TABLESPACE pg_default;
 
 with cte6 as (
 	SELECT t1.issueid
@@ -123,7 +123,7 @@ set staffid = null
 from cte8 where t3.issueid = cte8.issueid;
 
 -- OBSERVATION - MOVE UNACCEPTABLE AND UNEXISTENT PATIENTS. Unacceptable patients have already been removed from {SOURCE_SCHEMA}.patient, so we can remove both unexistent and acceptable at once.
-CREATE TABLE {SOURCE_NOK_SCHEMA}.observation (LIKE {SOURCE_SCHEMA}.observation);
+CREATE TABLE {SOURCE_NOK_SCHEMA}.observation (LIKE {SOURCE_SCHEMA}.observation) TABLESPACE pg_default;
 
 with cte9 as (
 	SELECT t1.obsid
@@ -227,7 +227,7 @@ WHERE t1.obsid = cte14.obsid;
 
 
 -- PROBLEM - MOVE UNACCEPTABLE AND UNEXISTENT PATIENTS. Unacceptable patients have already been removed from {SOURCE_SCHEMA}.patient, so we can remove both unexistent and acceptable at once.
-CREATE TABLE {SOURCE_NOK_SCHEMA}.problem (LIKE {SOURCE_SCHEMA}.problem);
+CREATE TABLE {SOURCE_NOK_SCHEMA}.problem (LIKE {SOURCE_SCHEMA}.problem) TABLESPACE pg_default;
 
 with cte15 as (
 	SELECT t1.obsid
@@ -265,7 +265,7 @@ from cte17 where t3.obsid = cte17.obsid;
 
 
 -- REFERRAL - UNACCEPTABLE AND UNEXISTENT PATIENTS. Unacceptable patients have already been removed from {SOURCE_SCHEMA}.patient, so we can remove both unexistent and acceptable at once.
-CREATE TABLE {SOURCE_NOK_SCHEMA}.referral (LIKE {SOURCE_SCHEMA}.referral);
+CREATE TABLE {SOURCE_NOK_SCHEMA}.referral (LIKE {SOURCE_SCHEMA}.referral) TABLESPACE pg_default;
 
 with cte18 as (
 	SELECT t1.obsid
