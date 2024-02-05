@@ -11,7 +11,7 @@ DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.hes_primary_diag_hosp CASCADE;
 DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.hes_procedures_epi CASCADE;
 
 -- PATIENT - Move unacceptable patient from source_hesapc.patient to source_hesapc_nok.patient
-CREATE TABLE {SOURCE_NOK_SCHEMA}.hes_patient (LIKE {SOURCE_SCHEMA}.hes_patient);
+CREATE TABLE {SOURCE_NOK_SCHEMA}.hes_patient (LIKE {SOURCE_SCHEMA}.hes_patient) TABLESPACE pg_default;
 
 WITH cte1 as (
 	SELECT patid FROM {SOURCE_SCHEMA}.hes_patient
@@ -24,7 +24,7 @@ SELECT t1.*
 FROM {SOURCE_SCHEMA}.hes_patient as t1
 INNER JOIN cte1 on cte1.patid = t1.patid;
 	
-alter table {SOURCE_NOK_SCHEMA}.hes_patient add constraint pk_patient_nok primary key (patid);
+alter table {SOURCE_NOK_SCHEMA}.hes_patient add constraint pk_patient_nok primary key (patid) USING INDEX TABLESPACE pg_default;
 
 DELETE FROM {SOURCE_SCHEMA}.hes_patient as t1 
 USING {SOURCE_NOK_SCHEMA}.hes_patient as t2
