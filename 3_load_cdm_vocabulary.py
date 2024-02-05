@@ -323,8 +323,8 @@ def main():
 						data_provider = db_conf['data_provider']
 						prefix = ''
 						if data_provider == 'cprd':
-							extension = '.txt'
-							separator = '	'
+							extension = '.csv'
+							separator = ','
 						elif data_provider == 'iqvia':
 							extension = '.csv' # + sorted(glob.iglob(folder + '\\*.out'))
 							separator = '	'
