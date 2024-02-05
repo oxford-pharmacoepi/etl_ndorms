@@ -162,6 +162,19 @@ def main():
 						if ret == True:
 							print('Finished applying indexes LOOKUP tables')	
 # ---------------------------------------------------------
+# Create daysupply_modes and daysupply_decodes - Sequential execution 
+# ---------------------------------------------------------
+				if ret == True and database_type == 'gold':
+					qa = input('Are you sure you want to CREATE daysupply_modes and daysupply_decodes tables (y/n):')
+					while qa.lower() not in ['y', 'n', 'yes', 'no']:
+						qa = input('I did not understand that. Are you sure you want to CREATE daysupply_modes and daysupply_decodes tables (y/n):')
+					if qa.lower() in ['y', 'yes']:
+						fname = dir_sql + '2d_' + database_type + '_daysupply_create.sql'
+						print(fname + ' ...')
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
+						if ret == True:
+							print('Finished creation of daysupply_modes and daysupply_decodes tables.')
+# ---------------------------------------------------------
 # Move CODE to the processed directory?
 # ---------------------------------------------------------
 				if ret == True:

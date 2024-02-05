@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.consultation CASCADE;
 DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.patient CASCADE;
 
 -- PATIENT - Remove unacceptable
-CREATE TABLE {SOURCE_NOK_SCHEMA}.patient (LIKE {SOURCE_SCHEMA}.patient);
+CREATE TABLE {SOURCE_NOK_SCHEMA}.patient (LIKE {SOURCE_SCHEMA}.patient) TABLESPACE pg_default;
 
 with cte1 as (
 	SELECT t1.patid 
@@ -29,7 +29,7 @@ SELECT t1.*
 FROM {SOURCE_SCHEMA}.patient as t1
 INNER JOIN cte1 on cte1.patid = t1.patid;
 
-alter table {SOURCE_NOK_SCHEMA}.patient add constraint pk_patient_nok primary key (patid);
+alter table {SOURCE_NOK_SCHEMA}.patient add constraint pk_patient_nok primary key (patid) USING INDEX TABLESPACE pg_default;
 
 DELETE FROM {SOURCE_SCHEMA}.patient as t1 
 using {SOURCE_NOK_SCHEMA}.patient as t2
@@ -37,7 +37,7 @@ WHERE t1.patid = t2.patid;
 
 
 -- CONSULTATION - Remove records with NULL EVENTDATE
-CREATE TABLE {SOURCE_NOK_SCHEMA}.consultation (LIKE {SOURCE_SCHEMA}.consultation);
+CREATE TABLE {SOURCE_NOK_SCHEMA}.consultation (LIKE {SOURCE_SCHEMA}.consultation) TABLESPACE pg_default;
 
 with cte2 as (
 	SELECT *
@@ -52,7 +52,7 @@ DELETE FROM {SOURCE_SCHEMA}.consultation
 WHERE eventdate is null;
 
 -- CLINICAL - Remove records with NULL EVENTDATE
-CREATE TABLE {SOURCE_NOK_SCHEMA}.clinical (LIKE {SOURCE_SCHEMA}.clinical);
+CREATE TABLE {SOURCE_NOK_SCHEMA}.clinical (LIKE {SOURCE_SCHEMA}.clinical) TABLESPACE pg_default;
 
 with cte3 as (
 	SELECT *
@@ -68,7 +68,7 @@ WHERE eventdate is null;
 
 
 -- REFERRAL - Remove records with NULL EVENTDATE
-CREATE TABLE {SOURCE_NOK_SCHEMA}.referral (LIKE {SOURCE_SCHEMA}.referral);
+CREATE TABLE {SOURCE_NOK_SCHEMA}.referral (LIKE {SOURCE_SCHEMA}.referral) TABLESPACE pg_default;
 
 with cte4 as (
 	SELECT *
@@ -84,7 +84,7 @@ WHERE eventdate is null;
 
 
 -- THERAPY - Remove records with NULL EVENTDATE
-CREATE TABLE {SOURCE_NOK_SCHEMA}.therapy (LIKE {SOURCE_SCHEMA}.therapy);
+CREATE TABLE {SOURCE_NOK_SCHEMA}.therapy (LIKE {SOURCE_SCHEMA}.therapy) TABLESPACE pg_default;
 
 with cte5 as (
 	SELECT *
@@ -100,7 +100,7 @@ WHERE eventdate is null;
 
 
 -- IMMUNISATION - Remove records with NULL EVENTDATE
-CREATE TABLE {SOURCE_NOK_SCHEMA}.immunisation (LIKE {SOURCE_SCHEMA}.immunisation);
+CREATE TABLE {SOURCE_NOK_SCHEMA}.immunisation (LIKE {SOURCE_SCHEMA}.immunisation) TABLESPACE pg_default;
 
 with cte6 as (
 	SELECT *
@@ -116,7 +116,7 @@ WHERE eventdate is null;
 
 
 -- TEST - Remove records with NULL EVENTDATE
-CREATE TABLE {SOURCE_NOK_SCHEMA}.test (LIKE {SOURCE_SCHEMA}.test);
+CREATE TABLE {SOURCE_NOK_SCHEMA}.test (LIKE {SOURCE_SCHEMA}.test) TABLESPACE pg_default;
 
 with cte7 as (
 	SELECT *

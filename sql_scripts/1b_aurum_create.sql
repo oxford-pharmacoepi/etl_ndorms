@@ -11,20 +11,20 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.patient (
 	regenddate date,
 	acceptable smallint,
 	cprd_ddate date
-);
+)TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.practice (
 	pracid int,
 	lcd date,
 	uts date,
 	region int
-);
+)TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.staff (
 	staffid bigint,
 	pracid int,
 	jobcatid int
-);
+)TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.consultation (
 	patid bigint,
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.consultation (
 	conssourceid int,
 	cprdconstype int,
 	consmedcodeid bigint
-);
+)TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.observation (
 	patid bigint,
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.observation (
 	numrangelow real,
 	numrangehigh real,
 	probobsid bigint
-);
+)TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.problem (
 	patid bigint,
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.problem (
 	parentprobrelid int,
 	probstatusid int,
 	signid int
-);
+)TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.drugissue (
 	patid bigint,
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.drugissue (
 	quantunitid smallint,
 	duration int,
 	estnhscost real
-);
+)TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.referral (
 	patid bigint,
@@ -96,11 +96,11 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.referral (
 	refurgencyid smallint,
 	refservicetypeid smallint,
 	refmodeid smallint
-);
+)TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}._records (
 	tbl_name varchar(20) NOT NULL,
 	source_records bigint DEFAULT 0,
 	source_nok_records bigint DEFAULT 0,
 	total_records bigint DEFAULT 0
-);
+)TABLESPACE pg_default;
