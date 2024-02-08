@@ -1,5 +1,25 @@
 drop table if exists {VOCABULARY_SCHEMA}.source_to_source_vocab_map CASCADE;
 
+CREATE TABLE IF NOT EXISTS {VOCABULARY_SCHEMA}.source_to_source_vocab_map
+(
+    source_code varchar(255),
+    source_concept_id integer,
+    source_code_description varchar(255),
+    source_vocabulary_id varchar(30),
+    source_domain_id varchar(20),
+    source_concept_class_id varchar(20),
+    source_valid_start_date date,
+    source_valid_end_date date,
+    source_invalid_reason varchar(1),
+    target_concept_id integer,
+    target_concept_name varchar(255),
+    target_vocabulary_id varchar(30),
+    target_domain_id varchar(20),
+    target_concept_class_id varchar(20),
+    target_invalid_reason varchar(1),
+    target_standard_concept varchar(1)
+)TABLESPACE pg_default;
+
 WITH CTE_VOCAB_MAP AS (
        SELECT c.concept_code AS SOURCE_CODE, c.concept_id AS SOURCE_CONCEPT_ID, c.CONCEPT_NAME AS SOURCE_CODE_DESCRIPTION,
                         c.vocabulary_id AS SOURCE_VOCABULARY_ID, c.domain_id AS SOURCE_DOMAIN_ID, c.concept_class_id AS SOURCE_CONCEPT_CLASS_ID,
@@ -20,8 +40,8 @@ WITH CTE_VOCAB_MAP AS (
                      ON c2.CONCEPT_ID = stcm.target_concept_id
        WHERE stcm.INVALID_REASON IS NULL
 )
-
-SELECT * INTO {VOCABULARY_SCHEMA}.source_to_source_vocab_map FROM CTE_VOCAB_MAP;
+INSERT INTO {VOCABULARY_SCHEMA}.source_to_source_vocab_map
+SELECT * FROM CTE_VOCAB_MAP;
 
 create index idx_source_vocab_map_source_code on {VOCABULARY_SCHEMA}.source_to_source_vocab_map (source_code) TABLESPACE pg_default;
 create index idx_source_vocab_map_source_vocab_id on {VOCABULARY_SCHEMA}.source_to_source_vocab_map (source_vocabulary_id) TABLESPACE pg_default;
