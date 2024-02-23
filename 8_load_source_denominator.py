@@ -31,7 +31,7 @@ def main():
 			while qa.lower() not in ['y', 'n', 'yes', 'no']:
 				qa = input('I did not understand that. Are you sure you want to DROP the ' + database_type.upper() + ' denominators tables (y/n):') 
 			if qa.lower() in ['y', 'yes']:
-				fname = dir_sql + '7a_' + database_type + '_denom_drop.sql'
+				fname = dir_sql + '8a_' + database_type + '_denom_drop.sql'
 				print('Calling ' + fname + ' ...')
 				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
 			if ret == True:
@@ -45,7 +45,7 @@ def main():
 # ---------------------------------------------------------
 # Create denominators tables
 # ---------------------------------------------------------
-					fname = dir_sql + '7b_' + database_type + '_denom_create.sql'
+					fname = dir_sql + '8b_' + database_type + '_denom_create.sql'
 					print('Calling ' + fname + ' ...')
 					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
 # ---------------------------------------------------------
@@ -72,7 +72,7 @@ def main():
 # Build PKs & IDXs
 # ---------------------------------------------------------
 					print('Build PKs and IDXs ...')
-					sql_file_list = sorted(glob.iglob(dir_sql + '7c_' + database_type + '_denom_pk_idx_*.sql'))
+					sql_file_list = sorted(glob.iglob(dir_sql + '8c_' + database_type + '_denom_pk_idx_*.sql'))
 					ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, True)
 					if ret == True:
 						print('Finished adding ' + database_type.upper() + ' PKs/indexes')

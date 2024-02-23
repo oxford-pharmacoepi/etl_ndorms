@@ -18,11 +18,11 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.aurum_acceptablepats (
 	uts date,
 	lcd date,
 	region int
-);
+) TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.aurum_practices (
 	pracid int,
 	lcd date,
 	uts date,
 	region int
-);
+) TABLESPACE pg_default;
