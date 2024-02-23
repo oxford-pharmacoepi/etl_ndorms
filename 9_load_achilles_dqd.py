@@ -56,6 +56,8 @@ def main():
 					if ret == True:
 						data_provider = db_conf['data_provider']
 						prefix = ''
+						with_quotes = False
+						null_string = ''
 						if data_provider == 'cprd':
 							extension = '.txt'
 							separator = '	'
@@ -65,6 +67,8 @@ def main():
 						elif data_provider == 'thin':
 							extension = '.csv'
 							separator = ','
+							with_quotes = True
+							null_string = 'NA'
 						elif data_provider == 'ukbiobank':
 							extension = '.tsv'
 							separator = '	'
@@ -73,7 +77,7 @@ def main():
 						print(tbl_list_full)
 						file_list = [[dir_data + '*' + tbl + '*' + extension] for tbl in tbl_list]
 						print(file_list)
-						ret = mapping_util.load_files_parallel(db_conf, result_schema, tbl_list, file_list, dir_data_processed, separator)
+						ret = mapping_util.load_files_parallel(db_conf, result_schema, tbl_list, file_list, dir_data_processed, separator, with_quotes, null_string)
 						if ret == True:
 							print('Finished loading cdm vocabulary.')
 # ---------------------------------------------------------

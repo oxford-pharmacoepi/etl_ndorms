@@ -158,7 +158,7 @@ def does_tbl_exist(cnx, tbl_name):
 	return(ret, exist)	
 
 # ---------------------------------------------------------
-def load_files(db_conf, schema, tbl_name, file_list, dir_processed, separator, with_quotes):
+def load_files(db_conf, schema, tbl_name, file_list, dir_processed, separator, with_quotes, null_string):
 	"Load files into tables"
 # ---------------------------------------------------------
 	ret = True
@@ -195,15 +195,17 @@ def load_files(db_conf, schema, tbl_name, file_list, dir_processed, separator, w
 				stream = StringIO()
 				if data_provider == 'ukbiobank':
 					stream.write(open(fname, encoding='cp1252', errors = 'ignore').read().replace('\\', ''))
+#				elif data_provider == 'thin':
+#					stream.write(open(fname, errors = 'ignore').read().replace('\\', '').replace(',NA,', ',,'))
 				else:
 					stream.write(open(fname, errors = 'ignore').read().replace('\\', ''))
 #				stream.write(open(fname, errors = 'ignore').read().replace('\\', '').replace('\u0000', ''))
 				stream.seek(0)
 				stream.readline()	#To avoid headers
 				if with_quotes == False:
-					cursor1.copy_from(stream, tbl_name, sep = separator, null = '')
+					cursor1.copy_from(stream, tbl_name, sep = separator, null = null_string)
 				else:
-					cursor1.copy_expert("COPY " + tbl_name + " FROM STDIN WITH (FORMAT CSV, delimiter '" + separator + "', quote '\"')", stream)
+					cursor1.copy_expert("COPY " + tbl_name + " FROM STDIN WITH (FORMAT CSV, delimiter '" + separator + "', quote '\"', NULL '" + null_string + "')", stream)
 # ---------------------------------------------------------
 # Move loaded file to PROCESSED directory
 # ---------------------------------------------------------
@@ -222,7 +224,7 @@ def load_files(db_conf, schema, tbl_name, file_list, dir_processed, separator, w
 	return(ret)
 
 # ---------------------------------------------------------
-def load_files_parallel(db_conf, schema, tbl_list, file_list, dir_processed, separator = '	', with_quotes = False):
+def load_files_parallel(db_conf, schema, tbl_list, file_list, dir_processed, separator = '	', with_quotes = False, null_string = ''):
 	"Load files into tables"
 # ---------------------------------------------------------
 	ret = True
@@ -234,7 +236,7 @@ def load_files_parallel(db_conf, schema, tbl_list, file_list, dir_processed, sep
 # Load files in parallel (all tables), sequentially within each table
 # ---------------------------------------------------------
 		with ProcessPoolExecutor(int(db_conf['max_workers'])) as executor:
-			futures = [executor.submit(load_files, db_conf, schema, tbl_name, file_list[idx], dir_processed, separator, with_quotes) for idx, tbl_name in enumerate(tbl_list)]
+			futures = [executor.submit(load_files, db_conf, schema, tbl_name, file_list[idx], dir_processed, separator, with_quotes, null_string) for idx, tbl_name in enumerate(tbl_list)]
 			for future in as_completed(futures):
 				if future.result() == False:
 					ret = False
