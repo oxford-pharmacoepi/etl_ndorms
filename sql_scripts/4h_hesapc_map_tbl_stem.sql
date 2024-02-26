@@ -7,7 +7,7 @@
 --drop index if exists {TARGET_SCHEMA}.idx_procedure_visit_id; -- NOT SURE WHERE THE PROCEDURE_OCCURRENCE TABLE IS USED ??
 --
 
-CREATE TABLE {CHUNK_SCHEMA}.stem_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM);
+CREATE TABLE {CHUNK_SCHEMA}.stem_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM) TABLESPACE pg_default;
 
 --insert into stem from stem_source, this is the vocab mapping portion
 with t as (
@@ -64,9 +64,9 @@ insert into {CHUNK_SCHEMA}.stem_{CHUNK_ID} (domain_id, person_id, visit_occurren
 										 anatomic_site_source_value, disease_status_source_value, modifier_concept_id, stem_source_table, stem_source_id)
 	select * from t;
 
-ALTER TABLE {CHUNK_SCHEMA}.stem_{CHUNK_ID} ADD CONSTRAINT pk_stem_{CHUNK_ID} PRIMARY KEY (id);
-create index idx_stem_domain_id_{CHUNK_ID} on {CHUNK_SCHEMA}.stem_{CHUNK_ID} (domain_id, visit_occurrence_id);
-create index idx_stem_unit_source_value_{CHUNK_ID} on {CHUNK_SCHEMA}.stem_{CHUNK_ID} (unit_source_value);
+ALTER TABLE {CHUNK_SCHEMA}.stem_{CHUNK_ID} ADD CONSTRAINT pk_stem_{CHUNK_ID} PRIMARY KEY (id) USING INDEX TABLESPACE pg_default;
+create index idx_stem_domain_id_{CHUNK_ID} on {CHUNK_SCHEMA}.stem_{CHUNK_ID} (domain_id, visit_occurrence_id) TABLESPACE pg_default;
+create index idx_stem_unit_source_value_{CHUNK_ID} on {CHUNK_SCHEMA}.stem_{CHUNK_ID} (unit_source_value) TABLESPACE pg_default;
 
 
 -----------------------------------------
