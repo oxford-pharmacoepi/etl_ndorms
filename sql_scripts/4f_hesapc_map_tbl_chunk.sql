@@ -4,14 +4,14 @@ CREATE SCHEMA IF NOT EXISTS {CHUNK_SCHEMA};
 --------------------------------
 DROP TABLE IF EXISTS {CHUNK_SCHEMA}.chunk_person;
 
-CREATE TABLE {CHUNK_SCHEMA}.chunk_person AS 
+CREATE TABLE {CHUNK_SCHEMA}.chunk_person TABLESPACE pg_default AS 
 	select (floor((row_number() over (order by person_id)-1)/{CHUNK_SIZE}) + 1)::int as chunk_id,
 	person_id
 	FROM {TARGET_SCHEMA}.person
 	order by chunk_id, person_id;
 
-ALTER TABLE {CHUNK_SCHEMA}.chunk_person ADD CONSTRAINT pk_chunk_person PRIMARY KEY (chunk_id, person_id);
-CREATE UNIQUE INDEX idx_chunk_person_id ON {CHUNK_SCHEMA}.chunk_person (chunk_id, person_id ASC);
+ALTER TABLE {CHUNK_SCHEMA}.chunk_person ADD CONSTRAINT pk_chunk_person PRIMARY KEY (chunk_id, person_id) USING INDEX TABLESPACE pg_default;
+CREATE UNIQUE INDEX idx_chunk_person_id ON {CHUNK_SCHEMA}.chunk_person (chunk_id, person_id ASC) TABLESPACE pg_default;
 CLUSTER {CHUNK_SCHEMA}.chunk_person USING idx_chunk_person_id;
 
 --------------------------------
@@ -19,7 +19,7 @@ CLUSTER {CHUNK_SCHEMA}.chunk_person USING idx_chunk_person_id;
 --------------------------------
 DROP TABLE IF EXISTS {CHUNK_SCHEMA}.chunk;
 
-CREATE TABLE {CHUNK_SCHEMA}.chunk AS 
+CREATE TABLE {CHUNK_SCHEMA}.chunk TABLESPACE pg_default AS 
 SELECT distinct chunk_id,
 		null::varchar(20) as stem_source_tbl,
 		null::varchar(20) as stem_tbl,
@@ -28,10 +28,10 @@ SELECT distinct chunk_id,
 		0::smallint as completed 
 FROM {CHUNK_SCHEMA}.chunk_person;
 
-ALTER TABLE {CHUNK_SCHEMA}.chunk ADD CONSTRAINT pk_chunk PRIMARY KEY (chunk_id);
-CREATE UNIQUE INDEX idx_chunk_id ON {CHUNK_SCHEMA}.chunk (chunk_id ASC);
+ALTER TABLE {CHUNK_SCHEMA}.chunk ADD CONSTRAINT pk_chunk PRIMARY KEY (chunk_id) USING INDEX TABLESPACE pg_default;
+CREATE UNIQUE INDEX idx_chunk_id ON {CHUNK_SCHEMA}.chunk (chunk_id ASC) TABLESPACE pg_default;
 CLUSTER {CHUNK_SCHEMA}.chunk USING idx_chunk_id;
-CREATE INDEX idx_chunk_completed ON {CHUNK_SCHEMA}.chunk (completed);
+CREATE INDEX idx_chunk_completed ON {CHUNK_SCHEMA}.chunk (completed) TABLESPACE pg_default;
 
 --------------------------------
 -- _RECORDS
@@ -42,8 +42,7 @@ create table {TARGET_SCHEMA}._records (
 	{TARGET_SCHEMA}_records bigint DEFAULT 0,
 	{TARGET_SCHEMA}_nok_records bigint DEFAULT 0,
 	total_records bigint DEFAULT 0
-);
-
+) TABLESPACE pg_default;
 
 --------------------------------
 -- DROP TABLES CREATED BY CHUNKING

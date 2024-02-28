@@ -1,5 +1,5 @@
 --insert into temp table from hes_diagnosis_epi
-CREATE TABLE {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM_SOURCE);
+CREATE TABLE {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM_SOURCE) TABLESPACE pg_default;
 
 WITH cte0 as (
 		select person_id
@@ -182,7 +182,7 @@ inner join {TARGET_SCHEMA}.visit_detail as t3 on t1.person_id = t3.person_id and
 LEFT JOIN cte3 AS t4 ON t1.person_id = t4.person_id and t1.visit_detail_source_value = t4.visit_detail_source_value
 WHERE t3.visit_detail_concept_id = 9201;	--Only visit records coming from hes_episodes
 
-create index idx_stem_source_{CHUNK_ID} on {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (source_concept_id);
+create index idx_stem_source_{CHUNK_ID} on {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (source_concept_id) TABLESPACE pg_default;
 
 -----------------------------------------
 -- UPDATE CHUNK
