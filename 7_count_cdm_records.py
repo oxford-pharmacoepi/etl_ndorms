@@ -28,8 +28,7 @@ def main():
 				time1 = time.time()
 				fname = dir_sql + '7a_cdm_records_create.sql'
 				print('Calling ' + fname + ' ...')
-				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
-				
+				ret = mapping_util.execute_multiple_queries(db_conf, fname)			
 				if ret == True:
 					tbl_list_count = [target_schema + "." + tbl for tbl in db_conf['tbl_cdm']]
 					tbl_list_count.extend([target_schema + "." + tbl for tbl in db_conf['tbl_cdm_voc']])
