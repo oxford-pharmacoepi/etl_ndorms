@@ -1,6 +1,6 @@
 _obsolete/
 sql_scripts/_obsolete/
-sql_script/processed/
+sql_scripts/processed/
 .idea/
 __pycache__/
 
