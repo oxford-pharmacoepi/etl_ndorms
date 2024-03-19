@@ -292,16 +292,23 @@ def get_table_count(db_conf, tbl_name, tbl_result, cnx=None):
 		query1 = 'select * from ' + tbl_result + ' where tbl_name = ' + tbl_name_short
 		cursor1.execute(query1)
 		present = cursor1.fetchone()
-		if present == None:
-			query1 = 'insert INTO ' + tbl_result + ' (tbl_name, ' + schema_tbl + '_records) VALUES (' + tbl_name_short + ', ' + records + ')'
-			cursor1.execute(query1)
-			print(f'{tbl_name} row count: {records}')
+		
+		if schema_tbl == db_conf['target_schema']:
+			if present == None:
+				query1 = 'insert INTO ' + tbl_result + ' (tbl_name, total_records) VALUES (' + tbl_name_short + ', ' + records + ')'
+				cursor1.execute(query1)
+				print(f'{tbl_name} row count: {records}')
 		else:
-			query1 = 'update ' + tbl_result + ' SET ' + schema_tbl + '_records = ' + records + ' where tbl_name = ' + tbl_name_short
-			cursor1.execute(query1)
-			print(f'{tbl_name} row count: {records}')
-			query1 = 'update ' + tbl_result + ' SET total_records = COALESCE(' + schema_tbl_result + '_records,0) + COALESCE(' + schema_tbl_result + '_nok_records,0) where tbl_name = ' + tbl_name_short
-			cursor1.execute(query1)
+			if present == None:
+				query1 = 'insert INTO ' + tbl_result + ' (tbl_name, ' + schema_tbl + '_records) VALUES (' + tbl_name_short + ', ' + records + ')'
+				cursor1.execute(query1)
+				print(f'{tbl_name} row count: {records}')
+			else:
+				query1 = 'update ' + tbl_result + ' SET ' + schema_tbl + '_records = ' + records + ' where tbl_name = ' + tbl_name_short
+				cursor1.execute(query1)
+				print(f'{tbl_name} row count: {records}')
+				query1 = 'update ' + tbl_result + ' SET total_records = COALESCE(' + schema_tbl_result + '_records,0) + COALESCE(' + schema_tbl_result + '_nok_records,0) where tbl_name = ' + tbl_name_short
+				cursor1.execute(query1)
 		cursor1.close()
 		cursor1 = None
 		if new_connection == True:

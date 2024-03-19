@@ -17,6 +17,7 @@ def main():
 		if ret == True and dir_study != '':
 			database_type = db_conf['database_type']
 			target_schema = db_conf['target_schema']
+			dir_sql = os.getcwd() + "\\sql_scripts\\"
 # ---------------------------------------------------------
 # Count records per table
 # ---------------------------------------------------------
@@ -25,12 +26,16 @@ def main():
 				qa = input('I did not understand that. Are you sure you want to build the _RECORDS table (y/n):') 
 			if qa.lower() in ['y', 'yes']:
 				time1 = time.time()
-				tbl_list_count = [target_schema + "." + tbl for tbl in db_conf['tbl_cdm']]
-				tbl_list_count.extend([target_schema + "." + tbl for tbl in db_conf['tbl_cdm_voc']])
-				ret = mapping_util.get_table_count_parallel(db_conf, tbl_list_count, target_schema + '._records')
+				fname = dir_sql + '7a_cdm_records_create.sql'
+				print('Calling ' + fname + ' ...')
+				ret = mapping_util.execute_multiple_queries(db_conf, fname)			
 				if ret == True:
-					msg = 'Finished counting on ' + database_type.upper() + ' data in ' + mapping_util.calc_time(time.time() - time1) + '\n'
-					print(msg)
+					tbl_list_count = [target_schema + "." + tbl for tbl in db_conf['tbl_cdm']]
+					tbl_list_count.extend([target_schema + "." + tbl for tbl in db_conf['tbl_cdm_voc']])
+					ret = mapping_util.get_table_count_parallel(db_conf, tbl_list_count, target_schema + '._records')
+					if ret == True:
+						msg = 'Finished counting on ' + database_type.upper() + ' data in ' + mapping_util.calc_time(time.time() - time1) + '\n'
+						print(msg)
 	except:
 		print(str(sys.exc_info()[1]))
 # ---------------------------------------------------------
