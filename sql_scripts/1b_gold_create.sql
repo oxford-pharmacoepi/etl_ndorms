@@ -188,9 +188,4 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}._records (
 	total_records bigint DEFAULT 0
 )TABLESPACE pg_default;
 
-create table {TARGET_SCHEMA}._records (
-	tbl_name varchar(25) NOT NULL,
-	{TARGET_SCHEMA}_records bigint DEFAULT 0,
-	{TARGET_SCHEMA}_nok_records bigint DEFAULT 0,
-	total_records bigint DEFAULT 0
-)TABLESPACE pg_default;
+
