@@ -375,7 +375,7 @@ def main():
 				while qa.lower() not in ['y', 'n', 'yes', 'no']:
 					qa = input('I did not understand that. Are you sure you want to CREATE/LOAD source_to_..._map tables tables (y/n):') 
 				if qa.lower() in ['y', 'yes']:
-					csv_file_list = sorted(glob.iglob(dir_stcm + '*_STCM.csv'))
+					csv_file_list = sorted(glob.iglob(dir_stcm + '*.csv'))
 					for fname in csv_file_list:
 						query = 'COPY ' + vocabulary_schema + '.source_to_concept_map FROM \'' + fname + '\' WITH DELIMITER E\',\' CSV HEADER QUOTE E\'"\'';
 						ret = mapping_util.execute_query(db_conf, query, True)
@@ -413,7 +413,7 @@ def main():
 					qa = input('I did not understand that. Are you sure you want to CHECKING ALL STCMs (y/n):') 
 				if qa.lower() in ['y', 'yes']:
 
-					if not list(glob.iglob(dir_stcm + '*_STCM.csv')):
+					if not list(glob.iglob(dir_stcm + '*.csv')):
 						print('NO STCM file found in ' + dir_stcm)
 						ret = False #stop the function if no STCM is found
 					else:
@@ -421,7 +421,7 @@ def main():
 						fname = dir_sql + '3f_check_stcm.sql'
 						print('Calling ' + fname + ' ...')
 
-						for fcsv in glob.iglob(dir_stcm + '*_STCM.csv'):		# iterator can't loop twice
+						for fcsv in glob.iglob(dir_stcm + '*.csv'):		# iterator can't loop twice
 							stcm = os.path.basename(fcsv).replace('.csv', '')
 							ret = check_stcm(fname, stcm, False)
 							if ret == False:
@@ -493,7 +493,7 @@ def main():
 # MOVE ALL STCM TO PROCESSED 
 # ---------------------------------------------------------
 			if ret == True:
-				for fstcm in glob.iglob(dir_stcm + '*_STCM.csv'):
+				for fstcm in glob.iglob(dir_stcm + '*.csv'):
 					file_processed = dir_stcm_processed + os.path.basename(fstcm)
 					os.rename(fstcm, file_processed)	#move to dir_stcm/processed
 				print('Finished moving ALL STCM csv files to processed')
