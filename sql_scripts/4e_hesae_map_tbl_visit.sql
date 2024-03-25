@@ -21,7 +21,7 @@ cte3 AS (
 	SELECT
 	NEXTVAL('sequence_vo') AS visit_occurrence_id,
 	t1.patid AS person_id,
-	9201 AS visit_concept_id,
+	9203 AS visit_concept_id,
 	t3.date_min AS visit_start_date, 
 	t3.date_min AS visit_start_datetime,
 	t3.date_max AS visit_end_date,
@@ -127,7 +127,7 @@ SELECT setval('sequence_vd', (SELECT MAX(visit_detail_id) from public.visit_deta
 WITH cte1 AS (
 	SELECT 
 	t1.patid AS person_id,
-	9201 AS visit_detail_concept_id,
+	9203 AS visit_detail_concept_id,
 	t1.arrivaldate AS visit_detail_start_date,
 	t1.arrivaldate AS visit_detail_start_datetime,
 	t1.arrivaldate  AS visit_detail_end_date,
