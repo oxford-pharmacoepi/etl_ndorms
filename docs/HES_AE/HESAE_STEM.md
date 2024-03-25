@@ -14,9 +14,11 @@ The stem_table is a staging area where HES A&E source codes like Read codes will
 **Reading from hes_diagnosis_epi**
 
 ![](images/image12.png)
+
 **Figure.1**
 
 |**Destination Field** |**Source field**|**Logic**|**Comment field**|
+| --- | 
 | id||Removed for performance reasons||
 | domain_id | NULL | | |
 | person_id | patid| Use patid to lookup Person_id in the  Person table| |
