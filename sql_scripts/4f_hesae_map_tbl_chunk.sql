@@ -11,8 +11,8 @@ CREATE TABLE {CHUNK_SCHEMA}.chunk_person TABLESPACE pg_default AS
 	order by chunk_id, person_id;
 
 ALTER TABLE {CHUNK_SCHEMA}.chunk_person ADD CONSTRAINT pk_chunk_person PRIMARY KEY (chunk_id, person_id) USING INDEX TABLESPACE pg_default;
-CREATE UNIQUE INDEX idx_chunk_person_id ON {CHUNK_SCHEMA}.chunk_person (chunk_id, person_id ASC) TABLESPACE pg_default;
-CLUSTER {CHUNK_SCHEMA}.chunk_person USING idx_chunk_person_id;
+CREATE UNIQUE INDEX idx_hesae_chunk_person_id ON {CHUNK_SCHEMA}.chunk_person (chunk_id, person_id ASC) TABLESPACE pg_default;
+CLUSTER {CHUNK_SCHEMA}.chunk_person USING idx_hesae_chunk_person_id;
 
 --------------------------------
 -- CHUNK
@@ -29,9 +29,9 @@ SELECT distinct chunk_id,
 FROM {CHUNK_SCHEMA}.chunk_person;
 
 ALTER TABLE {CHUNK_SCHEMA}.chunk ADD CONSTRAINT pk_chunk PRIMARY KEY (chunk_id) USING INDEX TABLESPACE pg_default;
-CREATE UNIQUE INDEX idx_chunk_id ON {CHUNK_SCHEMA}.chunk (chunk_id ASC) TABLESPACE pg_default;
-CLUSTER {CHUNK_SCHEMA}.chunk USING idx_chunk_id;
-CREATE INDEX idx_chunk_completed ON {CHUNK_SCHEMA}.chunk (completed) TABLESPACE pg_default;
+CREATE UNIQUE INDEX idx_hesae_chunk_id ON {CHUNK_SCHEMA}.chunk (chunk_id ASC) TABLESPACE pg_default;
+CLUSTER {CHUNK_SCHEMA}.chunk USING idx_hesae_chunk_id;
+CREATE INDEX idx_hesae_chunk_completed ON {CHUNK_SCHEMA}.chunk (completed) TABLESPACE pg_default;
 
 --------------------------------
 -- _RECORDS
@@ -43,6 +43,7 @@ CREATE INDEX idx_chunk_completed ON {CHUNK_SCHEMA}.chunk (completed) TABLESPACE 
 --	{TARGET_SCHEMA}_nok_records bigint DEFAULT 0,
 --	total_records bigint DEFAULT 0
 --) TABLESPACE pg_default;
+
 
 --------------------------------
 -- DROP TABLES CREATED BY CHUNKING
