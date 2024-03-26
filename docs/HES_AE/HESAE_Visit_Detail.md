@@ -22,7 +22,7 @@ description: "Visit_Detil mapping from hesae_attendance tables"
 | --- | --- | --- | --- |
 | visit_detail_id |  |  | Autogenerate: if table is empty, starts from MAX(public.visit_detail) + 1|
 | person_id | patid |  |  |
-| visit_detail_concept_id |  |  | 9201 = Inpatient visit |
+| visit_detail_concept_id |  |  | 9203 = "Emergency Room Visit" |
 | visit_detail_start_date | arrivaldate | |  |
 | visit_detail_start_datetime | arrivaldate | |  |
 | visit_detail_end_date |  | | Arrivaldate+depdur may allow us to retrieve the visit_end_date (To be investigated later)|

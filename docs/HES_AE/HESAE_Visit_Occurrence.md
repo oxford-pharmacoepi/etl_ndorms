@@ -19,7 +19,7 @@ description: "Visit_Occurrence mapping from hesae_attendance table"
 | --- | --- | --- | --- |
 | visit_occurrence_id |  |  | Autogenerate: if table is empty, start from MAX(public.visit_occurrence)+1  |
 | person_id | patid |  |  |
-| visit_concept_id |  |  | 9201 = Inpatient visit |
+| visit_concept_id |  |  | 9203 = "Emergency Room Visit" |
 | visit_start_date | arrivaldate | | Arrival date will be mapped to visit_start_date  |
 | visit_start_datetime | | |Arrival date will be mapped to visit_start_date  |
 | visit_end_date | arrivaldate| | Arrivaldate+depdur may allow us to retrieve the visit_end_date (To be investigated later)|
