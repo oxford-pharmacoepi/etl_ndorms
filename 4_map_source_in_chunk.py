@@ -110,7 +110,7 @@ def main():
 							msg = 'Finished calculating max_ids in ' + target_schema_to_link.upper() + ' data in ' + mapping_util.calc_time(time.time() - time1) + '\n'
 							print(msg)
 # ---------------------------------------------------------
-# Tables to load: PERSON,OBSERVATION_PERIOD, etc.
+# Tables to load: PERSON, OBSERVATION_PERIOD, etc.
 # ---------------------------------------------------------
 			if ret == True:
 				qa = input('Do you want to map the simple tables: PERSON, OBSERVATION_PERIOD, etc. (y/n):').lower()
@@ -146,88 +146,90 @@ def main():
 # ---------------------------------------------------------
 # Create/Recreate CHUNK table and any chunk job previously done?
 # ---------------------------------------------------------
-				qa = input('Do you want to CREATE/RECREATE the chunk table and remove any chunk work previously done? (y/n):').lower() 
-				while qa not in ['y', 'n', 'yes', 'no']:
-					qa = input('I did not understand that. Do you want to CREATE/RECREATE the chunk table and remove any chunk work previously done? (y/n):').lower()
-				if qa in ['y', 'yes']:
+			if ret == True:
+				if database_type not in ('hesop'): #HES_OP does not use STEM and does not need chunking
+					qa = input('Do you want to CREATE/RECREATE the chunk table and remove any chunk work previously done? (y/n):').lower() 
+					while qa not in ['y', 'n', 'yes', 'no']:
+						qa = input('I did not understand that. Do you want to CREATE/RECREATE the chunk table and remove any chunk work previously done? (y/n):').lower()
+					if qa in ['y', 'yes']:
 # ---------------------------------------------------------
 # Delete possible old stem_source_x and stem_x tables
 # ---------------------------------------------------------
-					(ret, exist) = mapping_util.does_tbl_exist(cnx, chunk_schema + '.chunk')
-					if ret == True and exist == True:
-						query1 = 'SELECT stem_source_tbl, stem_tbl FROM ' + chunk_schema + '.chunk WHERE completed = 1'
-						cursor1.execute(query1)
-						tbl_array = cursor1.fetchall()
-						stem_source_list = list(map(lambda x: x[0], tbl_array))
-						stem_list = list(map(lambda x: x[1], tbl_array))
-						for tbl_id in range(0,len(stem_source_list)):
-							query1 = 'DROP TABLE IF EXISTS ' + chunk_schema + '.' + stem_source_list[tbl_id];
+						(ret, exist) = mapping_util.does_tbl_exist(cnx, chunk_schema + '.chunk')
+						if ret == True and exist == True:
+							query1 = 'SELECT stem_source_tbl, stem_tbl FROM ' + chunk_schema + '.chunk WHERE completed = 1'
 							cursor1.execute(query1)
-							if stem_list[tbl_id] != None:
-								query1 = 'DROP TABLE IF EXISTS ' + chunk_schema + '.' + stem_list[tbl_id];
+							tbl_array = cursor1.fetchall()
+							stem_source_list = list(map(lambda x: x[0], tbl_array))
+							stem_list = list(map(lambda x: x[1], tbl_array))
+							for tbl_id in range(0,len(stem_source_list)):
+								query1 = 'DROP TABLE IF EXISTS ' + chunk_schema + '.' + stem_source_list[tbl_id];
 								cursor1.execute(query1)
-					fname = dir_sql + '4f_' + database_type + '_map_tbl_chunk.sql'
-					print('Executing ' + fname + ' ... (CHUNK)')
-					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
+								if stem_list[tbl_id] != None:
+									query1 = 'DROP TABLE IF EXISTS ' + chunk_schema + '.' + stem_list[tbl_id];
+									cursor1.execute(query1)
+						fname = dir_sql + '4f_' + database_type + '_map_tbl_chunk.sql'
+						print('Executing ' + fname + ' ... (CHUNK)')
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
 # Necessary to recall 4b here if the CDM tables were deleted
-					if ret == True:
-						cdm_version = db_conf['cdm_version']
-						if cdm_version == '5.3':
-							fname = dir_sql + '4b_OMOPCDM_postgresql_5_3_ddl.sql'
-						elif cdm_version == '5.4':
-							fname = dir_sql + '4b_OMOPCDM_postgresql_5_4_ddl.sql'
-						print('Calling ' + fname + ' ...')
-						ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
+						if ret == True:
+							cdm_version = db_conf['cdm_version']
+							if cdm_version == '5.3':
+								fname = dir_sql + '4b_OMOPCDM_postgresql_5_3_ddl.sql'
+							elif cdm_version == '5.4':
+								fname = dir_sql + '4b_OMOPCDM_postgresql_5_4_ddl.sql'
+							print('Calling ' + fname + ' ...')
+							ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
 # ---------------------------------------------------------
 # Start/Restart chunking
 # ---------------------------------------------------------
-			if ret == True:
-				qa = input('Would you like to progress with chunking? (y/n):').lower()
-				while qa not in ['y', 'n', 'yes', 'no']:
-					qa = input('I did not understand that. Would you like to progress with chunking? (y/n):').lower()
-				if qa in ['y', 'yes']:
+				if ret == True:
+					qa = input('Would you like to progress with chunking? (y/n):').lower()
+					while qa not in ['y', 'n', 'yes', 'no']:
+						qa = input('I did not understand that. Would you like to progress with chunking? (y/n):').lower()
+					if qa in ['y', 'yes']:
 # ---------------------------------------------------------
 # Select not completed chunk ids
 # ---------------------------------------------------------
-					cnx.autocommit = False
-					chunks_time1 = time.time()
-					query1 = 'SELECT distinct chunk_id FROM ' + chunk_schema + '.chunk where completed = 0 order by chunk_id'
-					chunk_limit = db_conf['chunk_limit']
-					if chunk_limit > 0:
-						query1 += ' limit ' + str(chunk_limit)
-					query1 += ';'
-					cursor1.execute(query1)
-					chunk_id_array = cursor1.fetchall()
-					chunk_id_list = list(map(lambda x: x[0], chunk_id_array))
+						cnx.autocommit = False
+						chunks_time1 = time.time()
+						query1 = 'SELECT distinct chunk_id FROM ' + chunk_schema + '.chunk where completed = 0 order by chunk_id'
+						chunk_limit = db_conf['chunk_limit']
+						if chunk_limit > 0:
+							query1 += ' limit ' + str(chunk_limit)
+						query1 += ';'
+						cursor1.execute(query1)
+						chunk_id_array = cursor1.fetchall()
+						chunk_id_list = list(map(lambda x: x[0], chunk_id_array))
 # ---------------------------------------------------------
 # Loop through the chunks executing 4g, 4h and 4i each time before commit
 # ---------------------------------------------------------
-					move_files = False
-					for chunk_id in chunk_id_list:
-						print(f'Executing chunk {str(chunk_id)} / {str(chunk_id_list[-1])}')
-						chunk_time1 = time.time()
-						if chunk_id == chunk_id_list[-1]:
-							move_files = True
-						fname = dir_sql + '4g_' + database_type + '_map_tbl_stem_source.sql'
-						print('Executing ' + fname + ' ... (STEM_SOURCE)')
-						ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
-						if ret == True:
-							fname = dir_sql + '4h_' + database_type + '_map_tbl_stem.sql'
-							print('Executing ' + fname + ' ... (STEM)')
+						move_files = False
+						for chunk_id in chunk_id_list:
+							print(f'Executing chunk {str(chunk_id)} / {str(chunk_id_list[-1])}')
+							chunk_time1 = time.time()
+							if chunk_id == chunk_id_list[-1]:
+								move_files = True
+							fname = dir_sql + '4g_' + database_type + '_map_tbl_stem_source.sql'
+							print('Executing ' + fname + ' ... (STEM_SOURCE)')
 							ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
+							if ret == True:
+								fname = dir_sql + '4h_' + database_type + '_map_tbl_stem.sql'
+								print('Executing ' + fname + ' ... (STEM)')
+								ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
+							if ret == True:
+								fname = dir_sql + '4i_' + database_type + '_map_tbl_cdm.sql'
+								print('Executing ' + fname + ' ... (CONDITION_OCCURRENCE, DRUG_EXPOSURE, DEVICE_EXPOSURE, PROCEDURE_OCCURRENCE, MEASUREMENT, OBSERVATION)')
+								ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
+							if ret == True:
+								cnx.commit()
+								msg = mapping_util.calc_time(time.time() - chunk_time1)
+								print(f'Chunk {str(chunk_id)} finished in {msg}')
+							if ret == False:
+								break
 						if ret == True:
-							fname = dir_sql + '4i_' + database_type + '_map_tbl_cdm.sql'
-							print('Executing ' + fname + ' ... (CONDITION_OCCURRENCE, DRUG_EXPOSURE, DEVICE_EXPOSURE, PROCEDURE_OCCURRENCE, MEASUREMENT, OBSERVATION)')
-							ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
-						if ret == True:
-							cnx.commit()
-							msg = mapping_util.calc_time(time.time() - chunk_time1)
-							print(f'Chunk {str(chunk_id)} finished in {msg}')
-						if ret == False:
-							break
-					if ret == True:
-						msg = mapping_util.calc_time(time.time() - chunks_time1)
-						print(f'Full CHUNK process completed in {msg}')
+							msg = mapping_util.calc_time(time.time() - chunks_time1)
+							print(f'Full CHUNK process completed in {msg}')
 			cnx.close()
 # ---------------------------------------------------------
 # Report total time
