@@ -27,7 +27,7 @@ The patients mapped to the CDM from HES OP in this instance were restricted to t
 | month_of_birth | NULL|  | |
 | day_of_birth | NULL |  |  |
 | birth_datetime |NULL  |  |  |
-| race_concept_id | gen_ethnicity | | race_concept_id will be mapped to SNOMED Concept_id by using gen_ethnicity to retrieve the target_concept_id from source_to_standard_vocab_map where source_vocabulary_id = "CPRD_ETHIC_STCM".|
+| race_concept_id | gen_ethnicity | | race_concept_id will be mapped to SNOMED Concept_id by using gen_ethnicity to retrieve the target_concept_id from source_to_standard_vocab_map where source_vocabulary_id = "CPRD_ETHNIC_STCM".|
 | ethnicity_concept_id | NULL |  |   |
 | location_id |NULL  |  |  |
 | provider_id | NULL |  |  |

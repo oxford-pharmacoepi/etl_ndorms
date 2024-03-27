@@ -21,9 +21,9 @@ description: "Visit_Occurrence mapping from hesop_appointment table"
 | person_id | patid |  | If attended <> 5 discard visit appointment detail (we accept only attended = 5) |
 | visit_concept_id |  |  | 9202 = Outpatient visit |
 | visit_start_date | apptdate | | Appointment date will be mapped to visit_start_date  |
-| visit_start_datetime |NULL | |  |
+| visit_start_datetime |apptdate | |  |
 | visit_end_date | apptdate| | Appointment date will also be mapped to visit_end_date because its an Outpatient appointment|
-| visit_end_datetime |NULL | | |
+| visit_end_datetime |apptdate| | |
 | visit_type_concept_id |  |  | 32818 = "EHR administration record” |
 | provider_id |NULL | |  |
 | care_site_id |NULL | |  |
