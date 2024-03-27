@@ -21,15 +21,15 @@ description: "Visit_Occurrence mapping from hesop_appointment table"
 | person_id | patid |  | If attended <> 5 discard visit appointment detail (we accept only attended = 5) |
 | visit_concept_id |  |  | 9202 = Outpatient visit |
 | visit_start_date | apptdate | | Appointment date will be mapped to visit_start_date  |
-| visit_start_datetime |NULL | |  |
+| visit_start_datetime |apptdate | |  |
 | visit_end_date | apptdate| | Appointment date will also be mapped to visit_end_date because its an Outpatient appointment|
-| visit_end_datetime |NULL | | |
+| visit_end_datetime |apptdate| | |
 | visit_type_concept_id |  |  | 32818 = "EHR administration record” |
 | provider_id |NULL | |  |
 | care_site_id |NULL | |  |
 | visit_source_value | attendkey | | This will allow us to retrieve Visit_occurrence_id.  |
 | visit_source_concept_id | NULL |  |  |
-| admitting_source_concept_id | aerefsource |  | Check for OMOP codes from aerefsource |
+| admitting_source_concept_id | NULL|  | |
 | admitting_source_value | NULL |  | |
 | discharge_to_concept_id | NULL |  | |
 | discharge_to_source_value | NULL |  |  |

@@ -11,9 +11,9 @@ description: "Provider mapping from HES OP hesop_clinical table"
 
 ## Reading from hesop_clinical
 
-Use the hes_episodes table to populate the provider table. In HES APC, the Pconsult field represents the unique identifier given to the consultant which in this case is representing the provider.  
+Use the hesop_clinical table to populate the provider table. 
 
-![](images/image3.png)
+![](images/image5.png)
 
 | Destination Field | Source field | Logic | Comment field |
 | --- | --- | :---: | --- |
