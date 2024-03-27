@@ -19,13 +19,13 @@ description: "Visit_Detil mapping from hesop_appointment tables"
 
 | Destination Field | Source field | Logic | Comment field |
 | --- | --- | --- | --- |
-| visit_detail_id |  |  | Autogenerate: if table is empty, starts from MAX(public.visit_detail) + 1|
-| person_id | patid |  | If attended <> 5 discard visit appointment detail ( we accept only attended = 5) |
+| visit_detail_id |  | Autogenerate: if table is empty, starts from MAX(public.visit_detail) + 1 | If attended <> 5 discard visit appointment detail ( we accept only attended = 5) |
+| person_id | patid |  | |
 | visit_detail_concept_id |  |  | 9202 = Outpatient visit |
 | visit_detail_start_date | apptdate | |  |
 | visit_detail_start_datetime | apptdate | |  |
 | visit_detail_end_date | apptdate | | Appointment date will also be mapped to visit_detail_end_date because it's an outpatient appointment |
-| visit_detail_end_datetime |NULL | | |
+| visit_detail_end_datetime | apptdate | | |
 | visit_detail_type_concept_id |  |  | 32818 = "EHR administration record” |
 | provider_id | NULL|  | |
 | care_site_id | NULL|  |  |
@@ -37,5 +37,5 @@ description: "Visit_Detil mapping from hesop_appointment tables"
 | discharge_to_source_value |NULL  |  |  |
 | preceding_visit_detail_id |  |  | Use patid + attendkey where to get the preceding visit_detail_id if any.|
 | visit_detail_parent_id | NULL |  |  |
-| visit_occurrence_id |  |  | Use attendkey to retrieve visit_occurrence_id from public.visit_occurrence |
+| visit_occurrence_id |  |  | Use Patid + attendkey to retrieve visit_occurrence_id from visit_occurrence |
 
