@@ -188,12 +188,16 @@ def main():
 					qa = input('Are you sure you want to COUNT the records for all the ' + database_type.upper() + ' tables (y/n):') 
 				if qa.lower() in ['y', 'yes']:
 					time1 = time.time()
-					source_nok_schema = db_conf['source_nok_schema']
-					tbl_list_count = tbl_db_list + [source_nok_schema + "." + tbl for tbl in db_conf[tbl_db]]
-					ret = mapping_util.get_table_count_parallel(db_conf, tbl_list_count, source_schema + '._records')
+					fname = dir_sql + '1e_source_records_create.sql'
+					print('Calling ' + fname + ' ...')
+					ret = mapping_util.execute_multiple_queries(db_conf, fname)			
 					if ret == True:
-						task_finished = "Finished counting on  " + database_type.upper() + " data in {0}".format(mapping_util.calc_time(time.time() - time1))
-						print(task_finished)
+						source_nok_schema = db_conf['source_nok_schema']
+						tbl_list_count = tbl_db_list + [source_nok_schema + "." + tbl for tbl in db_conf[tbl_db]]
+						ret = mapping_util.get_table_count_parallel(db_conf, tbl_list_count, source_schema + '._records')
+						if ret == True:
+							task_finished = "Finished counting on  " + database_type.upper() + " data in {0}".format(mapping_util.calc_time(time.time() - time1))
+							print(task_finished)
 # ---------------------------------------------------------
 # Move CODE to the processed directory?
 # ---------------------------------------------------------
