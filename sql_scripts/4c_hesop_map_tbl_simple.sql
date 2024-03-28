@@ -50,13 +50,12 @@ CREATE UNIQUE INDEX idx_person_id ON {TARGET_SCHEMA}.person (person_id ASC);
 CLUSTER {TARGET_SCHEMA}.person USING xpk_person;
 
 --------------------------------
--- PROVIDER from hesop_clinical & hesop_appointment
+-- PROVIDER from hesop_clinical
 --------------------------------
-DROP SEQUENCE IF EXISTS sequence_pro;
-CREATE SEQUENCE sequence_pro INCREMENT 1;
-SELECT setval('sequence_pro', (SELECT MAX(provider_id) FROM public.PROVIDER));
+DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_pro;
+CREATE SEQUENCE {TARGET_SCHEMA}.sequence_pro INCREMENT 1;
+SELECT setval('{TARGET_SCHEMA}.sequence_pro', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'provider'));
 
--- We have duplicated people with more than 1 speciality to save that information and use in episodes
 with cte1 AS (
 	select DISTINCT CASE WHEN tretspef <> '&' THEN tretspef ELSE mainspef END as specialty
 	from {SOURCE_SCHEMA}.hesop_clinical
@@ -85,7 +84,7 @@ INSERT INTO {TARGET_SCHEMA}.PROVIDER (
 	gender_source_concept_id
 )
 SELECT 
-	nextval('sequence_pro') AS provider_id,
+	nextval('{TARGET_SCHEMA}.sequence_pro') AS provider_id,
 	NULL AS provider_name,
 	NULL AS npi,
 	NULL AS dea,
@@ -100,36 +99,36 @@ SELECT
 	NULL::int AS gender_source_concept_id
 FROM cte2;
 
-DROP SEQUENCE IF EXISTS sequence_pro;
+DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_pro;
 --The following is used in the mapping
-CREATE UNIQUE INDEX idx_provider_source ON {TARGET_SCHEMA}.provider (provider_source_value, specialty_source_value ASC);
+--CREATE UNIQUE INDEX idx_provider_source ON {TARGET_SCHEMA}.provider (provider_source_value, specialty_source_value ASC);
 
 ----------------------------------
 ---- OBSERVATION_PERIOD --
 ----------------------------------
---DROP SEQUENCE IF EXISTS observation_period_seq;
---
---CREATE SEQUENCE observation_period_seq;
---
---with cte as ( 
---	select t1.patid, MIN(t1.admidate) as min_date, MAX(t1.discharged) as max_date 
---	from {SOURCE_SCHEMA}.hes_hospital as t1 
---	inner join {TARGET_SCHEMA}.person as t2 on t2.person_id = t1.patid 
---	group by t1.patid 
---	) 
---INSERT INTO {TARGET_SCHEMA}.OBSERVATION_PERIOD
--- (
---	observation_period_id,
---	person_id,
---	observation_period_start_date,
---	observation_period_end_date,
---	period_type_concept_id
--- )
---select
---	nextval('observation_period_seq'),
---	cte.patid,  
---	GREATEST(cte.min_date, t3.start) as observation_period_start_date,  
---	LEAST(cte.max_date,t3.end) as observation_period_end_date,
---	32880
---from cte, {SOURCE_SCHEMA}.linkage_coverage as t3 
---where t3.data_source = 'hes_apc'; 
+DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.observation_period_seq;
+
+CREATE SEQUENCE {TARGET_SCHEMA}.observation_period_seq;
+
+with cte as ( 
+	select t1.patid, MIN(t1.apptdate) as min_date, MAX(t1.apptdate) as max_date 
+	from {SOURCE_SCHEMA}.hesop_appointment as t1 
+	inner join {TARGET_SCHEMA}.person as t2 on t2.person_id = t1.patid 
+	group by t1.patid 
+) 
+INSERT INTO {TARGET_SCHEMA}.OBSERVATION_PERIOD
+ (
+	observation_period_id,
+	person_id,
+	observation_period_start_date,
+	observation_period_end_date,
+	period_type_concept_id
+ )
+select
+	nextval('{TARGET_SCHEMA}.observation_period_seq'),
+	cte.patid,  
+	GREATEST(cte.min_date, t3.start) as observation_period_start_date,  
+	LEAST(cte.max_date,t3.end) as observation_period_end_date,
+	32880
+from cte, {SOURCE_SCHEMA}.linkage_coverage as t3 
+where t3.data_source = 'hes_op'; 
