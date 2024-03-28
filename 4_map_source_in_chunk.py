@@ -25,6 +25,13 @@ def main():
 			if not os.path.exists(dir_sql_processed):
 				os.makedirs(dir_sql_processed)
 # ---------------------------------------------------------
+# Create the schemas, if not present
+# ---------------------------------------------------------
+			fname = dir_sql + '4__schema_create.sql'
+			print('Calling ' + fname + ' ...')
+			ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
+		if ret == True:
+# ---------------------------------------------------------
 # Create/Recreate CDM tables? Parallel execution of queries in the file - Ask the user for DROP confirmation
 # ---------------------------------------------------------
 			qa = input('Are you sure you want to DROP/CREATE all the CDM tables (y/n):') 
@@ -33,7 +40,7 @@ def main():
 			if qa.lower() in ['y', 'yes']:
 				fname = dir_sql + '4a_cdm_drop_tbl.sql'
 				print('Calling ' + fname + ' ...')
-				ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
+				ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)
 				if ret == True:
 					cdm_version = db_conf['cdm_version']
 					if cdm_version == '5.3':
@@ -118,30 +125,30 @@ def main():
 					qa = input('I did not understand that. Do you want to map the simple tables: LOCATION, CARE_SITE, PROVIDER, PERSON, DEATH, OBSERVATION_PERIOD (y/n):') 
 				if qa in ['y', 'yes']:
 					fname = dir_sql + '4c_' + database_type + '_map_tbl_simple.sql'
-					print('Executing ' + fname + ' ... (PERSON,OBSERVATION_PERIOD, etc.)')
+					print('Executing ' + fname + ' ... (PERSON, OBSERVATION_PERIOD, etc.)')
 					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
 # ---------------------------------------------------------
 # Tables to load: TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL
 # ---------------------------------------------------------
 			if ret == True:
 				if database_type == 'aurum':
-					qa = input('Do you want to CREATE/RECREATE the temp tables (temp_concept_map, temp_drug_concept_map, temp_visit_detail)? (y/n):').lower() 
+					qa = input('Do you want to CREATE/RECREATE the temp tables (TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL)? (y/n):').lower() 
 					while qa not in ['y', 'n', 'yes', 'no']:
-						qa = input('I did not understand that. Do you want to CREATE/RECREATE the temp tables (temp_concept_map, temp_drug_concept_map, temp_visit_detail? (y/n):').lower()
+						qa = input('I did not understand that. Do you want to CREATE/RECREATE the temp tables (TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL? (y/n):').lower()
 					if qa in ['y', 'yes']:
 						fname = dir_sql + '4d_' + database_type + '_map_tbl_tmp.sql'
-						print('Executing ' + fname + ' ... (temp_concept_map, temp_drug_concept_map, temp_visit_detail)')
+						print('Executing ' + fname + ' ... (TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL)')
 						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
 # ---------------------------------------------------------
 # Tables to load: VISIT_OCCURRENCE, VISIT_DETAIL
 # ---------------------------------------------------------
 			if ret == True:
-				qa = input('Do you want to CREATE/RECREATE the visit tables (visit_occurrence, visit_detail)? (y/n):').lower() 
+				qa = input('Do you want to CREATE/RECREATE the visit tables (VISIT_OCCURRENCE, VISIT_DETAIL)? (y/n):').lower() 
 				while qa not in ['y', 'n', 'yes', 'no']:
-					qa = input('I did not understand that. Do you want to CREATE/RECREATE the visit tables (visit_occurrence, visit_detail)? (y/n):').lower()
+					qa = input('I did not understand that. Do you want to CREATE/RECREATE the visit tables (VISIT_OCCURRENCE, VISIT_DETAIL)? (y/n):').lower()
 				if qa in ['y', 'yes']:
 					fname = dir_sql + '4e_' + database_type + '_map_tbl_visit.sql'
-					print('Executing ' + fname + ' ... (visit_occurrence, visit_detail)')
+					print('Executing ' + fname + ' ... (VISIT_OCCURRENCE, VISIT_DETAIL)')
 					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
 # ---------------------------------------------------------
 # Create/Recreate CHUNK table and any chunk job previously done?
@@ -183,53 +190,53 @@ def main():
 # ---------------------------------------------------------
 # Start/Restart chunking
 # ---------------------------------------------------------
-				if ret == True:
-					qa = input('Would you like to progress with chunking? (y/n):').lower()
-					while qa not in ['y', 'n', 'yes', 'no']:
-						qa = input('I did not understand that. Would you like to progress with chunking? (y/n):').lower()
-					if qa in ['y', 'yes']:
+					if ret == True:
+						qa = input('Would you like to progress with chunking? (y/n):').lower()
+						while qa not in ['y', 'n', 'yes', 'no']:
+							qa = input('I did not understand that. Would you like to progress with chunking? (y/n):').lower()
+						if qa in ['y', 'yes']:
 # ---------------------------------------------------------
 # Select not completed chunk ids
 # ---------------------------------------------------------
-						cnx.autocommit = False
-						chunks_time1 = time.time()
-						query1 = 'SELECT distinct chunk_id FROM ' + chunk_schema + '.chunk where completed = 0 order by chunk_id'
-						chunk_limit = db_conf['chunk_limit']
-						if chunk_limit > 0:
-							query1 += ' limit ' + str(chunk_limit)
-						query1 += ';'
-						cursor1.execute(query1)
-						chunk_id_array = cursor1.fetchall()
-						chunk_id_list = list(map(lambda x: x[0], chunk_id_array))
+							cnx.autocommit = False
+							chunks_time1 = time.time()
+							query1 = 'SELECT distinct chunk_id FROM ' + chunk_schema + '.chunk where completed = 0 order by chunk_id'
+							chunk_limit = db_conf['chunk_limit']
+							if chunk_limit > 0:
+								query1 += ' limit ' + str(chunk_limit)
+							query1 += ';'
+							cursor1.execute(query1)
+							chunk_id_array = cursor1.fetchall()
+							chunk_id_list = list(map(lambda x: x[0], chunk_id_array))
 # ---------------------------------------------------------
 # Loop through the chunks executing 4g, 4h and 4i each time before commit
 # ---------------------------------------------------------
-						move_files = False
-						for chunk_id in chunk_id_list:
-							print(f'Executing chunk {str(chunk_id)} / {str(chunk_id_list[-1])}')
-							chunk_time1 = time.time()
-							if chunk_id == chunk_id_list[-1]:
-								move_files = True
-							fname = dir_sql + '4g_' + database_type + '_map_tbl_stem_source.sql'
-							print('Executing ' + fname + ' ... (STEM_SOURCE)')
-							ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
-							if ret == True:
-								fname = dir_sql + '4h_' + database_type + '_map_tbl_stem.sql'
-								print('Executing ' + fname + ' ... (STEM)')
+							move_files = False
+							for chunk_id in chunk_id_list:
+								print(f'Executing chunk {str(chunk_id)} / {str(chunk_id_list[-1])}')
+								chunk_time1 = time.time()
+								if chunk_id == chunk_id_list[-1]:
+									move_files = True
+								fname = dir_sql + '4g_' + database_type + '_map_tbl_stem_source.sql'
+								print('Executing ' + fname + ' ... (STEM_SOURCE)')
 								ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
+								if ret == True:
+									fname = dir_sql + '4h_' + database_type + '_map_tbl_stem.sql'
+									print('Executing ' + fname + ' ... (STEM)')
+									ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
+								if ret == True:
+									fname = dir_sql + '4i_' + database_type + '_map_tbl_cdm.sql'
+									print('Executing ' + fname + ' ... (CONDITION_OCCURRENCE, DRUG_EXPOSURE, DEVICE_EXPOSURE, PROCEDURE_OCCURRENCE, MEASUREMENT, OBSERVATION)')
+									ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
+								if ret == True:
+									cnx.commit()
+									msg = mapping_util.calc_time(time.time() - chunk_time1)
+									print(f'Chunk {str(chunk_id)} finished in {msg}')
+								if ret == False:
+									break
 							if ret == True:
-								fname = dir_sql + '4i_' + database_type + '_map_tbl_cdm.sql'
-								print('Executing ' + fname + ' ... (CONDITION_OCCURRENCE, DRUG_EXPOSURE, DEVICE_EXPOSURE, PROCEDURE_OCCURRENCE, MEASUREMENT, OBSERVATION)')
-								ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
-							if ret == True:
-								cnx.commit()
-								msg = mapping_util.calc_time(time.time() - chunk_time1)
-								print(f'Chunk {str(chunk_id)} finished in {msg}')
-							if ret == False:
-								break
-						if ret == True:
-							msg = mapping_util.calc_time(time.time() - chunks_time1)
-							print(f'Full CHUNK process completed in {msg}')
+								msg = mapping_util.calc_time(time.time() - chunks_time1)
+								print(f'Full CHUNK process completed in {msg}')
 			cnx.close()
 # ---------------------------------------------------------
 # Report total time
