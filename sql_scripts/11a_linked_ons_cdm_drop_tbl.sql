@@ -1,0 +1,1 @@
+drop table if exists {TARGET_SCHEMA}.DEATH_ONS CASCADE;
