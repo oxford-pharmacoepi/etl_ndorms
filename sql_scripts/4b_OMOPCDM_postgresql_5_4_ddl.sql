@@ -567,20 +567,20 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem
 	TABLESPACE pg_default;
 
 --HINT DISTRIBUTE ON RANDOM
-CREATE TABLE IF NOT EXISTS {RESULT_SCHEMA}.COHORT (
-			cohort_definition_id integer NOT NULL,
-			subject_id integer NOT NULL,
-			cohort_start_date date NOT NULL,
-			cohort_end_date date NOT NULL )
-			TABLESPACE tablespace_e;
-
---HINT DISTRIBUTE ON RANDOM
-CREATE TABLE IF NOT EXISTS {RESULT_SCHEMA}.COHORT_DEFINITION (
-			cohort_definition_id integer NOT NULL,
-			cohort_definition_name varchar(255) NOT NULL,
-			cohort_definition_description TEXT NULL,
-			definition_type_concept_id integer NOT NULL,
-			cohort_definition_syntax TEXT NULL,
-			subject_concept_id integer NOT NULL,
-			cohort_initiation_date date NULL )
-			TABLESPACE tablespace_e;
+--CREATE TABLE IF NOT EXISTS results.COHORT ( -- CREATED LATER BY ATLAS SCRIPT
+--			cohort_definition_id integer NOT NULL,
+--			subject_id integer NOT NULL,
+--			cohort_start_date date NOT NULL,
+--			cohort_end_date date NOT NULL )
+--			TABLESPACE tablespace_e;
+--
+----HINT DISTRIBUTE ON RANDOM
+--CREATE TABLE IF NOT EXISTS results.COHORT_DEFINITION ( -- CREATED LATER BY ATLAS SCRIPT
+--			cohort_definition_id integer NOT NULL,
+--			cohort_definition_name varchar(255) NOT NULL,
+--			cohort_definition_description TEXT NULL,
+--			definition_type_concept_id integer NOT NULL,
+--			cohort_definition_syntax TEXT NULL,
+--			subject_concept_id integer NOT NULL,
+--			cohort_initiation_date date NULL )
+--			TABLESPACE tablespace_e;
