@@ -42,7 +42,7 @@ SELECT
 	0 AS ethnicity_source_concept_id
 FROM {SOURCE_SCHEMA}.hes_patient as t1
 LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t1.gen_ethnicity = t2.source_code 
-	and t2.source_vocabulary_id = 'HESAPC_ETHNIC_STCM';;
+	and t2.source_vocabulary_id = 'CPRD_ETHNIC_STCM';
 
 ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person_id);
 
@@ -52,9 +52,9 @@ CLUSTER {TARGET_SCHEMA}.person USING xpk_person;
 --------------------------------
 -- PROVIDER from hes_episodes
 --------------------------------
-DROP SEQUENCE IF EXISTS sequence_pro;
-CREATE SEQUENCE sequence_pro INCREMENT 1;
-SELECT setval('sequence_pro', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'provider'));
+DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_pro;
+CREATE SEQUENCE {TARGET_SCHEMA}.sequence_pro INCREMENT 1;
+SELECT setval('{TARGET_SCHEMA}.sequence_pro', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'provider'));
 
 -- We have duplicated people with more than 1 speciality to save that information and use in episodes
 with cte1 AS (
@@ -69,7 +69,7 @@ cte2 AS (
 	t2.source_code_description AS specialty_source_value
 	FROM cte1 as t1
 	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t1.specialty = t2.source_code 
-	and t2.source_vocabulary_id = 'HESAPC_SPEC_STCM'
+	and t2.source_vocabulary_id = 'HES_SPEC_STCM'
 )
 INSERT INTO {TARGET_SCHEMA}.PROVIDER (
 	provider_id,
@@ -87,7 +87,7 @@ INSERT INTO {TARGET_SCHEMA}.PROVIDER (
 	gender_source_concept_id
 )
 SELECT 
-	nextval('sequence_pro') AS provider_id,
+	nextval('{TARGET_SCHEMA}.sequence_pro') AS provider_id,
 	NULL AS provider_name,
 	NULL AS npi,
 	NULL AS dea,
@@ -102,16 +102,16 @@ SELECT
 	NULL::int AS gender_source_concept_id
 FROM cte2;
 
-DROP SEQUENCE IF EXISTS sequence_pro;
+DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_pro;
 --The following is used in the mapping
 CREATE UNIQUE INDEX idx_provider_source ON {TARGET_SCHEMA}.provider (provider_source_value, specialty_source_value ASC);
 
 --------------------------------
 -- OBSERVATION_PERIOD --
 --------------------------------
-DROP SEQUENCE IF EXISTS observation_period_seq;
+DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.observation_period_seq;
 
-CREATE SEQUENCE observation_period_seq;
+CREATE SEQUENCE {TARGET_SCHEMA}.observation_period_seq;
 
 with cte as ( 
 	select t1.patid, MIN(t1.admidate) as min_date, MAX(t1.discharged) as max_date 
@@ -128,7 +128,7 @@ INSERT INTO {TARGET_SCHEMA}.OBSERVATION_PERIOD
 	period_type_concept_id
  )
 select
-	nextval('observation_period_seq'),
+	nextval('{TARGET_SCHEMA}.observation_period_seq'),
 	cte.patid,  
 	GREATEST(cte.min_date, t3.start) as observation_period_start_date,  
 	LEAST(cte.max_date,t3.end) as observation_period_end_date,
@@ -136,7 +136,8 @@ select
 from cte, {SOURCE_SCHEMA}.linkage_coverage as t3 
 where t3.data_source = 'hes_apc'; 
 
-ALTER TABLE {TARGET_SCHEMA}.observation_period ADD CONSTRAINT xpk_observation_period PRIMARY KEY (observation_period_id);
+DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.observation_period_seq;
 
+ALTER TABLE {TARGET_SCHEMA}.observation_period ADD CONSTRAINT xpk_observation_period PRIMARY KEY (observation_period_id);
 CREATE INDEX idx_observation_period_id ON {TARGET_SCHEMA}.observation_period (person_id ASC);
 CLUSTER {TARGET_SCHEMA}.observation_period USING idx_observation_period_id;

@@ -1,10 +1,9 @@
 --------------------------------
 -- VISIT_OCCURRENCE
 --------------------------------
-DROP SEQUENCE IF EXISTS sequence_vo;
-CREATE SEQUENCE sequence_vo INCREMENT 1;
---SELECT setval('sequence_vo', (SELECT MAX(visit_occurrence_id) FROM public.visit_occurrence));
-SELECT setval('sequence_vo', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'visit_occurrence'));
+DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_vo;
+CREATE SEQUENCE {TARGET_SCHEMA}.sequence_vo INCREMENT 1;
+SELECT setval('{TARGET_SCHEMA}.sequence_vo', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'visit_occurrence'));
 
 with cte1 AS (
 	SELECT person_id
@@ -18,7 +17,7 @@ cte2 AS (
 ),
 cte3 AS (
 	SELECT
-	NEXTVAL('sequence_vo') AS visit_occurrence_id,
+	NEXTVAL('{TARGET_SCHEMA}.sequence_vo') AS visit_occurrence_id,
 	t1.patid AS person_id,
 	9201 AS visit_concept_id,
 	COALESCE(admidate, t3.date_min, discharged) AS visit_start_date, 
@@ -106,7 +105,7 @@ SELECT
 	INNER JOIN cte4 AS t2 ON t1.visit_occurrence_id = t2.visit_occurrence_id
 	LEFT JOIN cte5 AS t3 ON t1.visit_occurrence_id = t3.visit_occurrence_id;
 
-DROP SEQUENCE IF EXISTS sequence_vo;
+DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_vo;
 
 ALTER TABLE {TARGET_SCHEMA}.visit_occurrence ADD CONSTRAINT xpk_visit_occurrence PRIMARY KEY (visit_occurrence_id);
 CREATE INDEX idx_visit_occurrence_person_id ON {TARGET_SCHEMA}.visit_occurrence (person_id, visit_start_date);
@@ -115,14 +114,12 @@ CREATE INDEX idx_visit_concept_id ON {TARGET_SCHEMA}.visit_occurrence (visit_con
 CREATE INDEX idx_visit_source_value ON {TARGET_SCHEMA}.visit_occurrence (visit_source_value ASC);
 
 --------------------------------
--- VISIT_DETAIL
---------------------------------
 -- VISIT_DETAIL FROM hes_episodes
 --------------------------------
-DROP SEQUENCE IF EXISTS sequence_vd;
-CREATE SEQUENCE sequence_vd INCREMENT 1; 
+DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_vd;
+CREATE SEQUENCE {TARGET_SCHEMA}.sequence_vd INCREMENT 1; 
 --SELECT setval('sequence_vd', (SELECT MAX(visit_detail_id) from public.visit_detail));
-SELECT setval('sequence_vd', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'visit_detail'));
+SELECT setval('{TARGET_SCHEMA}.sequence_vd', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'visit_detail'));
 
 WITH cte1 AS (
 	SELECT 
@@ -137,9 +134,9 @@ WITH cte1 AS (
 	NULL::int AS care_site_id,
 	t1.epikey AS visit_detail_source_value,
 	NULL::int AS visit_detail_source_concept_id,
-	t2.source_code_description AS admitting_source_value,	-- ANTO: definition to be added instead of number
-	t2.target_concept_id AS admitting_source_concept_id,				-- ANTO: to be implemented FROM admimeth
-	t3.source_code_description AS discharge_to_source_value,		-- ANTO: definition to be added instead of number
+	t2.source_code_description AS admitting_source_value,		-- ANTO: definition to be added instead of number
+	t2.target_concept_id AS admitting_source_concept_id,		-- ANTO: to be implemented FROM admimeth
+	t3.source_code_description AS discharge_to_source_value,	-- ANTO: definition to be added instead of number
 	t3.target_concept_id AS discharge_to_concept_id,			-- ANTO: to be implemented FROM dismeth
 	NULL::int AS preceding_visit_detail_id, 					-- ANTO: to be filled in later when the table is all filled in
 	NULL::int AS visit_detail_parent_id,
@@ -262,7 +259,7 @@ cte6 AS (
 ),
 cte7 AS (
 	SELECT 
-	NEXTVAL('sequence_vd') AS visit_detail_id, 
+	NEXTVAL('{TARGET_SCHEMA}.sequence_vd') AS visit_detail_id, 
 	t1.person_id,	
 	t1.visit_detail_concept_id,
 	t1.visit_detail_start_date,
@@ -342,7 +339,7 @@ FROM cte7 as t1
 LEFT JOIN cte8 AS t2 ON t1.visit_detail_id = t2.visit_detail_id
 LEFT JOIN cte9 AS t3 ON t1.person_id = t3.patid and t1.visit_detail_source_value::bigint = t3.epikey;
 
-DROP SEQUENCE IF EXISTS sequence_vd;
+DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_vd;
 
 ALTER TABLE {TARGET_SCHEMA}.visit_detail ADD CONSTRAINT xpk_visit_detail PRIMARY KEY (visit_detail_id);	
 CREATE INDEX idx_visit_detail_person_id  ON {TARGET_SCHEMA}.visit_detail (person_id, visit_detail_source_value);
