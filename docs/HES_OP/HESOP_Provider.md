@@ -25,7 +25,7 @@ Use the hesop_clinical table to populate the provider table.
 | care_site_id | NULL| | |
 | year_of_birth | NULL |  |  |
 | gender_concept_id | NULL | |  |
-| provider_source_value | |  | Create a dummy provider_source_value since we do not have an actual provider |
+| provider_source_value | NULL |  | |
 | specialty_source_value | tretspef, mainspef | If tretspef is not null then tretspef else mainspef|
 | specialty_source_concept_id |NULL  |  | |
 | gender_source_value | NULL| |  |

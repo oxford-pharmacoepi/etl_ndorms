@@ -1,4 +1,4 @@
-title: HES CDM Documentation
+title: NDORMS CDM Documentation
 description: A starter template for a Jeykll site using the Just the Docs theme!
 #theme: just-the-docs
 remote_theme: just-the-docs/just-the-docs
@@ -6,7 +6,7 @@ remote_theme: just-the-docs/just-the-docs
 #url: https://just-the-docs.github.io
 
 aux_links:
-  Ndorms ETL Builder: https://github.com/oxford-pharmacoepi/etl_ndorms
+  NDORMS ETL Builder: https://github.com/oxford-pharmacoepi/etl_ndorms
 
 plugins:
   - jekyll-default-layout
