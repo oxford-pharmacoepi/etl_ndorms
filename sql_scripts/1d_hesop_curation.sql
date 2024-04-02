@@ -1,8 +1,6 @@
 DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.hesop_patient CASCADE;
-DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.hesop_appointment CASCADE;
 
-
--- PATIENT - Move unacceptable patient from source_hesapc.patient to source_hesapc_nok.patient
+-- PATIENT - Move unacceptable patient from source_hesop.patient to source_hesop_nok.patient
 CREATE TABLE {SOURCE_NOK_SCHEMA}.hesop_patient (LIKE {SOURCE_SCHEMA}.hesop_patient) TABLESPACE pg_default;
 
 WITH cte1 as (
