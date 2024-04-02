@@ -248,9 +248,9 @@ def main():
 # Move CODE to the processed directory?
 # ---------------------------------------------------------
 			if ret == True:
-				qa = input('Are you sure you want to MOVE all the vocabulary CODE in the "processed" folder (y/n):') 
+				qa = input('Are you sure you want to MOVE all the mapping CODE in the "processed" folder (y/n):') 
 				while qa.lower() not in ['y', 'n', 'yes', 'no']:
-					qa = input('I did not understand that. Are you sure you want to MOVE all the vocabulary CODE in the "processed" folder (y/n):') 
+					qa = input('I did not understand that. Are you sure you want to MOVE all the mapping CODE in the "processed" folder (y/n):') 
 				if qa.lower() in ['y', 'yes']:
 					for f in glob.iglob(dir_sql + '3*.sql'):
 						file_processed = dir_sql_processed + os.path.basename(f)
