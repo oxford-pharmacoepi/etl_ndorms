@@ -13,5 +13,5 @@ SELECT patid,
 	COALESCE(target_concept_id, 0),
 	cause,
 	COALESCE(source_concept_id, 0)
-FROM {SOURCE_SCHEMA}.death_patient as t1
+FROM {SOURCE_SCHEMA}.ons_death as t1
 left join icd10 as t2 on t1.cause = t2.source_code;

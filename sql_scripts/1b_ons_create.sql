@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.death_patient (
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.ons_death (
 	patid				bigint,
 	pracid				int,
 	gen_death_id		bigint,
