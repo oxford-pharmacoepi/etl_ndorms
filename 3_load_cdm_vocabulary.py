@@ -334,7 +334,7 @@ def main():
 				if qa.lower() in ['y', 'yes']:
 					fname = dir_sql + '3a_cdm_drop_vocabulary.sql'
 					print('Calling ' + fname + ' ...')
-					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)
 # ---------------------------------------------------------
 # Create vocabularies tables - Parallel execution of queries in the file - Ask the user for CREATE/LOAD confirmation
 # ---------------------------------------------------------
