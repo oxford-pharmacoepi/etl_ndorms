@@ -172,6 +172,8 @@ def main():
 						(ret, curation) = is_curation_needed_gold(tbl_db_list[idx_patient])
 					elif database_type[0:3].lower() == 'hes':
 						curation = True
+					elif database_type == 'ons':
+						curation = True
 					if ret == True and curation == True:
 						fname = dir_sql + '1d_' + database_type + '_curation.sql'
 						print('Executing ' + fname + ' ...')
