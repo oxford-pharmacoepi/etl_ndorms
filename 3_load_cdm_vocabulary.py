@@ -98,20 +98,20 @@ def check_stcm(fname, stcm, debug):
 		dir_suggest_stcm = db_conf['dir_stcm'] + '\\suggestion' 
 		dir_processed = dir_suggest_stcm + '\\' + db_conf['dir_processed']
 		update_csv = dir_suggest_stcm + '\\' + stcm + '_update' + '.csv'		# The _update.csv file name.
-		dalete_csv = dir_suggest_stcm + '\\' + stcm + '_delete' + '.csv'		# The _delete.csv file name.
 
 		if not os.path.exists(dir_suggest_stcm):
 			os.makedirs(dir_suggest_stcm)
 
 		if not os.path.exists(dir_processed):
 			os.makedirs(dir_processed)
+		delete_csv = dir_suggest_stcm + '\\' + stcm + '_delete' + '.csv'		# The _delete.csv file name.
 
 		queries = mapping_util.parse_queries_file(db_conf, fname)
 
 		print("Checking %s in database..." %stcm)
 
 		ret = export_csv(queries[0], stcm, update_csv, debug)
-		ret = export_csv(queries[1], stcm, dalete_csv, debug)
+		ret = export_csv(queries[1], stcm, delete_csv, debug)
 	except:
 		ret = False
 		err = sys.exc_info()
