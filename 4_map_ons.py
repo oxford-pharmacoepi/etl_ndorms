@@ -31,26 +31,23 @@ def main():
 			while qa.lower() not in ['y', 'n', 'yes', 'no']:
 				qa = input('I did not understand that. Are you sure you want to DROP/CREATE all the CDM tables (y/n):') 
 			if qa.lower() in ['y', 'yes']:
-				fname = dir_sql + '11a_' + database_type + '_cdm_drop_tbl.sql'
+				fname = dir_sql + '4a_ons_cdm_drop_tbl.sql'
 				print('Calling ' + fname + ' ...')
 				ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
 				if ret == True:
-					fname = dir_sql + '11b_' + database_type + '_OMOPCDM_death_ddl.sql'
+					fname = dir_sql + '4b_ons_OMOPCDM_death_ddl.sql'
 					print('Calling ' + fname + ' ...')
 					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
 # ---------------------------------------------------------
 # mapping ONS death_patient to death
 # ---------------------------------------------------------
-			qa = input('Do you want to map the linked data to OMOP CDM (y/n):') 
+			qa = input('Do you want to map the ' + database_type.upper() + ' data to OMOP CDM (y/n):') 
 			while qa.lower() not in ['y', 'n', 'yes', 'no']:
 				qa = input('I did not understand that. Are you sure you want to DROP/CREATE all the CDM tables (y/n):') 
 			if qa.lower() in ['y', 'yes']:
-				if "linked_ons" == database_type:
-					fname = dir_sql + '11c_linked_ons_map_to_death.sql'
-					print('Calling ' + fname + ' ...')
-					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
-				else:
-					print('No mapping implimentation with linked data: ' + database_type.upper())
+				fname = dir_sql + '4c_ons_map_to_death.sql'
+				print('Calling ' + fname + ' ...')
+				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
 # ---------------------------------------------------------
 # Report total time
 # ---------------------------------------------------------
@@ -65,7 +62,7 @@ def main():
 				while qa.lower() not in ['y', 'n', 'yes', 'no']:
 					qa = input('I did not understand that. Are you sure you want to MOVE all the vocabulary CODE in the "processed" folder (y/n):') 
 				if qa.lower() in ['y', 'yes']:
-					for f in glob.iglob(dir_sql + '11*.sql'):
+					for f in glob.iglob(dir_sql + '4*.sql'):
 						file_processed = dir_sql_processed + os.path.basename(f)
 						print(os.path.basename(f))
 						print(file_processed)

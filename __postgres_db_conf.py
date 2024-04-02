@@ -29,7 +29,7 @@ db_conf = dict({
 	'tbl_cprd': ['denominator', 'documentation', 'lookups', 'reference'],
 	'tbl_cdm': ['care_site', 'condition_era', 'condition_occurrence', 'death', 'device_exposure', 'dose_era', 'drug_era', 'drug_exposure', 'location', 'measurement', 'observation', 'observation_period', 'person', 'procedure_occurrence', 'provider', 'visit_detail', 'visit_occurrence'],
 	'tbl_cdm_voc': ['drug_strength', 'concept', 'concept_relationship', 'concept_ancestor', 'concept_synonym', 'vocabulary', 'relationship', 'concept_class', 'domain'],
-	'tbl_linked': ['death_patient'] # 'eligibility'
+	'tbl_ons': ['death_patient'] 
 })
 
 
