@@ -44,7 +44,7 @@ cte4 AS (
 	FROM {SOURCE_SCHEMA}.hesop_appointment AS t1
 	INNER JOIN cte3 as t2 ON t1.patid = t2.person_id AND t1.attendkey = t2.attendkey
 	WHERE t1.attended = 5     -- 5 = (Seen, having attended on time or, if late, before the relevant care professional was ready to see the patient) 
-	ORDER BY t1.apptdate, t1.patid, t1.attendkey
+	ORDER BY t1.patid, t1.apptdate, t1.attendkey
 ),
 cte5 AS (
 	SELECT t1.person_id, t1.visit_occurrence_id, MAX(t2.visit_occurrence_id) AS preceding_visit_occurrence_id 
@@ -97,19 +97,6 @@ with cte1 AS (
 	SELECT person_id
 	FROM {TARGET_SCHEMA}.person
 ),
---cte2 AS (
---	select t1.person_id, t2.attendkey,
---	CASE WHEN t2.tretspef <> '&' THEN t2.tretspef ELSE t2.mainspef END as specialty
---	FROM cte1 as t1
---	inner join {SOURCE_SCHEMA}.hesop_clinical AS t2 on t1.person_id = t2.patid
---),	
---cte3 AS (	
---	select t1.person_id, t1.attendkey, t3.provider_id
---	FROM cte2 as t1
---	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t2 on t1.specialty = t2.source_code 
---	and t2.source_vocabulary_id = 'HES_SPEC_STCM'
---	INNER JOIN {TARGET_SCHEMA}.provider as t3 on t3.specialty_source_value = t2.source_code_description
---),
 cte2 AS (
 	SELECT 
 	NEXTVAL('{TARGET_SCHEMA}.sequence_vd') AS visit_detail_id,
@@ -130,10 +117,9 @@ cte2 AS (
 	NULL::int AS preceding_visit_detail_id, 					
 	NULL::int AS visit_detail_parent_id
 	FROM {SOURCE_SCHEMA}.hesop_appointment AS t1
---	INNER JOIN cte3 as t2 ON t1.patid = t2.person_id AND t1.attendkey = t2.attendkey
 	INNER JOIN cte1 as t2 ON t1.patid = t2.person_id
 	WHERE t1.attended = 5     -- 5 = (Seen, having attended on time or, if late, before the relevant care professional was ready to see the patient)
-	ORDER BY t1.apptdate, t1.patid, t1.attendkey
+	ORDER BY t1.patid, t1.apptdate, t1.attendkey
 ),
 cte3 AS (
 	SELECT 
