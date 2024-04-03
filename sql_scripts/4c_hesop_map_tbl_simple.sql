@@ -41,7 +41,7 @@ SELECT
 	NULL AS ethnicity_source_value,
 	0 AS ethnicity_source_concept_id
 FROM {SOURCE_SCHEMA}.hesop_patient as t1
-LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t1.gen_ethnicity = t2.source_code 
+LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t2 on t1.gen_ethnicity = t2.source_code 
 	and t2.source_vocabulary_id = 'CPRD_ETHNIC_STCM';
 
 ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person_id);
@@ -54,18 +54,20 @@ CLUSTER {TARGET_SCHEMA}.person USING xpk_person;
 --------------------------------
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_pro;
 CREATE SEQUENCE {TARGET_SCHEMA}.sequence_pro INCREMENT 1;
-SELECT setval('{TARGET_SCHEMA}.sequence_pro', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'provider'));
+SELECT setval('{TARGET_SCHEMA}.sequence_pro', 
+				(SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'provider'));
 
 with cte1 AS (
 	select DISTINCT CASE WHEN tretspef <> '&' THEN tretspef ELSE mainspef END as specialty
 	from {SOURCE_SCHEMA}.hesop_clinical
+	WHERE (tretspef <> '&' OR mainspef <> '&')
 ),
 cte2 AS (
 	SELECT 
 	DISTINCT t2.target_concept_id AS specialty_concept_id, 
 	t2.source_code_description AS specialty_source_value
 	FROM cte1 as t1
-	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t1.specialty = t2.source_code 
+	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t2 on t1.specialty = t2.source_code 
 	and t2.source_vocabulary_id = 'HES_SPEC_STCM'
 )
 INSERT INTO {TARGET_SCHEMA}.PROVIDER (
@@ -101,7 +103,7 @@ FROM cte2;
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_pro;
 --The following is used in the mapping
---CREATE UNIQUE INDEX idx_provider_source ON {TARGET_SCHEMA}.provider (provider_source_value, specialty_source_value ASC);
+CREATE UNIQUE INDEX idx_provider_source ON {TARGET_SCHEMA}.provider (specialty_source_value ASC);
 
 ----------------------------------
 ---- OBSERVATION_PERIOD --
@@ -132,3 +134,5 @@ select
 	32880
 from cte, {SOURCE_SCHEMA}.linkage_coverage as t3 
 where t3.data_source = 'hes_op'; 
+
+DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.observation_period_seq;
