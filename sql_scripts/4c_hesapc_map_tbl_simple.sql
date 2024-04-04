@@ -56,19 +56,20 @@ DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_pro;
 CREATE SEQUENCE {TARGET_SCHEMA}.sequence_pro INCREMENT 1;
 SELECT setval('{TARGET_SCHEMA}.sequence_pro', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'provider'));
 
--- We have duplicated people with more than 1 speciality to save that information and use in episodes
+-- We have duplicated people with more than 1 speciality to save that information and use it in episodes
 with cte1 AS (
 	select distinct pconsult AS provider_source_value,
 	CASE WHEN tretspef <> '&' THEN tretspef ELSE mainspef END as specialty
 	from {SOURCE_SCHEMA}.hes_episodes
 	WHERE pconsult <> '&'
+	AND (tretspef <> '&' OR mainspef <> '&')
 ),
 cte2 AS (
 	SELECT DISTINCT t2.target_concept_id AS specialty_concept_id, 
 	t1.provider_source_value,
 	t2.source_code_description AS specialty_source_value
 	FROM cte1 as t1
-	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t1.specialty = t2.source_code 
+	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t2 on t1.specialty = t2.source_code 
 	and t2.source_vocabulary_id = 'HES_SPEC_STCM'
 )
 INSERT INTO {TARGET_SCHEMA}.PROVIDER (

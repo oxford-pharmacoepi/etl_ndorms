@@ -2,17 +2,13 @@
 layout: default
 title: ONS Mortality
 nav_order: 5
-description: "Office for National Statistics (ONS) Mortality  (OP) ETL Documentation"
+description: "Office for National Statistics (ONS) Mortality ETL Documentation"
 has_children: true
 permalink: /docs/ONS_Mortality
 ---
 
 # Office for National Statistics (ONS) Mortality ETL Documentation
 
-*Coming Soon.....*
+These materials are meant to serve as documentation and reference for how the ONS Mortality data was converted to the OMOP Common Data Model (CDM).
 
-
-## Change log
-
-### 28-Mar-2024
-- Creation of documentation
+![](images/image01.png)

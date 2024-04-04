@@ -1,15 +1,29 @@
 --------------------------------
--- VISIT_OCCURRENCE FROM hesop_appointment
+-- VISIT_OCCURRENCE FROM hesop_appointment, hesop_clinical
 --------------------------------
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_vo;
 CREATE SEQUENCE {TARGET_SCHEMA}.sequence_vo INCREMENT 1;
-SELECT setval('{TARGET_SCHEMA}.sequence_vo', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'visit_occurrence'));
+SELECT setval('{TARGET_SCHEMA}.sequence_vo', 
+			(SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'visit_occurrence'));
 
 with cte1 AS (
 	SELECT person_id
 	FROM {TARGET_SCHEMA}.person
 ),
 cte2 AS (
+	select t1.person_id, t2.attendkey,
+	CASE WHEN t2.tretspef <> '&' THEN t2.tretspef ELSE CASE WHEN t2.mainspef <> '&' THEN t2.mainspef ELSE Null END END as specialty
+	FROM cte1 as t1
+	INNER JOIN {SOURCE_SCHEMA}.hesop_clinical AS t2 on t1.person_id = t2.patid
+),	
+cte3 AS (	
+	select t1.person_id, t1.attendkey, t3.provider_id
+	FROM cte2 as t1
+	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t2 on t1.specialty = t2.source_code 
+	and t2.source_vocabulary_id = 'HES_SPEC_STCM'
+	LEFT JOIN {TARGET_SCHEMA}.provider as t3 on t3.specialty_source_value = t2.source_code_description
+),
+cte4 AS (
 	SELECT
 	NEXTVAL('{TARGET_SCHEMA}.sequence_vo') AS visit_occurrence_id,
 	t1.patid AS person_id,
@@ -19,7 +33,7 @@ cte2 AS (
 	t1.apptdate AS visit_end_date,
 	t1.apptdate AS visit_end_datetime,
 	32818 AS visit_type_concept_id,
-	NULL::bigint AS provider_id,
+	t2.provider_id,
 	NULL::int AS care_site_id,
 	t1.attendkey AS visit_source_value,
 	NULL::int AS visit_source_concept_id,
@@ -28,13 +42,14 @@ cte2 AS (
 	NULL::varchar AS discharge_to_source_value,
 	NULL::int AS discharge_to_concept_id
 	FROM {SOURCE_SCHEMA}.hesop_appointment AS t1
-	INNER JOIN cte1 as t2 ON t1.patid = t2.person_id
+	INNER JOIN cte3 as t2 ON t1.patid = t2.person_id AND t1.attendkey = t2.attendkey
 	WHERE t1.attended = 5     -- 5 = (Seen, having attended on time or, if late, before the relevant care professional was ready to see the patient) 
+	ORDER BY t1.patid, t1.apptdate, t1.attendkey
 ),
-cte3 AS (
+cte5 AS (
 	SELECT t1.person_id, t1.visit_occurrence_id, MAX(t2.visit_occurrence_id) AS preceding_visit_occurrence_id 
-	FROM cte2 AS t1
-	INNER JOIN cte2 AS t2 ON t1.person_id = t2.person_id
+	FROM cte4 AS t1
+	INNER JOIN cte4 AS t2 ON t1.person_id = t2.person_id
 	WHERE t1.visit_occurrence_id > t2.visit_occurrence_id
 	GROUP BY t1.person_id, t1.visit_occurrence_id
 )
@@ -60,8 +75,8 @@ INSERT INTO {TARGET_SCHEMA}.visit_occurrence (
 SELECT
 	t1.*,
 	t2.preceding_visit_occurrence_id
-	FROM cte2 AS t1
-	LEFT JOIN cte3 AS t2 ON t1.visit_occurrence_id = t2.visit_occurrence_id;
+	FROM cte4 AS t1
+	LEFT JOIN cte5 AS t2 ON t1.visit_occurrence_id = t2.visit_occurrence_id;
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_vo;
 
@@ -92,7 +107,6 @@ cte2 AS (
 	t1.apptdate AS visit_detail_end_date,
 	t1.apptdate AS visit_detail_end_datetime,
 	32818 AS visit_detail_type_concept_id,
-	NULL::int AS provider_id,
 	NULL::int AS care_site_id,
 	t1.attendkey AS visit_detail_source_value,
 	NULL::int AS visit_detail_source_concept_id,
@@ -104,12 +118,13 @@ cte2 AS (
 	NULL::int AS visit_detail_parent_id
 	FROM {SOURCE_SCHEMA}.hesop_appointment AS t1
 	INNER JOIN cte1 as t2 ON t1.patid = t2.person_id
-	WHERE t1.attended = 5     -- 5 = (Seen, having attended on time or, if late, before the relevant care professional was ready to see the patient) 
+	WHERE t1.attended = 5     -- 5 = (Seen, having attended on time or, if late, before the relevant care professional was ready to see the patient)
+	ORDER BY t1.patid, t1.apptdate, t1.attendkey
 ),
 cte3 AS (
 	SELECT 
 	t1.*,
-	t2.visit_occurrence_id
+	t2.visit_occurrence_id, t2.provider_id
 	FROM cte2 as t1
 	INNER JOIN {TARGET_SCHEMA}.visit_occurrence AS t2 ON t1.person_id = t2.person_id and t1.visit_detail_source_value = t2.visit_source_value::bigint
 ),
