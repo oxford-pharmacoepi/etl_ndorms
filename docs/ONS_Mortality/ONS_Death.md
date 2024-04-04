@@ -2,7 +2,7 @@
 layout: default
 title: Death 
 nav_order: 1
-parent: ONS Death Registration
+parent: ONS Mortality
 description: "Death mapping from ONS Death table"
 ---
 
@@ -10,7 +10,7 @@ description: "Death mapping from ONS Death table"
 
 ## Reading from ONS.Death
 
-Linkage between ONS death registration data and CPRD primary care data uses an eight-step deterministic linkage algorithm based on four identifiers, shown in Table 1 below. Postcode in the ONS data is based on the usual residence of the deceased as recorded in the death registration data. The linkage is undertaken by NHS Digital, acting as a trusted-third party, on behalf of CPRD. No personal identifiers are held by CPRD, or included in the CPRD GOLD, CPRD Aurum, or linked death registration data.
+Linkage between ONS Mortality data and CPRD primary care data uses an eight-step deterministic linkage algorithm based on four identifiers, shown in Table 1 below. Postcode in the ONS data is based on the usual residence of the deceased as recorded in the death registration data. The linkage is undertaken by NHS Digital, acting as a trusted-third party, on behalf of CPRD. No personal identifiers are held by CPRD, or included in the CPRD GOLD, CPRD Aurum, or linked death registration data.
 
 | Step | Match |
 | --- | --- |
@@ -40,9 +40,3 @@ CPRD provides users with a match_rank variable which corresponds to the step at 
 | cause_concept_id | cause | concept.concept_id | |
 | cause_source_value | cause | | |
 | cause_source_concept_id | cause | concept.concept_id | |
-
-
-## Change log
-
-### 04-April-2024
-- Creation of documentation
