@@ -27,15 +27,15 @@ The matching steps are applied sequentially. If a CPRD GOLD or CPRD Aurum patien
 
 CPRD provides users with a match_rank variable which corresponds to the step at which the match was established. In general, a lower value for the match_rank is considered stronger evidence for a positive match. 
 
-**ONLY records with match_rank <= 2 are used in our mapping.**
+**ONLY records with match_rank =1 or 2 are used in our mapping.**
 
 ![](images/image02.png)
 
 | Destination Field | Source field | Logic | Comment field |
 | --- | --- | --- | --- |
 | person_id | patid | | |
-| death_date | dod | COALESCE(dod, dor) | |
-| death_datetime | dod | COALESCE(dod, dor) | |
+| death_date | dod | | |
+| death_datetime | dod | | |
 | death_type_concept_id | | Use [**32815** - Death Certificate](https://athena.ohdsi.org/search-terms/terms/32815) | |
 | cause_concept_id | cause | concept.concept_id | |
 | cause_source_value | cause | | |
