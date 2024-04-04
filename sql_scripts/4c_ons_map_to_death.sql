@@ -7,8 +7,8 @@ With icd10 as(
 )
 INSERT INTO {TARGET_SCHEMA}.death_ons
 SELECT patid,
-	COALESCE(dod, dor),
-	COALESCE(dod, dor), 
+	dod,
+	dod, 
 	32815,
 	COALESCE(target_concept_id, 0),
 	cause,
