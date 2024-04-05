@@ -27,7 +27,7 @@ description: "Visit_detail v5.4 description"
 | provider_id | pconsult,tretspef |  | Provider_id from PROVIDER using pconsult and tretspef |
 | care_site_id |NULL |  |  |
 | visit_detail_source_value | epikey | | This will allow us to retrieve visit_detail_id using patid. |
-| visit_detail_source_concept_id |  |  | 32828 |
+| visit_detail_source_concept_id | NULL |  |  |
 | admitting_from_source_concept_id | admimeth |  | Definition to be added instead of number |
 | admitting_from_source_value | admimeth |  | Check for OMOP codes from admimeth |
 | discharge_to_concept_id | dismeth |  | Definition to be added instead of number |

@@ -31,7 +31,7 @@ description: "Visit_Detil mapping from hesae_attendance tables"
 | provider_id |NULL |  | |
 | care_site_id |NULL |  |  |
 | visit_detail_source_value | aekey | | This will allow us to retrieve visit_detail_id using patid. |
-| visit_detail_source_concept_id |  |  | 32828 |
+| visit_detail_source_concept_id | NULL |  | |
 | admitting_source_concept_id | aerefsource |  | Definition to be added instead of number |
 | admitting_source_value | aerefsource |  | Check for OMOP codes from aerefsource |
 | discharge_to_concept_id |NULL |  |  |
