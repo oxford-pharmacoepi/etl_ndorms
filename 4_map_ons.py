@@ -27,9 +27,9 @@ def main():
 # ---------------------------------------------------------
 # Create/Recreate CDM tables? Parallel execution of queries in the file - Ask the user for DROP confirmation
 # ---------------------------------------------------------
-			qa = input('Are you sure you want to DROP/CREATE all the CDM tables (y/n):') 
+			qa = input('Are you sure you want to DROP/CREATE all the CDM tables for ONS (y/n):') 
 			while qa.lower() not in ['y', 'n', 'yes', 'no']:
-				qa = input('I did not understand that. Are you sure you want to DROP/CREATE all the CDM tables (y/n):') 
+				qa = input('I did not understand that. Are you sure you want to DROP/CREATE all the CDM tables for ONS(y/n):') 
 			if qa.lower() in ['y', 'yes']:
 				fname = dir_sql + '4a_ons_cdm_drop_tbl.sql'
 				print('Calling ' + fname + ' ...')
@@ -39,13 +39,13 @@ def main():
 					print('Calling ' + fname + ' ...')
 					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
 # ---------------------------------------------------------
-# mapping ONS death_patient to death
+# mapping ONS_death to CDM Death_ONS
 # ---------------------------------------------------------
 			qa = input('Do you want to map the ' + database_type.upper() + ' data to OMOP CDM (y/n):') 
 			while qa.lower() not in ['y', 'n', 'yes', 'no']:
 				qa = input('I did not understand that. Are you sure you want to DROP/CREATE all the CDM tables (y/n):') 
 			if qa.lower() in ['y', 'yes']:
-				fname = dir_sql + '4c_ons_map_to_death.sql'
+				fname = dir_sql + '4c_ons_map_tbl_death_ons.sql'
 				print('Calling ' + fname + ' ...')
 				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
 # ---------------------------------------------------------
