@@ -27,3 +27,7 @@ SELECT patid,
 	COALESCE(source_concept_id, 0)
 FROM {SOURCE_SCHEMA}.ons_death as t1
 left join dc_vocab as t2 on t1.cause = t2.source_code;
+
+
+-- added PK in death_ons
+ALTER TABLE {TARGET_SCHEMA}.death_ons ADD CONSTRAINT xpk_death_ons PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default;

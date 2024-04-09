@@ -49,6 +49,17 @@ def main():
 				print('Calling ' + fname + ' ...')
 				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
 # ---------------------------------------------------------
+# Update Death from Death_ONS
+# ---------------------------------------------------------
+#				if ret == True:
+			qa = input('Do you want to update Death from Death_ONS (y/n):') 
+			while qa.lower() not in ['y', 'n', 'yes', 'no']:
+				qa = input('I did not understand that. Are you sure you want to update Death from Death_ONS (y/n):') 
+			if qa.lower() in ['y', 'yes']:
+				fname = dir_sql + '4d_ons_map_tbl_death.sql'
+				print('Calling ' + fname + ' ...')
+				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+# ---------------------------------------------------------
 # Report total time
 # ---------------------------------------------------------
 			if ret == True:
