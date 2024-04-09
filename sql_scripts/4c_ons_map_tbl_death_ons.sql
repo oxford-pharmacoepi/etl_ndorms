@@ -14,8 +14,7 @@ With icd10_temp AS(
 	UNION
 
 	select source_code, source_concept_id, target_concept_id
-	-- from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map  
-	from {VOCABULARY_SCHEMA}.source_to_concept_map --Tentative: 
+	from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map  
 	where source_vocabulary_id = 'ONS_DEATH_CAUSE_STCM'
 )
 INSERT INTO {TARGET_SCHEMA}.death_ons
