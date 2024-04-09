@@ -33,7 +33,7 @@ db_conf = dict({
 	'tbl_hesapc': ['hes_patient', 'hes_hospital', 'hes_acp', 'hes_ccare', 'hes_maternity', 'hes_episodes', 'hes_diagnosis_hosp', 'hes_primary_diag_hosp', 'hes_diagnosis_epi', 'hes_procedures_epi', 'hes_hrg'],
 	'tbl_hesop': ['hesop_patient', 'hesop_appointment', 'hesop_clinical'],
 	'tbl_hesae': ['hesae_patient', 'hesae_attendance', 'hesae_diagnosis', 'hesae_investigation', 'hesae_treatment', 'hesae_hrg', 'hesae_pathway'],
-	'tbl_ons': ['death_patient'],
+	'tbl_ons': ['ons_death'],
 	'tbl_cprd': ['denominator', 'documentation', 'lookups', 'reference'],
 	'tbl_cdm': ['care_site', 'condition_era', 'condition_occurrence', 'death', 'device_exposure', 'dose_era', 'drug_era', 'drug_exposure', 'location', 'measurement', 'observation', 'observation_period', 'person', 'procedure_occurrence', 'provider', 'visit_detail', 'visit_occurrence'],
 	'tbl_cdm_voc': ['drug_strength', 'concept', 'concept_relationship', 'concept_ancestor', 'concept_synonym', 'vocabulary', 'relationship', 'concept_class', 'domain']
