@@ -59,3 +59,8 @@ X67.4,710682,ONS_DEATH_CAUSE_STCM,Intentional self-poisoning by and exposure to 
 Y83.0,45556776,ONS_DEATH_CAUSE_STCM,"Surgical operation with transplant of whole organ as the cause of abnormal reaction of the patient, or of later complication, without mention of misadventure at the time of the procedure",4179244,SNOMED,1990-05-01,2099-12-31,
 Y83.1,45547251,ONS_DEATH_CAUSE_STCM,"Surgical operation with implant of artificial internal device as the cause of abnormal reaction of the patient, or of later complication, without mention of misadventure at the time of the procedure",434547,SNOMED,1990-05-01,2099-12-31,
 Y83.3,45556777,ONS_DEATH_CAUSE_STCM,"Surgical operation with formation of external stoma as the cause of abnormal reaction of the patient, or of later complication, without mention of misadventure at the time of the procedure",434547,SNOMED,1990-05-01,2099-12-31,
+X00.0,0,ONS_DEATH_CAUSE_STCM,Accident caused by fire and flames,432504,SNOMED,2002-01-31,2099-12-31,
+X05.1,0,ONS_DEATH_CAUSE_STCM,Accident caused by clothes on fire,439614,SNOMED,2002-01-31,2099-12-31,
+X06.0,0,ONS_DEATH_CAUSE_STCM,Accident caused by clothes on fire,439614,SNOMED,2002-01-31,2099-12-31,
+X08.0,0,ONS_DEATH_CAUSE_STCM,Accident caused by fire and flames,432504,SNOMED,2002-01-31,2099-12-31,
+X08.1,0,ONS_DEATH_CAUSE_STCM,Accident caused by fire and flames,432504,SNOMED,2002-01-31,2099-12-31,
