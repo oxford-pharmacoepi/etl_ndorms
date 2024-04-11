@@ -34,17 +34,6 @@ CLUSTER {CHUNK_SCHEMA}.chunk USING idx_chunk_id;
 CREATE INDEX idx_chunk_completed ON {CHUNK_SCHEMA}.chunk (completed) TABLESPACE pg_default;
 
 --------------------------------
--- _RECORDS
---------------------------------
---drop table if exists {TARGET_SCHEMA}._records CASCADE;
---create table {TARGET_SCHEMA}._records (
---	tbl_name varchar(25) NOT NULL,
---	{TARGET_SCHEMA}_records bigint DEFAULT 0,
---	{TARGET_SCHEMA}_nok_records bigint DEFAULT 0,
---	total_records bigint DEFAULT 0
---) TABLESPACE pg_default;
-
---------------------------------
 -- DROP TABLES CREATED BY CHUNKING
 --------------------------------
 truncate table {TARGET_SCHEMA}.condition_occurrence;
