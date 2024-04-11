@@ -120,7 +120,7 @@ INSERT INTO {TARGET_SCHEMA}.death(person_id, death_date, death_datetime, death_t
 SELECT patid,
 	cprd_ddate,
 	NULL::timestamp,
-	32815,
+	32817,
 	0,
 	NULL,
 	0
