@@ -132,6 +132,7 @@ def main():
 # ---------------------------------------------------------
 					if ret == True:
 						dir_list_folders = [dir_source_files + tbl for tbl in db_conf[tbl_db]]
+						print(dir_list_folders)
 						ret = mapping_util.load_folders_parallel(db_conf, source_schema, dir_list_folders)
 						if ret == True:
 							task_finished = "Finished loading " + database_type.upper() + " source data in {0}".format(mapping_util.calc_time(time.time() - time1))
@@ -149,7 +150,9 @@ def main():
 # ---------------------------------------------------------
 					time1 = time.time()
 					print('Build PKs and IDXs ...')
-					sql_file_list = sorted(glob.iglob(dir_sql + '1c_' + database_type + '_pk_idx_*.sql'))
+					sql_file_list = sorted(glob.iglob(dir_sql + '1c_' + database_type + '_pk_idx*.sql'))
+					print(dir_sql + '1c_' + database_type + '_pk_idx*.sql')
+					print(sql_file_list)
 					ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, True)
 					if ret == True:
 						task_finished = 'Finished adding PKs/indexes to ' + database_type.upper() + ' in {0}'.format(mapping_util.calc_time(time.time() - time1))
