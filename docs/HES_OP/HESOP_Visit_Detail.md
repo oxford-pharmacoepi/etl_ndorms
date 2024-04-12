@@ -19,14 +19,14 @@ description: "Visit_Detil mapping from hesop_appointment tables"
 
 | Destination Field | Source field | Logic | Comment field |
 | --- | --- | --- | --- |
-| visit_detail_id |  | Autogenerate: if table is empty, starts from MAX(public.visit_detail) + 1 | If attended <> 5 discard visit appointment detail ( we accept only attended = 5) |
+| visit_detail_id |  | nextval('public.sequence_vd') AS visit_detail_id |  A sequence named "sequence_vd" is created in the public schema to uniquely generate "visit_detail_id"s. It initializes by fetching the highest ID from the _max_ids table where "tbl_name" equals "visit_detail". This table, located in the schema to be linked to the target schema, stores the maximum IDs for all CDM tables to help set the starting point for the next ID in a given sequence. Additionally If attended <> 5 discard visit appointment detail ( we accept only attended = 5) |
 | person_id | patid |  | |
-| visit_detail_concept_id |  |  | 9202 = Outpatient visit |
+| visit_detail_concept_id |  | 9202 = Outpatient visit |  |
 | visit_detail_start_date | apptdate | |  |
 | visit_detail_start_datetime | apptdate | |  |
 | visit_detail_end_date | apptdate | | Appointment date will also be mapped to visit_detail_end_date because it's an outpatient appointment |
 | visit_detail_end_datetime | apptdate | | |
-| visit_detail_type_concept_id |  |  | 32818 = "EHR administration record” |
+| visit_detail_type_concept_id |  | 32818 = "EHR administration record” |  |
 | provider_id | NULL|  | |
 | care_site_id | NULL|  |  |
 | visit_detail_source_value | attendkey | | This will allow us to retrieve visit_detail_id using patid. |

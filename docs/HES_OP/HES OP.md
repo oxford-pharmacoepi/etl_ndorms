@@ -16,6 +16,7 @@ The image below (Figure.1) shows a high-level diagram of how the native tables i
 *HES OP source Data Mapping for CDM v5.3 & CDM v5.4*
 
 ![](images/image1.png)
+
 **Figure.1**
 
 ## Change log
