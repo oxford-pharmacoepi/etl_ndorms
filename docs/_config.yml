@@ -6,7 +6,7 @@ remote_theme: just-the-docs/just-the-docs
 #url: https://just-the-docs.github.io
 
 aux_links:
-  NDORMS ETL Builder: https://github.com/oxford-pharmacoepi/etl_ndorms
+  NDORMS ETL GITHUB REPO: https://github.com/oxford-pharmacoepi/etl_ndorms
 
 plugins:
   - jekyll-default-layout
