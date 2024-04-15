@@ -28,8 +28,7 @@ The matching steps are applied sequentially. If a CPRD GOLD or CPRD Aurum patien
 CPRD provides users with a match_rank variable which corresponds to the step at which the match was established. In general, a lower value for the match_rank is considered stronger evidence for a positive match. 
 
 **ONLY ONS death data with match_rank =1 or 2, within the linkage_coverage period and valid in the database linked (i.e. patients do not exists in the source_nok) to are used in our mapping.**
-
-https://pubmed.ncbi.nlm.nih.gov/32078979/
+For Details, please refer to the [paper](https://pubmed.ncbi.nlm.nih.gov/32078979/). 
 
 ![](images/image02.png)
 
