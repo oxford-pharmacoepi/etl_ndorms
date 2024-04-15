@@ -1,6 +1,6 @@
 ﻿source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
 00,0,HESAE_REFSOURCE_STCM,General practitioner,38004247,NUCC,1970-01-01,2099-12-31,
-01,0,HESAE_REFSOURCE_STCM,Self referral,8584,CMS Place of Service,1970-01-01,2099-12-31,
+01,0,HESAE_REFSOURCE_STCM,Self referral,0,,,,
 02,0,HESAE_REFSOURCE_STCM,Local authority social services,38004199,NUCC,1970-01-01,2099-12-31,
 03,0,HESAE_REFSOURCE_STCM,Emergency services,581381,CMS Place of Service,1970-01-01,2099-12-31,
 03,0,HESAE_REFSOURCE_STCM,Emergency services,8782,CMS Place of Service,1970-01-01,2099-12-31,
