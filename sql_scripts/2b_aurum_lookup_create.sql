@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.productdictionary
 	termfromemis varchar(250),
 	productname varchar(250),
 	formulation varchar(250),
-	routeofadministration varchar(100),
+	routeofadministration varchar(120),
 	drugsubstancename varchar(1000),
 	substancestrength varchar(650),
 	bnfchapter varchar(200),
