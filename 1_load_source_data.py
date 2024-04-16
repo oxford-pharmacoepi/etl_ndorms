@@ -171,8 +171,9 @@ def main():
 						idx_observation = db_conf[tbl_db].index('observation')
 						(ret, curation) = is_curation_needed_aurum(tbl_db_list[idx_patient], tbl_db_list[idx_observation])
 					elif database_type == 'gold':
-						idx_patient = db_conf[tbl_db].index('patient')
-						(ret, curation) = is_curation_needed_gold(tbl_db_list[idx_patient])
+#						idx_patient = db_conf[tbl_db].index('patient')
+#						(ret, curation) = is_curation_needed_gold(tbl_db_list[idx_patient])
+						curation = True
 					elif database_type[0:3].lower() == 'hes':
 						curation = True
 					elif database_type == 'ons':
