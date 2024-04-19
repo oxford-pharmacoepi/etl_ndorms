@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.gp_scripts (
 	data_provider		int,
 	issue_date			date,
 	read_2				varchar(7),
-	bnf_code			varchar(14),
+	bnf_code			varchar(15),
 	dmd_code			varchar(20),
 	drug_name			varchar(500),
 	quantity			varchar(20)
