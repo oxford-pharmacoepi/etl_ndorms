@@ -13,14 +13,14 @@ INNER JOIN cte1 on cte1.patid = t1.patid;
 INSERT INTO {SOURCE_NOK_SCHEMA}.ons_death
 select t1.*
 from {SOURCE_SCHEMA}.ons_death as t1
-join {SOURCE_TO_LINK_SCHEMA}.linkage_coverage as t2 on t1.dod < t2.start or t1.dod > t2.end 
 where t2.data_source = 'ons_death';
 
+join source.linkage_coverage as t2 on t1.dod < t2.start or t1.dod > t2.end 
 -- Eliminate dead patients exist in source_nok.patient
 INSERT INTO {SOURCE_NOK_SCHEMA}.ons_death
 select t1.*
 from {SOURCE_SCHEMA}.ons_death as t1
-join {SOURCE_NOK_TO_LINK_SCHEMA}.patient as t2 on t1.patid = t2.patid;
+join source_nok.patient as t2 on t1.patid = t2.patid
 
 alter table {SOURCE_NOK_SCHEMA}.ons_death add constraint pk_dpatient_nok primary key (patid) USING INDEX TABLESPACE pg_default;
 
