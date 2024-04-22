@@ -435,6 +435,7 @@ def parse_queries_file(db_conf, filename, chunk_id=None):
 	medical_dictionary = db_conf['medical_dictionary_filename'] if 'medical_dictionary_filename' in db_conf else None
 	product_dictionary = db_conf['product_dictionary_filename'] if 'product_dictionary_filename' in db_conf else None
 	chunk_size = str(db_conf['chunk_size']) if 'chunk_size' in db_conf else None
+	source_release_date = db_conf['source_release_date'] if 'source_release_date' in db_conf else None	
 
 	query_list = open(filename).read().split(';')
 	for idx, item in enumerate(query_list):
@@ -454,6 +455,7 @@ def parse_queries_file(db_conf, filename, chunk_id=None):
 		query = query.replace('{PRODUCT_DICTIONARY}', product_dictionary) if product_dictionary is not None else query  
 		query = query.replace('{CHUNK_SIZE}', chunk_size) if chunk_size is not None else query  
 		query = query.replace('{CHUNK_ID}', chunk_id) if chunk_id is not None else query
+		query = query.replace('{SOURCE_RELEASE_DATE}', source_release_date) if source_release_date is not None else query
 		query_list[idx] = query
 	return(query_list)
 
