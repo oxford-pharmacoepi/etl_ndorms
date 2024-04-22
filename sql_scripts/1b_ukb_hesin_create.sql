@@ -1,5 +1,5 @@
----Creating biob_hesin Table ---------------------------------------
-CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.biob_hesin (
+---Creating hesin Table ---------------------------------------
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesin (
 	eid					bigint,
 	ins_index				bigint,
 	dsource					varchar(10),
@@ -44,8 +44,8 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.biob_hesin (
 	carersi					int)
 	TABLESPACE pg_default;
 	
----Creating biob_hesin_critical Table ---------------------------------------
-CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.biob_hesin_critical (
+---Creating hesin_critical Table ---------------------------------------
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesin_critical (
 	eid				bigint,
 	ins_index			bigint,
 	arr_index			bigint,
@@ -77,8 +77,8 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.biob_hesin_critical (
 	unitbedconfig			int)
 	TABLESPACE pg_default;
 
----Creating biob_hesin_delivery Table ---------------------------------------
-CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.biob_hesin_delivery (
+---Creating hesin_delivery Table ---------------------------------------
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesin_delivery (
 	eid				bigint,
 	ins_index			bigint,
 	arr_index			bigint,
@@ -93,8 +93,8 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.biob_hesin_delivery (
 	delstat				int)
 	TABLESPACE pg_default;
 
----Creating biob_hesin_diag Table ---------------------------------------
-CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.biob_hesin_diag (
+---Creating hesin_diag Table ---------------------------------------
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesin_diag (
 	eid				bigint,
 	ins_index			bigint,
 	arr_index			bigint,
@@ -105,8 +105,8 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.biob_hesin_diag (
 	diag_icd10_nb			varchar(10))
 	TABLESPACE pg_default;
 
----Creating biob_hesin_maternity Table ---------------------------------------
-CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.biob_hesin_maternity (
+---Creating hesin_maternity Table ---------------------------------------
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesin_maternity (
 	eid				bigint,
 	ins_index			bigint,
 	numbaby				int,
@@ -123,8 +123,8 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.biob_hesin_maternity (
 	matage				int)
 	TABLESPACE pg_default;
 
----Creating biob_hesin_oper Table ---------------------------------------
-CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.biob_hesin_oper (
+---Creating hesin_oper Table ---------------------------------------
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesin_oper (
 	eid				bigint,
 	ins_index			bigint,
 	arr_index			bigint,
@@ -138,8 +138,8 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.biob_hesin_oper (
 	preopdur			int)
 	TABLESPACE pg_default;
 
----Creating biob_hesin_psych Table ---------------------------------------
-CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.biob_hesin_psych (
+---Creating hesin_psych Table ---------------------------------------
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesin_psych (
 	eid				bigint,
 	ins_index			bigint,
 	detncat_uni			int,
