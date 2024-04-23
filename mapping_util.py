@@ -424,8 +424,6 @@ def parse_queries_file(db_conf, filename, chunk_id=None):
 	database = db_conf['database'] if 'database' in db_conf else None
 	source_nok_schema = db_conf['source_nok_schema'] if 'source_nok_schema' in db_conf else None
 	source_schema = db_conf['source_schema'] if 'source_schema' in db_conf else None	
-	source_schema_to_link = db_conf['source_schema_to_link'] if 'source_schema_to_link' in db_conf else None
-	source_nok_schema_to_link = db_conf['source_nok_schema_to_link'] if 'source_nok_schema_to_link' in db_conf else None	
 	target_schema = db_conf['target_schema'] if 'target_schema' in db_conf else None
 	target_schema_to_link = db_conf['target_schema_to_link'] if 'target_schema_to_link' in db_conf else None
 	vocabulary_schema = db_conf['vocabulary_schema'] if 'vocabulary_schema' in db_conf else None
@@ -437,6 +435,7 @@ def parse_queries_file(db_conf, filename, chunk_id=None):
 	medical_dictionary = db_conf['medical_dictionary_filename'] if 'medical_dictionary_filename' in db_conf else None
 	product_dictionary = db_conf['product_dictionary_filename'] if 'product_dictionary_filename' in db_conf else None
 	chunk_size = str(db_conf['chunk_size']) if 'chunk_size' in db_conf else None
+	source_release_date = db_conf['source_release_date'] if 'source_release_date' in db_conf else None	
 
 	query_list = open(filename).read().split(';')
 	for idx, item in enumerate(query_list):
@@ -444,8 +443,6 @@ def parse_queries_file(db_conf, filename, chunk_id=None):
 		query = query.replace('{DATABASE}', database) if database is not None else query
 		query = query.replace('{SOURCE_NOK_SCHEMA}', source_nok_schema) if source_nok_schema is not None else query
 		query = query.replace('{SOURCE_SCHEMA}', source_schema) if source_schema is not None else query
-		query = query.replace('{SOURCE_TO_LINK_SCHEMA}', source_schema_to_link) if source_schema_to_link is not None else query
-		query = query.replace('{SOURCE_NOK_TO_LINK_SCHEMA}', source_nok_schema_to_link) if source_nok_schema_to_link is not None else query
 		query = query.replace('{TARGET_SCHEMA}', target_schema) if target_schema is not None else query
 		query = query.replace('{TARGET_SCHEMA_TO_LINK}', target_schema_to_link) if target_schema_to_link is not None else query
 		query = query.replace('{VOCABULARY_SCHEMA}', vocabulary_schema) if vocabulary_schema is not None else query  
@@ -458,6 +455,7 @@ def parse_queries_file(db_conf, filename, chunk_id=None):
 		query = query.replace('{PRODUCT_DICTIONARY}', product_dictionary) if product_dictionary is not None else query  
 		query = query.replace('{CHUNK_SIZE}', chunk_size) if chunk_size is not None else query  
 		query = query.replace('{CHUNK_ID}', chunk_id) if chunk_id is not None else query
+		query = query.replace('{SOURCE_RELEASE_DATE}', source_release_date) if source_release_date is not None else query
 		query_list[idx] = query
 	return(query_list)
 
