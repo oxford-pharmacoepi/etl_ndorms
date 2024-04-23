@@ -7,8 +7,8 @@ SELECT setval('{TARGET_SCHEMA}.sequence_vo',
 			(SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'visit_occurrence'));
 
 with cte1 AS (
-	SELECT person_id, observation_period_start_date, observation_period_end_date
-	FROM {TARGET_SCHEMA}.observation_period
+	SELECT person_id
+	FROM {TARGET_SCHEMA}.person
 ),
 cte2 AS (
 	select t1.person_id, t2.attendkey,
@@ -33,7 +33,7 @@ cte4 AS (
 	t1.apptdate AS visit_end_date,
 	t1.apptdate AS visit_end_datetime,
 	32818 AS visit_type_concept_id,
-	t3.provider_id,
+	t2.provider_id,
 	NULL::int AS care_site_id,
 	t1.attendkey AS visit_source_value,
 	NULL::int AS visit_source_concept_id,
@@ -42,11 +42,8 @@ cte4 AS (
 	NULL::varchar AS discharge_to_source_value,
 	NULL::int AS discharge_to_concept_id
 	FROM {SOURCE_SCHEMA}.hesop_appointment AS t1
-	INNER JOIN cte1 as t2 ON t1.person_id = t2.person_id
-	INNER JOIN cte3 as t3 ON t1.patid = t3.person_id AND t1.attendkey = t3.attendkey
+	INNER JOIN cte3 as t2 ON t1.patid = t2.person_id AND t1.attendkey = t2.attendkey
 	WHERE t1.attended = 5     -- 5 = (Seen, having attended on time or, if late, before the relevant care professional was ready to see the patient) 
-	AND t1.apptdate >= t2.observation_period_start_date
-	AND t1.apptdate <= t2.observation_period_end_date
 	ORDER BY t1.patid, t1.apptdate, t1.attendkey
 ),
 cte5 AS (
@@ -97,8 +94,8 @@ CREATE SEQUENCE {TARGET_SCHEMA}.sequence_vd INCREMENT 1;
 SELECT setval('{TARGET_SCHEMA}.sequence_vd', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'visit_detail'));
 
 with cte1 AS (
-	SELECT person_id, observation_period_start_date, observation_period_end_date
-	FROM {TARGET_SCHEMA}.observation_period
+	SELECT person_id
+	FROM {TARGET_SCHEMA}.person
 ),
 cte2 AS (
 	SELECT 
@@ -122,8 +119,6 @@ cte2 AS (
 	FROM {SOURCE_SCHEMA}.hesop_appointment AS t1
 	INNER JOIN cte1 as t2 ON t1.patid = t2.person_id
 	WHERE t1.attended = 5     -- 5 = (Seen, having attended on time or, if late, before the relevant care professional was ready to see the patient)
-	AND t1.apptdate >= t2.observation_period_start_date
-	AND t1.apptdate <= t2.observation_period_end_date
 	ORDER BY t1.patid, t1.apptdate, t1.attendkey
 ),
 cte3 AS (
