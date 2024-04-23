@@ -100,22 +100,23 @@ def main():
 # ---------------------------------------------------------
 # mapping ONS_death to CDM Death_ONS
 # ---------------------------------------------------------
-			qa = input('Do you want to map the ' + database_type.upper() + ' data to OMOP CDM (y/n):') 
-			while qa.lower() not in ['y', 'n', 'yes', 'no']:
-				qa = input('I did not understand that. Are you sure you want to map the ' + database_type.upper() + ' data to OMOP CDM (y/n):') 
-			if qa.lower() in ['y', 'yes']:
-				fname = dir_sql + '4c_ons_map_tbl_death_ons.sql'
-				print('Calling ' + fname + ' ...')
-				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+			if ret == True:
+				qa = input('Do you want to map the ' + database_type.upper() + ' data to OMOP CDM (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Are you sure you want to map the ' + database_type.upper() + ' data to OMOP CDM (y/n):') 
+				if qa.lower() in ['y', 'yes']:
+					fname = dir_sql + '4c_ons_map_tbl_death_ons.sql'
+					print('Calling ' + fname + ' ...')
+					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
 # ---------------------------------------------------------
 # Update Death from Death_ONS
 # ---------------------------------------------------------
-#				if ret == True:
-			qa = input('Do you want to update Death and Observation Period from Death_ONS (y/n):') 
-			while qa.lower() not in ['y', 'n', 'yes', 'no']:
-				qa = input('I did not understand that. Are you sure you want to update Death and Observation Period from Death_ONS (y/n):') 
-			if qa.lower() in ['y', 'yes']:
-				ret = updatefromDeathONS()
+			if ret == True:
+				qa = input('Do you want to update Death and Observation Period from Death_ONS (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Are you sure you want to update Death and Observation Period from Death_ONS (y/n):') 
+				if qa.lower() in ['y', 'yes']:
+					ret = updatefromDeathONS()
 # ---------------------------------------------------------
 # Report total time
 # ---------------------------------------------------------
@@ -125,7 +126,6 @@ def main():
 # ---------------------------------------------------------
 # Move CODE to the processed directory?
 # ---------------------------------------------------------
-			if ret == True:
 				qa = input('Are you sure you want to MOVE all the vocabulary CODE in the "processed" folder (y/n):') 
 				while qa.lower() not in ['y', 'n', 'yes', 'no']:
 					qa = input('I did not understand that. Are you sure you want to MOVE all the vocabulary CODE in the "processed" folder (y/n):') 
