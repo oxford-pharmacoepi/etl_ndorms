@@ -9,4 +9,3 @@ drop table if exists {SOURCE_SCHEMA}.hes_diagnosis_hosp CASCADE;
 drop table if exists {SOURCE_SCHEMA}.hes_primary_diag_hosp CASCADE;
 drop table if exists {SOURCE_SCHEMA}.hes_diagnosis_epi CASCADE;
 drop table if exists {SOURCE_SCHEMA}.hes_procedures_epi CASCADE;
-drop table if exists {SOURCE_SCHEMA}._records CASCADE;

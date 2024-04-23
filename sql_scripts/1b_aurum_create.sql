@@ -97,10 +97,3 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.referral (
 	refservicetypeid smallint,
 	refmodeid smallint
 )TABLESPACE pg_default;
-
---CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}._records (
---	tbl_name varchar(20) NOT NULL,
---	source_records bigint DEFAULT 0,
---	source_nok_records bigint DEFAULT 0,
---	total_records bigint DEFAULT 0
---)TABLESPACE pg_default;
