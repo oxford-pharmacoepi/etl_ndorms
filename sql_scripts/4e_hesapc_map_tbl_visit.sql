@@ -6,8 +6,8 @@ CREATE SEQUENCE {TARGET_SCHEMA}.sequence_vo INCREMENT 1;
 SELECT setval('{TARGET_SCHEMA}.sequence_vo', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'visit_occurrence'));
 
 with cte1 AS (
-	SELECT person_id
-	FROM {TARGET_SCHEMA}.person
+	SELECT person_id, observation_period_start_date, observation_period_end_date
+	FROM {TARGET_SCHEMA}.observation_period
 ),
 cte2 AS (
 	SELECT t2.spno, MIN(t2.epistart) AS date_min, MAX(t2.epiend) AS date_max 
@@ -17,7 +17,7 @@ cte2 AS (
 ),
 cte3 AS (
 	SELECT
-	NEXTVAL('{TARGET_SCHEMA}.sequence_vo') AS visit_occurrence_id,
+--	NEXTVAL('{TARGET_SCHEMA}.sequence_vo') AS visit_occurrence_id,
 	t1.patid AS person_id,
 	9201 AS visit_concept_id,
 	COALESCE(t1.admidate, t3.date_min, t1.discharged) AS visit_start_date, 
@@ -39,7 +39,7 @@ cte3 AS (
 	LEFT JOIN cte2 as t3 ON t1.spno = t3.spno
 	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t1.admimeth = t4.source_code and t4.source_vocabulary_id = 'HESAPC_ADMIMETH_STCM'
 	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t5 on t1.dismeth::varchar = t5.source_code and t5.source_vocabulary_id = 'HESAPC_DISMETH_STCM'
-	ORDER BY t1.patid, COALESCE(t1.admidate, t3.date_min, t1.discharged), COALESCE(t1.discharged, t3.date_max, t3.date_min), t1.spno
+--	ORDER BY t1.patid, COALESCE(t1.admidate, t3.date_min, t1.discharged), COALESCE(t1.discharged, t3.date_max, t3.date_min), t1.spno
 ),
 cte4 AS (
 	SELECT visit_occurrence_id,
@@ -58,9 +58,35 @@ cte4 AS (
 	FROM cte3
 ),
 cte5 AS (
+	SELECT
+	NEXTVAL('{TARGET_SCHEMA}.sequence_vo') AS visit_occurrence_id, 
+	t1.person_id,
+	t1.visit_concept_id,
+	t2.visit_start_date, 
+	t2.visit_start_datetime,
+	t2.visit_end_date,
+	t2.visit_end_datetime,
+	t1.visit_type_concept_id,
+	t1.provider_id,
+	t1.care_site_id,
+	t1.visit_source_value,
+	t1.visit_source_concept_id,
+	t1.admitting_source_value,
+	t1.admitting_source_concept_id,
+	t1.discharge_to_source_value,
+	t1.discharge_to_concept_id,
+	t1.preceding_visit_occurrence_id
+	from cte3 as t1
+	inner join cte4 as t2 on t1.person_id = t2.person_id
+	inner join cte1 as t3 on t1.person_id = t3.person_id
+	WHERE t2.visit_start_date >= t3.observation_period_start_date
+	AND t2.visit_end_date <= t3.observation_period_end_date
+	ORDER BY t1.person_id, t2.visit_start_date, t2.visit_end_date, t1.visit_source_value
+),
+cte6 AS (
 	SELECT t1.person_id, t1.visit_occurrence_id, MAX(t2.visit_occurrence_id) AS preceding_visit_occurrence_id 
-	FROM cte3 AS t1
-	INNER JOIN cte3 AS t2 ON t1.person_id = t2.person_id
+	FROM cte5 AS t1
+	INNER JOIN cte5 AS t2 ON t1.person_id = t2.person_id
 	WHERE t1.visit_occurrence_id > t2.visit_occurrence_id
 	GROUP BY t1.person_id, t1.visit_occurrence_id
 )
@@ -87,10 +113,10 @@ SELECT
 	t1.visit_occurrence_id,
 	t1.person_id,
 	t1.visit_concept_id,
-	t2.visit_start_date, 
-	t2.visit_start_datetime,
-	t2.visit_end_date,
-	t2.visit_end_datetime,
+	t1.visit_start_date, 
+	t1.visit_start_datetime,
+	t1.visit_end_date,
+	t1.visit_end_datetime,
 	t1.visit_type_concept_id,
 	t1.provider_id,
 	t1.care_site_id,
@@ -100,10 +126,10 @@ SELECT
 	t1.admitting_source_concept_id,
 	t1.discharge_to_source_value,
 	t1.discharge_to_concept_id,
-	t3.preceding_visit_occurrence_id
-	FROM cte3 AS t1
-	INNER JOIN cte4 AS t2 ON t1.visit_occurrence_id = t2.visit_occurrence_id
-	LEFT JOIN cte5 AS t3 ON t1.visit_occurrence_id = t3.visit_occurrence_id;
+	t2.preceding_visit_occurrence_id
+	FROM cte5 AS t1
+--	INNER JOIN cte5 AS t2 ON t1.visit_occurrence_id = t2.visit_occurrence_id
+	LEFT JOIN cte6 AS t2 ON t1.visit_occurrence_id = t2.visit_occurrence_id;
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_vo;
 
@@ -121,8 +147,8 @@ CREATE SEQUENCE {TARGET_SCHEMA}.sequence_vd INCREMENT 1;
 SELECT setval('{TARGET_SCHEMA}.sequence_vd', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'visit_detail'));
 
 with cte1 AS (
-	SELECT person_id
-	FROM {TARGET_SCHEMA}.person
+	SELECT person_id, observation_period_start_date, observation_period_end_date
+	FROM {TARGET_SCHEMA}.observation_period
 ),
 cte2 AS (
 	SELECT 
@@ -285,6 +311,9 @@ cte8 AS (
 	t2.visit_occurrence_id
 	FROM cte7 as t1
 	INNER JOIN {TARGET_SCHEMA}.visit_occurrence AS t2 ON t2.visit_source_value::bigint = t1.spno and t2.person_id = t1.person_id
+	INNER JOIN cte1 as t3 ON t1.person_id = t3.person_id
+	WHERE t1.visit_detail_start_date >= t3.observation_period_start_date
+	AND t1.visit_detail_start_date <= t3.observation_period_end_date
 	ORDER BY t1.person_id, t1.visit_detail_start_date, t1.visit_detail_source_value
 ),
 cte9 AS (
