@@ -20,9 +20,13 @@ with cte1 as (
 	OR t1.gender in (0,3,4)
 	OR t1.gender is null 
 	OR t1.yob < 75
-	OR (t1.yob + 1800) > date_part('year', CURRENT_DATE)
+	OR (LEFT(current_database(),10) <> 'cdm_gold_p' AND (t1.yob + 1800) > date_part('year', CURRENT_DATE))
+	OR (LEFT(current_database(),10) = 'cdm_gold_p' AND t1.yob > date_part('year', CURRENT_DATE))
 	OR t1.frd is null
-	OR LEAST(t1.tod, t2.lcd, t1.deathdate, to_date(CONCAT(RIGHT(current_database(), 6), '01'), 'YYYYMMDD')) < GREATEST(t1.frd, t2.uts)
+	OR (LEFT(current_database(),10) <> 'cdm_gold_p' AND 
+		(LEAST(t1.tod, t2.lcd, t1.deathdate, to_date(CONCAT(RIGHT(current_database(), 6), '01'), 'YYYYMMDD')) < GREATEST(t1.frd, t2.uts)))	
+	OR (LEFT(current_database(),10) = 'cdm_gold_p' AND 
+		(LEAST(t1.tod, t2.lcd, t1.deathdate, to_date('{SOURCE_RELEASE_DATE}', 'YYYY-MM-DD')) < GREATEST(t1.frd, t2.uts)))
 )
 INSERT INTO {SOURCE_NOK_SCHEMA}.patient
 SELECT t1.* 
