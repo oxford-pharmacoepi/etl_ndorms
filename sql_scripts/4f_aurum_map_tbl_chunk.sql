@@ -34,18 +34,6 @@ CLUSTER chunks.chunk USING idx_chunk_id;
 CREATE INDEX idx_chunk_completed ON chunks.chunk (completed);
 
 --------------------------------
--- _RECORDS
---------------------------------
-drop table if exists {TARGET_SCHEMA}._records CASCADE;
-create table {TARGET_SCHEMA}._records (
-	tbl_name varchar(25) NOT NULL,
-	{TARGET_SCHEMA}_records bigint DEFAULT 0,
-	{TARGET_SCHEMA}_nok_records bigint DEFAULT 0,
-	total_records bigint DEFAULT 0
-);
-
-
---------------------------------
 -- DROP TABLES CREATED BY CHUNKING
 --------------------------------
 --drop table if exists {TARGET_SCHEMA}.stem_source CASCADE;	--We do not use it anymore, but need it as template for smaller tables
