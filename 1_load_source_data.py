@@ -42,33 +42,6 @@ def is_curation_needed_aurum(tbl_patient, tbl_observation):
 	return(ret, curation)
 
 # ---------------------------------------------------------
-def is_curation_needed_gold(tbl_patient):
-	"Check if curation is necessary"
-# ---------------------------------------------------------
-	ret 		= True
-	curation 	= False
-	
-	try:
-		cnx = sql.connect(
-			user = db_conf['username'],
-			password = db_conf['password'],
-			database = db_conf['database']
-		)
-		cursor1 = cnx.cursor()
-		query1 = "SELECT 1 FROM " + tbl_patient + " WHERE accept = 0 OR gender in (0,3,4) OR gender is null OR yob < 75 OR frd is null LIMIT 1"
-		cursor1.execute(query1);
-		found = cursor1.fetchone()
-		if found != None:
-			curation = True
-		cursor1.close()
-		cnx.close()	
-	except:
-		ret = False
-		err = sys.exc_info()
-		print("Function = {0}, Error = {1}, {2}".format("is_curation_needed_gold", err[0], err[1]))
-	return(ret, curation)
-
-# ---------------------------------------------------------
 # MAIN PROGRAM
 # ---------------------------------------------------------
 def main():
@@ -171,8 +144,6 @@ def main():
 						idx_observation = db_conf[tbl_db].index('observation')
 						(ret, curation) = is_curation_needed_aurum(tbl_db_list[idx_patient], tbl_db_list[idx_observation])
 					elif database_type == 'gold':
-#						idx_patient = db_conf[tbl_db].index('patient')
-#						(ret, curation) = is_curation_needed_gold(tbl_db_list[idx_patient])
 						curation = True
 					elif database_type[0:3].lower() == 'hes':
 						curation = True
