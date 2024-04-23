@@ -4,8 +4,7 @@ CREATE TABLE {SOURCE_NOK_SCHEMA}.ons_death (LIKE {SOURCE_SCHEMA}.ons_death) TABL
 with cte1 as (
 	select *
 	from {SOURCE_SCHEMA}.ons_death
-	where cause is null
-	or match_rank > 2
+	where match_rank > 2
 )
 INSERT INTO {SOURCE_NOK_SCHEMA}.ons_death
 (SELECT t1.* FROM {SOURCE_SCHEMA}.ons_death as t1
