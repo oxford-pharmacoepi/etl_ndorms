@@ -61,15 +61,14 @@ with cte as (
 	from {SOURCE_SCHEMA}.hesae_attendance as t1 
 	inner join {TARGET_SCHEMA}.person as t2 on t2.person_id = t1.patid 
 	group by t1.patid 
-	) 
-INSERT INTO {TARGET_SCHEMA}.OBSERVATION_PERIOD
- (
+	)
+INSERT INTO {TARGET_SCHEMA}.OBSERVATION_PERIOD (
 	observation_period_id,
 	person_id,
 	observation_period_start_date,
 	observation_period_end_date,
 	period_type_concept_id
- )
+)
 select
 	nextval('{TARGET_SCHEMA}.observation_period_seq'),
 	cte.patid,  
