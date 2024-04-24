@@ -31,8 +31,6 @@ cte3 AS (
 	NULL::int AS visit_source_concept_id,
 	t3.source_code_description AS admitting_source_value,
 	t3.target_concept_id AS admitting_source_concept_id,
---	NULL AS admitting_source_value,
---	NULL::bigint AS admitting_source_concept_id,
 	NULL AS discharge_to_source_value,
 	NULL::bigint AS discharge_to_concept_id,
 	NULL::bigint AS preceding_visit_occurrence_id
@@ -165,19 +163,6 @@ cte2 AS (
 	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t3 on t2.aerefsource = t3.source_code::int and t3.source_vocabulary_id = 'HESAE_REFSOURCE_STCM'
 ),
 cte3 AS (
---	SELECT person_id, visit_detail_source_value,
---	CASE WHEN visit_detail_start_date <= visit_detail_end_date 
---		THEN visit_detail_start_date ELSE visit_detail_end_date 
---	END AS visit_detail_start_date,
---	CASE WHEN visit_detail_start_date <= visit_detail_end_date 
---		THEN visit_detail_start_date ELSE visit_detail_end_date 
---	END AS visit_detail_start_datetime,
---	CASE WHEN visit_detail_start_date <= visit_detail_end_date 
---		THEN visit_detail_end_date ELSE visit_detail_start_date 
---	END AS visit_detail_end_date,
---	CASE WHEN visit_detail_start_date <= visit_detail_end_date 
---		THEN visit_detail_end_date ELSE visit_detail_start_date 
---	END AS visit_detail_end_datetime
 	SELECT person_id, visit_detail_source_value,
 	LEAST(visit_detail_start_date, visit_detail_end_date) AS visit_detail_start_date,
 	LEAST(visit_detail_start_date, visit_detail_end_date) AS visit_detail_start_datetime,
@@ -290,7 +275,7 @@ LEFT JOIN cte6 AS t2 ON t1.visit_detail_id = t2.visit_detail_id;
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_vd;
  
 ALTER TABLE {TARGET_SCHEMA}.visit_detail ADD CONSTRAINT xpk_visit_detail PRIMARY KEY (visit_detail_id);	
-CREATE INDEX idx_visit_detail_person_id  ON {TARGET_SCHEMA}.visit_detail (person_id, visit_detail_source_value);
+CREATE INDEX idx_visit_detail_person_id ON {TARGET_SCHEMA}.visit_detail (person_id, visit_detail_source_value);
 CLUSTER {TARGET_SCHEMA}.visit_detail USING idx_visit_detail_person_id;
 CREATE INDEX idx_visit_detail_concept_id ON {TARGET_SCHEMA}.visit_detail (visit_detail_concept_id ASC);
 CREATE INDEX idx_visit_detail_occurrence_id ON {TARGET_SCHEMA}.visit_detail (visit_occurrence_id ASC);
