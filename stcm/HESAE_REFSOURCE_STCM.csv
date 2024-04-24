@@ -1,0 +1,9 @@
+source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
+00,0,HESAE_REFSOURCE_STCM,General practitioner,38004247,NUCC,1970-01-01,2099-12-31,
+02,0,HESAE_REFSOURCE_STCM,Local authority social services,38004199,NUCC,1970-01-01,2099-12-31,
+03,0,HESAE_REFSOURCE_STCM,Emergency services,8782,CMS Place of Service,1970-01-01,2099-12-31,
+04,0,HESAE_REFSOURCE_STCM,Work,581475,CMS Place of Service,1970-01-01,2099-12-31,
+05,0,HESAE_REFSOURCE_STCM,Educational establishment,8537,CMS Place of Service,1970-01-01,2099-12-31,
+07,0,HESAE_REFSOURCE_STCM,Health care provider,8977,CMS Place of Service,1970-01-01,2099-12-31,
+92,0,HESAE_REFSOURCE_STCM,General dental practitioner,38004218,NUCC,1970-01-02,2099-12-31,
+93,0,HESAE_REFSOURCE_STCM,Community dental service,903270,HES Specialty,1970-01-01,2099-12-31,
