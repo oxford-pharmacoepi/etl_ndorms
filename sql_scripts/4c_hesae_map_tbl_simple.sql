@@ -80,3 +80,7 @@ from cte, {SOURCE_SCHEMA}.linkage_coverage as t3
 where t3.data_source = 'hes_ae'; 
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.observation_period_seq;
+
+ALTER TABLE {TARGET_SCHEMA}.observation_period ADD CONSTRAINT xpk_observation_period PRIMARY KEY (observation_period_id);
+CREATE INDEX idx_observation_period_id ON {TARGET_SCHEMA}.observation_period (person_id ASC);
+CLUSTER {TARGET_SCHEMA}.observation_period USING idx_observation_period_id;																														 
