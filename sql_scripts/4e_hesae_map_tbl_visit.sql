@@ -10,43 +10,36 @@ with cte1 AS (
 	FROM {TARGET_SCHEMA}.observation_period
 ),
 cte2 AS (
-	SELECT t2.patid, t2.aekey, MIN(t2.arrivaldate) AS date_min, 
-	MAX(t2.arrivaldate) AS date_max
-	FROM cte1 as t1
-	INNER JOIN {SOURCE_SCHEMA}.hesae_attendance AS t2 ON t2.patid = t1.person_id
-	GROUP BY t2.patid, t2.aekey
-),
-cte3 AS (
 	SELECT
-	t1.patid AS person_id,
+	t2.patid AS person_id,
 	9203 AS visit_concept_id,
-	t2.date_min AS visit_start_date, 
-	t2.date_min AS visit_start_datetime,
-	t2.date_max AS visit_end_date,
-	t2.date_max AS visit_end_datetime,
+	t2.arrivaldate AS visit_start_date, 
+	t2.arrivaldate AS visit_start_datetime,
+	t2.arrivaldate AS visit_end_date,
+	t2.arrivaldate AS visit_end_datetime,
 	32818 AS visit_type_concept_id,
 	NULL::bigint AS provider_id,
 	NULL::int AS care_site_id,
-	t1.aekey AS visit_source_value,
+	t2.aekey AS visit_source_value,
 	NULL::int AS visit_source_concept_id,
 	t3.source_code_description AS admitting_source_value,
 	t3.target_concept_id AS admitting_source_concept_id,
 	NULL AS discharge_to_source_value,
 	NULL::bigint AS discharge_to_concept_id,
 	NULL::bigint AS preceding_visit_occurrence_id
-	FROM {SOURCE_SCHEMA}.hesae_attendance AS t1
-	INNER JOIN cte2 as t2 ON t1.patid = t2.patid AND t1.aekey = t2.aekey
-	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t3 on t1.aerefsource = t3.source_code::int and t3.source_vocabulary_id = 'HESAE_REFSOURCE_STCM'
+	FROM cte1 as t1	
+	INNER JOIN {SOURCE_SCHEMA}.hesae_attendance AS t2 ON t1.person_id = t2.patid
+	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t3 on t2.aerefsource = t3.source_code::int and t3.source_vocabulary_id = 'HESAE_REFSOURCE_STCM'
 ),
-cte4 AS (
+cte3 AS (
 	SELECT person_id, visit_source_value,
 	LEAST(visit_start_date, visit_end_date) AS visit_start_date,
 	LEAST(visit_start_date, visit_end_date) AS visit_start_datetime,
 	GREATEST(visit_start_date, visit_end_date) AS visit_end_date,
 	GREATEST(visit_start_date, visit_end_date) AS visit_end_datetime
-	FROM cte3
+	FROM cte2
 ),
-cte5 AS (
+cte4 AS (
 	SELECT
 	NEXTVAL('{TARGET_SCHEMA}.sequence_vo') AS visit_occurrence_id, 
 	t1.person_id,
@@ -65,17 +58,17 @@ cte5 AS (
 	t1.discharge_to_source_value,
 	t1.discharge_to_concept_id,
 	t1.preceding_visit_occurrence_id
-	from cte3 as t1
-	inner join cte4 as t2 on t1.person_id = t2.person_id and t1.visit_source_value = t2.visit_source_value
+	from cte2 as t1
+	inner join cte3 as t2 on t1.person_id = t2.person_id and t1.visit_source_value = t2.visit_source_value
 	inner join cte1 as t3 on t1.person_id = t3.person_id
 	WHERE t2.visit_start_date >= t3.observation_period_start_date
 	AND t2.visit_end_date <= t3.observation_period_end_date
 	ORDER BY t1.person_id, t2.visit_start_date, t2.visit_end_date, t1.visit_source_value
 ),
-cte6 AS (
+cte5 AS (
 	SELECT t1.person_id, t1.visit_occurrence_id, MAX(t2.visit_occurrence_id) AS preceding_visit_occurrence_id 
-	FROM cte5 AS t1
-	INNER JOIN cte5 AS t2 ON t1.person_id = t2.person_id
+	FROM cte4 AS t1
+	INNER JOIN cte4 AS t2 ON t1.person_id = t2.person_id
 	WHERE t1.visit_occurrence_id > t2.visit_occurrence_id
 	GROUP BY t1.person_id, t1.visit_occurrence_id
 )
@@ -116,8 +109,8 @@ SELECT
 	t1.discharge_to_source_value,
 	t1.discharge_to_concept_id,
 	t2.preceding_visit_occurrence_id
-	FROM cte5 AS t1
-	LEFT JOIN cte6 AS t2 ON t1.visit_occurrence_id = t2.visit_occurrence_id;
+	FROM cte4 AS t1
+	LEFT JOIN cte5 AS t2 ON t1.visit_occurrence_id = t2.visit_occurrence_id;
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_vo;
 
@@ -215,7 +208,7 @@ cte5 AS (
 	t1.visit_detail_parent_id,
 	t2.visit_occurrence_id
 	FROM cte4 as t1
-	INNER JOIN {TARGET_SCHEMA}.visit_occurrence AS t2 ON t2.visit_source_value::bigint = t1.visit_detail_source_value
+	INNER JOIN {TARGET_SCHEMA}.visit_occurrence AS t2 ON t2.person_id = t1.person_id AND t2.visit_source_value::bigint = t1.visit_detail_source_value
 	INNER JOIN cte1 as t3 ON t1.person_id = t3.person_id
 	WHERE t1.visit_detail_start_date >= t3.observation_period_start_date
 	AND t1.visit_detail_start_date <= t3.observation_period_end_date
