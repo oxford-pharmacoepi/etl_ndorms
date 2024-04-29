@@ -19,8 +19,12 @@ cte1 AS (
 		t2.aekey::VARCHAR AS visit_detail_source_value,
 		t3.arrivaldate AS start_date,
 		t3.arrivaldate AS end_date,
-		CASE WHEN LENGTH(t2.diag) = 2 OR LENGTH(t2.diag) = 3 
-			THEN t2.diag ELSE TRIM(LEFT(t2.diag,3)) END AS source_value, 
+		CASE 
+			WHEN TRIM(LEFT(t2.diag,3)) in (SELECT source_code from {VOCABULARY_SCHEMA}.source_to_concept_map WHERE source_vocabulary_id IN ('HESAE_DIAG_STCM'))
+				THEN TRIM(LEFT(t2.diag,3))
+			WHEN TRIM(LEFT(t2.diag,2)) in (SELECT source_code from {VOCABULARY_SCHEMA}.source_to_concept_map WHERE source_vocabulary_id IN ('HESAE_DIAG_STCM'))
+				THEN TRIM(LEFT(t2.diag,2))
+				ELSE TRIM(t2.diag) END AS source_value, 
 		CASE 
 			WHEN t2.diag_order = 1 THEN 32902
 			WHEN t2.diag_order > 1 THEN 32908
@@ -33,7 +37,8 @@ cte1 AS (
 		WHERE LEFT(t2.diag,1) ~ '\d' --If it is a number 		t2.DIAGSCHEME = 1
 ),	
 cte2 as (
-	SELECT DISTINCT t1.*, t2.source_concept_id
+	SELECT DISTINCT t1.*, 
+	CASE WHEN t2.source_concept_id is null then 0 else t2.source_concept_id END AS source_concept_id
 	FROM cte1 as t1
 	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t2 on t2.source_code = t1.source_value AND
 		t2.source_vocabulary_id IN ('HESAE_DIAG_STCM')
@@ -63,7 +68,8 @@ cte3 AS (
 		WHERE LEFT(t2.diag,1) !~ '\d' --If it is NOT a number 	--t2.DIAGSCHEME = 2
 ),	
 cte4 as (
-	SELECT DISTINCT t1.*, t2.source_concept_id
+	SELECT DISTINCT t1.*,
+	CASE WHEN t2.source_concept_id is null then 0 else t2.source_concept_id END AS source_concept_id
 	FROM cte3 as t1
 	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_code = t1.source_value
 		AND t2.source_vocabulary_id IN ('ICD10')
