@@ -106,7 +106,7 @@ def main():
 						cursor1.execute(query1)
 						query1 = 'CREATE TABLE ' + tbl_max_ids + ' \
 								(tbl_name varchar(25) NOT NULL, \
-								max_id bigint DEFAULT 0);'
+								max_id bigint DEFAULT 0) TABLESPACE pg_default;'
 						cursor1.execute(query1)
 						time1 = time.time()
 						tbl_list_count = [target_schema_to_link + "." + tbl for tbl in db_conf['tbl_cdm']]
