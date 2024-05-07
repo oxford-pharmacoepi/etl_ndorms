@@ -1,9 +1,3 @@
 ﻿source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
-01,0,HESAPC_ACPDISP_STCM,Same hospital ward,4023217,SNOMED,2002-01-31,2099-12-31,
-02,0,HESAPC_ACPDISP_STCM,Same hospital HDU (special care baby units),4262298,SNOMED,2003-01-31,2099-12-31,
-03,0,HESAPC_ACPDISP_STCM,Same hospital ICU,4148981,SNOMED,2002-01-31,2099-12-31,
-06,0,HESAPC_ACPDISP_STCM,Home or elsewhere,4081426,SNOMED,2002-01-31,2099-12-31,
-07,0,HESAPC_ACPDISP_STCM,Deceased,434489,SNOMED,2006-01-31,2099-12-31,
-08,0,HESAPC_ACPDISP_STCM,No change in location(augmented care ended),4119043,SNOMED,2002-01-31,2099-12-31,
-98,0,HESAPC_ACPDISP_STCM,Not applicable,4294169,SNOMED,2003-01-31,2099-12-31,
-99,0,HESAPC_ACPDISP_STCM,Not known,4129922,SNOMED,2002-01-31,2099-12-31,
+03,0,HESAPC_ACPDISP_STCM,Same hospital ICU,32037,Visit,1970-01-01,2099-12-31,
+04,0,HESAPC_ACPDISP_STCM,ICU in other hospital,32037,Visit,1970-01-01,2099-12-31,
