@@ -45,15 +45,16 @@ def check_stcm_vocabulary_id(fcsv, debug):
 # - Select rows from Database and then write to a CSV
 # @param query 		Select SQL 
 # @param params		params for the Select SQL
+# @param subdir		stcm subdirectory (1-to-1 / 1-to-many)
 # @param fcsv		return csv file name	
 # @param debug		flag of debug
 # ---------------------------------------------------------
-def export_csv(query, params, fcsv, debug):
+def export_csv(query, params, subdir, fcsv, debug):
 # ---------------------------------------------------------
 	ret = False
 	
 	try:
-		dir_suggest_stcm = db_conf['dir_stcm'] + '\\suggestion' 
+		dir_suggest_stcm = db_conf['dir_stcm'] + subdir + 'suggestion' 
 	
 		cnx = sql.connect(
 			user=db_conf['username'],
@@ -67,7 +68,7 @@ def export_csv(query, params, fcsv, debug):
 			msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Processing: ' + query
 			print(msg)
 			
-		cursor1.execute(query, (params,))	
+		cursor1.execute(query, params)	
 
 		data = cursor1.fetchall()
 		if not data:
@@ -129,29 +130,96 @@ def check_stcm(fname, stcm, debug):
 	ret = False
 	
 	try:
-		dir_suggest_stcm = db_conf['dir_stcm'] + '\\suggestion' 
-		dir_processed = dir_suggest_stcm + '\\' + db_conf['dir_processed']
-		update_csv = dir_suggest_stcm + '\\' + stcm + '_update' + '.csv'		# The _update.csv file name.
-		delete_csv = dir_suggest_stcm + '\\' + stcm + '_delete' + '.csv'		# The _delete.csv file name.
+		cnx = sql.connect(
+			user=db_conf['username'],
+			password=db_conf['password'],
+			database=db_conf['database']
+		)
+		cursor1 = cnx.cursor()
+		cnx.autocommit = True	
 
 		queries = mapping_util.parse_queries_file(db_conf, fname)
 
 		print("Checking %s in database..." %stcm)
-
-		ret = export_csv(queries[0], stcm, update_csv, debug)
-		ret = export_csv(queries[1], stcm, delete_csv, debug)
+		cursor1.execute(queries[0], (stcm,));
+		
+		cursor1.close()
+		cursor1 = None
+		cnx.close()
+		
+		ret = True
+	
 	except:
 		ret = False
 		err = sys.exc_info()
-		print("Function = {0}, Error = {1}, {2}".format("check_stcm", err[0], err[1]))
+		print("Function = {0}, Error = {1}, {2}".format("check_stcm", err[0], err[1]))	
+		if cursor1 != None:
+			cursor1.close()
+		cnx.close()	
 
 	return(ret)	
 
 # ---------------------------------------------------------
+# Function: CHECK STCM 
+# - Select all non-standard, invalid target_concept_ids in every STCM
+# - Generate suggestion CSV for update 
+#       _update.csv for updating target_concept_ids if applicable
+#       _delete.csv for deletion (no standard and valid target_concept_ids found)
+# @param fname 		SQL file name
+# @param subdir	        subdir of stcm (1-to-1 / 1_to_many)
+# @param stcm		Name of the STCM
+# @param debug		flag of debug
+# ---------------------------------------------------------
+def generate_suggested_stcm(fname, subdir, stcm, debug):
+# ---------------------------------------------------------
+	ret = False
+	
+	if '/1-to-1/' == subdir:
+		params = (stcm, stcm)
+	else:
+		params = (stcm,)
+	
+	try:
+		dir_suggest_stcm = db_conf['dir_stcm'] + subdir + 'suggestion' 
+		dir_processed = dir_suggest_stcm + '\\' + db_conf['dir_processed']
+		update_csv = dir_suggest_stcm + '\\' + stcm + '_update' + '.csv'		# The _update.csv file name.
+		delete_csv = dir_suggest_stcm + '\\' + stcm + '_delete' + '.csv'		# The _delete.csv file name.	
+		
+		cnx = sql.connect(
+			user=db_conf['username'],
+			password=db_conf['password'],
+			database=db_conf['database']
+		)
+		cursor1 = cnx.cursor()
+		cnx.autocommit = True	
+
+		queries = mapping_util.parse_queries_file(db_conf, fname)
+
+		ret = export_csv(queries[0], params, subdir, update_csv, debug)	#for update 
+		if ret == True:
+			ret = export_csv(queries[1], params, subdir, delete_csv, debug)	#for delete 
+		
+		cursor1.close()
+		cursor1 = None
+		cnx.close()
+		
+		ret = True
+	
+	except:
+		ret = False
+		err = sys.exc_info()
+		print("Function = {0}, Error = {1}, {2}".format("check_stcm", err[0], err[1]))	
+		if cursor1 != None:
+			cursor1.close()
+		cnx.close()	
+
+	return(ret)
+
+# ---------------------------------------------------------
 # Function: UPDATE STCM 
-# - Read the suggestion CSVs under <dir_stcm>//suggestion one by one
+# - Read the suggestion CSVs under <dir_stcm>/<subdir>/suggestion one by one
 # - Update STCM in database
-# - Move the suggestion csv to <dir_stcm>//suggestion//processed
+# - Move the suggestion csv to <dir_stcm>//<subdir>/suggestion//processed
 # @param fname 		SQL file name
 # @param fcsv		STCM csv file name 
 # @param debug		flag of debug
@@ -160,14 +228,13 @@ def update_stcm(fname, fcsv, debug):
 # ---------------------------------------------------------
 	updated = False
 
-	try:
-		dir_old = db_conf['dir_stcm'] + '\\old'
-
-		if not os.path.exists(dir_old):
-			os.makedirs(dir_old)
-            
+	try:   
+	
+		stcm_name = os.path.basename(fcsv).replace('_update.csv', '').replace('_delete.csv', '')
+		print('Updating ' + stcm_name + '...')
+		
 		queries = mapping_util.parse_queries_file(db_conf, fname)
-
+		
 		cnx = sql.connect(
 			user=db_conf['username'],
 			password=db_conf['password'],
@@ -175,63 +242,22 @@ def update_stcm(fname, fcsv, debug):
 		)
 		cursor1 = cnx.cursor()
 		cnx.autocommit = False			
-
-		print("Reading %s ..." %(os.path.basename(fcsv)))
-		print("Updating the stcm ...")
-
-		with open(fcsv, 'r') as f:
-			d_reader = csv.DictReader(f)
-
-			for line in d_reader:
-                #update stcm target_concept_id
-				if debug:
-					time1 = time.time()
-					msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Processing: ' + queries[0]
-					print(msg)
-
-				if os.path.basename(fname) == '3g_update_stcm.sql':
-					cursor1.execute(queries[0], (
-													line['target_concept_id'], 
-													line['vocabulary_id'],
-													line['valid_start_date'],
-													line['valid_end_date'],
-													line['source_vocabulary_id'], line['source_code']       #where clause
-                                            ))
-				else: #if os.path.basename(fcsv) == '3h_delete_stcm.sql'
-					cursor1.execute(queries[0], (line['source_vocabulary_id'], line['source_code']))
-
-				if debug:
-					time1 = time.time()
-					msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Processing: ' + queries[1]
-					print(msg)
-
-				cursor1.execute(queries[1], (line['source_vocabulary_id'], line['source_code']))
-
-				if debug:
-					time1 = time.time()
-					msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Processing: ' + queries[2]
-					print(msg)
-
-				cursor1.execute(queries[2], (line['source_vocabulary_id'], line['source_code']))
-
-				if debug:
-					msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Query execution time: '
-					msg += mapping_util.calc_time(time.time() - time1) + "\n"
-					print(msg)
 		
+		#delete invalid/non-standard mapping in source_to_concept_map
+		cursor1.execute(queries[0], (stcm_name,));	
+		
+		if "_update.csv" in os.path.basename(fcsv):
+			#import suggestion _update to source_to_concept_map
+			query = 'COPY ' + db_conf['vocabulary_schema'] + '.source_to_concept_map FROM \'' + fcsv + '\' WITH DELIMITER E\',\' CSV HEADER QUOTE E\'"\'';
+			cursor1.execute(query)
+
 		cnx.commit()
 		cursor1.close()
 		cursor1 = None
 		cnx.close()
-
-		f.close()
+		
 		updated = True
         
-		if os.path.basename(fcsv) == '3g_update_stcm.sql':
-			print("Finished updating stcm")
-		else:
-			print("Finished deletion of stcm")                                
-
 	except:
 		updated = False
 		err = sys.exc_info()
@@ -239,45 +265,24 @@ def update_stcm(fname, fcsv, debug):
 		print('Transaction Rollback!!!')
 		if cursor1 != None:
 			cursor1.close()
-		cnx.close()		
-# ---------------------------------------------------------
-# Completed Transaction
-# ---------------------------------------------------------
-	if updated:
-		#move to processed
-		try:
-			dir_processed =  db_conf['dir_stcm'] + '\\suggestion\\'  + db_conf['dir_processed']
-			if not os.path.exists(dir_processed):
-				os.makedirs(dir_processed)
-			
-			file_processed = dir_processed + os.path.basename(fcsv)
-			os.rename(fcsv, file_processed)
-			if os.path.basename(fcsv) == '3g_update_stcm.sql':
-				print('Finished MOVING _update.csv files')
-			else:
-				print('Finished MOVING _delete.csv files')
-			updated = True
-		except:
-			updated = False
-			err = sys.exc_info()
-			print("Function = {0}, Error = {1}, {2}".format("update_stcm", err[0], err[1]))
-
+		cnx.close()	
+		
 	return updated
 
 # ---------------------------------------------------------
 # Function: GENERATE_NEW_STCM 
 # - Generate a new STCM CSV under <dir_stcm> for the next release.
-# @param fname 		SQL file name
-# @param fcsv		csv file name
+# @param fstcm		stcm name
+# @param subdir		stcm subdirectory name
 # @param debug		flag of debug
 # ---------------------------------------------------------
-def generate_new_stcm(fname, fstcm, debug):
+def generate_new_stcm(fstcm, subdir, debug):
 # ---------------------------------------------------------
 	ret = False
 
 	try:
-		query = mapping_util.parse_queries_file(db_conf, fname)[0]
-		ret = export_csv(query, fstcm, (db_conf['dir_stcm'] + '\\' + fstcm + ".csv"), debug)	
+		query = 'select * from ' + db_conf['vocabulary_schema'] + '.source_to_concept_map where source_vocabulary_id = %s order by source_code';
+		ret = export_csv(query, (fstcm,), subdir, (db_conf['dir_stcm'] + subdir + fstcm + ".csv"), debug)	
 		
 	except:
 		ret = False
@@ -291,6 +296,7 @@ def generate_new_stcm(fname, fstcm, debug):
 def main():
 	ret = True
 	global db_conf
+	subdir = [ '/1-to-many/', '/1-to-1/' ]
 	
 	try:
 		(ret, dir_study, db_conf, debug) = mapping_util.get_parameters()
@@ -306,10 +312,6 @@ def main():
 			if not os.path.exists(dir_voc_processed):
 				os.makedirs(dir_voc_processed)
 			dir_stcm = db_conf['dir_stcm'] + "\\"	
-			dir_stcm_processed = db_conf['dir_stcm'] + db_conf['dir_processed']
-			if not os.path.exists(dir_stcm_processed):
-				os.makedirs(dir_stcm_processed)
-			dir_stcm_old = db_conf['dir_stcm'] + "\\old\\"
 
 # ---------------------------------------------------------
 # If database does not exist, create database
@@ -405,12 +407,19 @@ def main():
 				while qa.lower() not in ['y', 'n', 'yes', 'no']:
 					qa = input('I did not understand that. Are you sure you want to CREATE/LOAD source_to_..._map tables tables (y/n):') 
 				if qa.lower() in ['y', 'yes']:
-					csv_file_list = sorted(glob.iglob(dir_stcm + '*.csv'))
-					for fname in csv_file_list:
+					csv_file_list = sorted(glob.iglob(dir_stcm + '/1-to-1/' + '*.csv'))
+					csv_file_list_1_to_n = sorted(glob.iglob(dir_stcm + '/1-to-many/' + '*.csv'))				
+					csv_file_list.extend(csv_file_list_1_to_n)
+					
+					if not csv_file_list:
+						print('NO STCM file found.')
+						ret = False;
+					else:
 # ---------------------------------------------------------
 # CHECK if STCM CSV name = source_vacabulary_id before loading
 # ---------------------------------------------------------
-						ret = check_stcm_vocabulary_id(fname, False)
+						for fname in csv_file_list:
+							ret = check_stcm_vocabulary_id(fname, False)
 					
 					if ret == True:
 						for fname in csv_file_list:
@@ -447,95 +456,152 @@ def main():
 			if ret == True:
 				qa = input('Are you sure you want to CHECK ALL STCMs (y/n):') 
 				while qa.lower() not in ['y', 'n', 'yes', 'no']:
-					qa = input('I did not understand that. Are you sure you want to CHECKING ALL STCMs (y/n):') 
+					qa = input('I did not understand that. Are you sure you want to CHECK ALL STCMs (y/n):') 
 				if qa.lower() in ['y', 'yes']:
-
-					if not list(glob.iglob(dir_stcm + '*.csv')):
-						print('NO STCM file found in ' + dir_stcm)
+				
+# ---------------------------------------------------------					
+					csv_file_list = sorted(glob.iglob(dir_stcm + '/1-to-1/' + '*.csv'))
+					csv_file_list_1_to_n = sorted(glob.iglob(dir_stcm + '/1-to-many/' + '*.csv'))				
+					csv_file_list.extend(csv_file_list_1_to_n)
+					
+					if not csv_file_list:
+						print('NO STCM file found.')
 						ret = False #stop the function if no STCM is found
-					else:					
-						fname = dir_sql + '3f_check_stcm.sql'
+					else:		
+						fname = dir_sql + '3f_create_temp_stcm_tbl.sql'
 						print('Calling ' + fname + ' ...')
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, True)
+						
+						if ret == True:		
+							fname = dir_sql + '3g_check_stcm.sql'
+							fname_1_to_1 = dir_sql + '3h_generate_suggested_1_to_1_stcm.sql'
+							fname_1_to_n = dir_sql + '3h_generate_suggested_1_to_n_stcm.sql'
+						
+							#loop by subdir
+							for sdir in subdir:
+								print('----- ' + sdir + ' -----')
 
-						for fcsv in glob.iglob(dir_stcm + '*.csv'):		# iterator can't loop twice
-							stcm = os.path.basename(fcsv).replace('.csv', '')
-							ret = check_stcm(fname, stcm, False)
-							if ret == False:
-								break
+								for fcsv in glob.iglob(dir_stcm + sdir + '*.csv'):		# iterator can't loop twice
+									stcm = os.path.basename(fcsv).replace('.csv', '')
+									ret = check_stcm(fname, stcm, False)
+									if ret == False:
+										break
+									
+									if '/1-to-1/' == sdir:
+										ret = generate_suggested_stcm(fname_1_to_1, sdir, stcm, False)
+									if '/1-to-many/' == sdir:
+										ret = generate_suggested_stcm(fname_1_to_n, sdir, stcm, False)
+									
+									if ret == False:
+										break
+							#loop end by subdir
+							
+						if ret == True:	
+							query = 'DROP TABLE ' + vocabulary_schema + '.temp_stcm';
+							print('Calling ' + query + ' ...')
+							ret = mapping_util.execute_query(db_conf, query, False)
 
-					if ret == True:
-						print('Finished checking ALL STCMs.')
+						if ret == True:
+							print('Finished checking ALL STCMs.')
 # ---------------------------------------------------------
 # UPDATE STCM 
 # ---------------------------------------------------------
-		if ret == True:
-			found = False
+			if ret == True:
+				found = False
+				
+				csv_file_list = sorted(glob.iglob(dir_stcm + '/1-to-1/' + "suggestion\\" + '*.csv'))
+				csv_file_list_1_to_n = sorted(glob.iglob(dir_stcm + '/1-to-many/' + "suggestion\\" + '*.csv'))				
+				csv_file_list.extend(csv_file_list_1_to_n)
+			
+				if csv_file_list:
+					found = True
 		
-			for fcsv in glob.iglob(dir_stcm + "suggestion\\" + '*.csv'):
-				found = True
-				break
-	
-			if found == True:
-				qa = input('Are you sure you want to UPDATE STCMs including deletion (y/n):') 
-				while qa.lower() not in ['y', 'n', 'yes', 'no']:
-					qa = input('I did not understand that. Are you sure you want to UPDATE STCMs including deletion (y/n):') 
-				if qa.lower() in ['y', 'yes']:
-					fname = dir_sql + '3g_update_stcm.sql'
-					print('Calling ' + fname + ' ...')
-					for fcsv in glob.iglob(dir_stcm + "suggestion\\" + '*_update.csv'):
-						ret = update_stcm(fname, fcsv, False)
-						if ret == False:
-							break
-					if ret == True:
-						fname = dir_sql + '3h_delete_stcm.sql'
-						print('Calling ' + fname + ' ...')
-						for fcsv in glob.iglob(dir_stcm + "suggestion\\" + '*_delete.csv'):
-							ret = update_stcm(fname, fcsv, False)
-							if ret == False:
-								break
-					if ret == True:
-						print('Finished updating STCMs (including deletion).')
+				if found == True:
+					qa = input('Are you sure you want to UPDATE STCMs including deletion (y/n):') 
+					while qa.lower() not in ['y', 'n', 'yes', 'no']:
+						qa = input('I did not understand that. Are you sure you want to UPDATE STCMs including deletion (y/n):') 
+					if qa.lower() in ['y', 'yes']:					
+					
+						fname = dir_sql + '3i_delete_stcm.sql'
+						#loop by subdir
+						for sdir in subdir:
+							print('----- ' + sdir + ' -----')
+							
+							dir_processed =  dir_stcm + sdir + 'suggestion\\'  + db_conf['dir_processed']
+							if not os.path.exists(dir_processed):
+								os.makedirs(dir_processed)
+								
+							dir_stcm_old = dir_stcm + sdir + 'old\\'
+							if not os.path.exists(dir_stcm_old):
+								os.makedirs(dir_stcm_old)
+
+							for fcsv in glob.iglob(dir_stcm + sdir + "suggestion\\" + '*.csv'):
+								ret = update_stcm(fname, fcsv, debug)
+								if ret == False:
+									break
+
+								#move suggestion csv files to processed	
+								file_processed = dir_processed + os.path.basename(fcsv)
+								os.rename(fcsv, file_processed)	
+
 # ---------------------------------------------------------
 # RENAME OLD STCM
 # ---------------------------------------------------------
-					if ret == True:
-						csv_file_list = sorted(glob.iglob(dir_stcm + "suggestion" + db_conf['dir_processed'] + '*.csv'))
-						dist_csv_file_list = []
-						for f in csv_file_list:
-							dist_csv_file_list.append(re.sub("_update.csv|_delete.csv\Z", "", os.path.basename(f)))
+							if ret == True:
+								csv_file_list = sorted(glob.iglob(dir_stcm + sdir + "suggestion\\" + db_conf['dir_processed'] + '*.csv'))
+								dist_csv_file_list = []
+								
+								for f in csv_file_list:
+									dist_csv_file_list.append(re.sub("_update.csv|_delete.csv\Z", "", os.path.basename(f)))
 
-						dist_csv_file_list = dict.fromkeys(dist_csv_file_list) #remove duplicated stcm fname
-
-						for fstcm in dist_csv_file_list:
-							stcm_file = dir_stcm + fstcm + ".csv"
-							f = list(glob.glob(stcm_file))
-							if f:
-								if not os.path.exists(dir_stcm_old):
-									os.makedirs(dir_stcm_old)
-							
-								old_stcm_file = dir_stcm_old + fstcm + "_old.csv"
-								os.rename(stcm_file, old_stcm_file)
-								print('Renamed and moved ' + fstcm)
+								dist_csv_file_list = dict.fromkeys(dist_csv_file_list) #remove duplicated stcm fname
+						
+								for fstcm in dist_csv_file_list:
+									stcm_file = dir_stcm + sdir + fstcm + ".csv"
+									f = list(glob.glob(stcm_file))
+									if f:
+										old_stcm_file = dir_stcm_old + fstcm + "_old.csv"
+										os.rename(stcm_file, old_stcm_file)
+										print('Renamed and moved ' + fstcm)
 # ---------------------------------------------------------
 # GENERATE NEW STCM 
 # ---------------------------------------------------------
-						if dist_csv_file_list:
-							fname = dir_sql + '3i_generate_new_stcm.sql'
+								if dist_csv_file_list:
+									for fstcm in dist_csv_file_list:
+										ret = generate_new_stcm(fstcm, sdir, False)
+										if ret == False:
+											break
+										
+						#loop end by subdir
+						if ret:
+							print('Finished generating new STCM')
+# ---------------------------------------------------------				
+# ---------------------------------------------------------
+# Rebuild source_to_source_vocab_map and source_to_standard_vocab_map from new source_to_concept_map
+# ---------------------------------------------------------	
+						if ret == True:
+							print('Rebuild source_to_source_vocab_map and source_to_standard_vocab_map from new source_to_concept_map')
+							fname = dir_sql + '3j_recreate_source_to_standard.sql'
 							print('Calling ' + fname + ' ...')
-							for fstcm in dist_csv_file_list:
-								ret = generate_new_stcm(fname, fstcm, True)
-								if ret == False:
-									break
-							if ret:
-								print('Finished generating new STCM')
+							ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)				
 # ---------------------------------------------------------
 # MOVE ALL STCM TO PROCESSED 
 # ---------------------------------------------------------
-			if ret == True:
-				for fstcm in glob.iglob(dir_stcm + '*.csv'):
-					file_processed = dir_stcm_processed + os.path.basename(fstcm)
-					os.rename(fstcm, file_processed)	#move to dir_stcm/processed
-				print('Finished moving ALL STCM csv files to processed')
+				if ret == True:
+					#loop by subdir
+					for sdir in subdir:
+						print('----- ' + sdir + ' -----')
+						dir_stcm_processed = dir_stcm + sdir + db_conf['dir_processed']
+						if not os.path.exists(dir_stcm_processed):
+							os.makedirs(dir_stcm_processed)
+				
+						for fstcm in glob.iglob(dir_stcm + sdir + '*.csv'):
+							file_processed = dir_stcm_processed + os.path.basename(fstcm)
+							os.rename(fstcm, file_processed)	#move to dir_stcm/processed
+							print( os.path.basename(fstcm) + ' is moved to processed')
+	
+					print('Finished moving ALL STCM csv files to processed')
+					#loop end by subdir
 # ---------------------------------------------------------
 # Move CODE to the processed directory?
 # ---------------------------------------------------------
