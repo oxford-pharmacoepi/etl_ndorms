@@ -458,7 +458,6 @@ def main():
 				while qa.lower() not in ['y', 'n', 'yes', 'no']:
 					qa = input('I did not understand that. Are you sure you want to CHECK ALL STCMs (y/n):') 
 				if qa.lower() in ['y', 'yes']:
-				
 # ---------------------------------------------------------					
 					csv_file_list = sorted(glob.iglob(dir_stcm + '/1-to-1/' + '*.csv'))
 					csv_file_list_1_to_n = sorted(glob.iglob(dir_stcm + '/1-to-many/' + '*.csv'))				
@@ -587,21 +586,21 @@ def main():
 # ---------------------------------------------------------
 # MOVE ALL STCM TO PROCESSED 
 # ---------------------------------------------------------
-				if ret == True:
-					#loop by subdir
-					for sdir in subdir:
-						print('----- ' + sdir + ' -----')
-						dir_stcm_processed = dir_stcm + sdir + db_conf['dir_processed']
-						if not os.path.exists(dir_stcm_processed):
-							os.makedirs(dir_stcm_processed)
-				
-						for fstcm in glob.iglob(dir_stcm + sdir + '*.csv'):
-							file_processed = dir_stcm_processed + os.path.basename(fstcm)
-							os.rename(fstcm, file_processed)	#move to dir_stcm/processed
-							print( os.path.basename(fstcm) + ' is moved to processed')
-	
-					print('Finished moving ALL STCM csv files to processed')
-					#loop end by subdir
+					if ret == True:
+						#loop by subdir
+						for sdir in subdir:
+							print('----- ' + sdir + ' -----')
+							dir_stcm_processed = dir_stcm + sdir + db_conf['dir_processed']
+							if not os.path.exists(dir_stcm_processed):
+								os.makedirs(dir_stcm_processed)
+					
+							for fstcm in glob.iglob(dir_stcm + sdir + '*.csv'):
+								file_processed = dir_stcm_processed + os.path.basename(fstcm)
+								os.rename(fstcm, file_processed)	#move to dir_stcm/processed
+								print( os.path.basename(fstcm) + ' is moved to processed')
+		
+						print('Finished moving ALL STCM csv files to processed')
+						#loop end by subdir
 # ---------------------------------------------------------
 # Move CODE to the processed directory?
 # ---------------------------------------------------------
