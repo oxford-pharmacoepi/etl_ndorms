@@ -36,7 +36,7 @@ def check_stcm_vocabulary_id(fcsv, debug):
 	except:
 		ret = False
 		err = sys.exc_info()
-		print("Function = {0}, Error = {1}, {2}".format("export_csv", err[0], err[1]))
+		print("Function = {0}, Error = {1}, {2}".format("check_stcm_vocabulary_id", err[0], err[1]))
 
 	return(ret)	
 
@@ -82,10 +82,9 @@ def export_csv(query, params, subdir, fcsv, debug):
 				os.makedirs(dir_suggest_stcm)
 		
 			headers = [i[0] for i in cursor1.description]
-			with open(fcsv, 'w') as csvFile:
+			with open(fcsv, 'w', newline='', encoding='utf-8') as csvFile:
 				# Create CSV writer.   
-				#writer = csv.writer(csvFile, delimiter=',', lineterminator='\r', quoting=csv.QUOTE_NONE, escapechar='\\')
-				writer = csv.writer(csvFile, delimiter=',', lineterminator='\r', quoting=csv.QUOTE_MINIMAL)
+				writer = csv.writer(csvFile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
 
 				# Add the headers and data to the CSV file.
 				writer.writerow(headers)
@@ -468,7 +467,7 @@ def main():
 						ret = False #stop the function if no STCM is found
 					else:		
 						fname = dir_sql + '3f_create_temp_stcm_tbl.sql'
-						print('Calling ' + fname + ' ...')
+						#print('Calling ' + fname + ' ...')
 						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, True)
 						
 						if ret == True:		
@@ -497,7 +496,7 @@ def main():
 							
 						if ret == True:	
 							query = 'DROP TABLE ' + vocabulary_schema + '.temp_stcm';
-							print('Calling ' + query + ' ...')
+							#print('Calling ' + query + ' ...')
 							ret = mapping_util.execute_query(db_conf, query, False)
 
 						if ret == True:
