@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.baseline (
 	eid				bigint 		not null,	
 	"210222"		int,
 	"52"			smallint,
-	"54"			smallint,
+	"34"			smallint,
 	"31"			smallint,
 	"21000"			int,
 	"26410"			NUMERIC,
