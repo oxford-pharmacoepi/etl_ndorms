@@ -88,14 +88,14 @@ With ICD10_1 AS(
 	left join death_cause as t2 on t1.eid = t2.eid and t1.ins_index = t2.ins_index
 )
 select 
-t1.eid as person_id,
-t1.date_of_death as death_date, 
-t1.date_of_death as death_datetime, 
-32879 as death_type_concept_id, --same as cdm_ukb_202003
+t1.eid,
+t1.date_of_death, 
+t1.date_of_death, 
+32879, --same as cdm_ukb_202003
 CASE 
 	WHEN t1.cause_icd10 is not null THEN COALESCE(t2.target_concept_id, 0) 
-END as cause_concept_id, 
-t1.cause_icd10 as cause_source_value, 
-t1.concept_id as cause_source_concept_id
+END, 
+t1.cause_icd10, 
+t1.concept_id
 from dead_patient as t1
 left join ICD10 as t2 on t1.concept_id = t2.source_concept_id;
