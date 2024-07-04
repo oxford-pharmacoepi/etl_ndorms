@@ -51,5 +51,5 @@ select * from CTE_VOCAB_MAP;
 
 ALTER TABLE {VOCABULARY_SCHEMA}.source_to_standard_vocab_map ADD CONSTRAINT xpk_source_to_standard_vocab_map PRIMARY KEY (source_code, source_vocabulary_id, target_concept_id) USING INDEX TABLESPACE pg_default;
 
---create index idx_vocab_map_source_code on {VOCABULARY_SCHEMA}.source_to_standard_vocab_map (source_code);
+create index idx_vocab_map_source_code on {VOCABULARY_SCHEMA}.source_to_standard_vocab_map (source_code) TABLESPACE pg_default;
 create index idx_vocab_map_source_vocab_id on {VOCABULARY_SCHEMA}.source_to_standard_vocab_map (source_vocabulary_id) TABLESPACE pg_default;
