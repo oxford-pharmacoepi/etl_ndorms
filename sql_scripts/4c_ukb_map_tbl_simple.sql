@@ -54,7 +54,7 @@ select
 	NULL::int
 from {SOURCE_SCHEMA}.baseline as t1
 join ukb as t2 on CONCAT('9-', t1."31") = t2.source_code and t2.target_domain_id = 'Gender'
-left join ukb as t3 on CONCAT('1001-', t1."21000") = t3.source_code and t3.target_domain_id = 'Race';
+left join ukb as t3 on CONCAT('1001-', t1."21000") = t3.source_code;
 
 ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default;
 CREATE UNIQUE INDEX idx_person_id ON {TARGET_SCHEMA}.person (person_id ASC) TABLESPACE pg_default;
