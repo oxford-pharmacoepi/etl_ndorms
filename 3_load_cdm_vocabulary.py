@@ -137,6 +137,7 @@ def check_stcm(fname, stcm, debug):
 		cursor1 = cnx.cursor()
 		cnx.autocommit = True	
 
+		print("Calling %s ..." %fname)
 		queries = mapping_util.parse_queries_file(db_conf, fname)
 
 		print("Checking %s in database..." %stcm)
@@ -487,7 +488,7 @@ def main():
 									
 									if '/1-to-1/' == sdir:
 										ret = generate_suggested_stcm(fname_1_to_1, sdir, stcm, False)
-									if '/1-to-many/' == sdir:
+									elif '/1-to-many/' == sdir:
 										ret = generate_suggested_stcm(fname_1_to_n, sdir, stcm, False)
 									
 									if ret == False:
