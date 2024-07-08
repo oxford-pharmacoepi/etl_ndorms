@@ -23,8 +23,8 @@ With base AS(
 	select distinct r.source_code, r.source_concept_id, r.source_vocabulary_id, r.source_code_description, 
 	cr.concept_id_2 as target_concept_id, c.vocabulary_id,  c.valid_start_date, c.valid_end_date, c.invalid_reason 
 	from rep_by r
-	join concept_relationship cr on cr.concept_id_1 = r.concept_id_2
-	join concept c on cr.concept_id_2 = c.concept_id
+	join {VOCABULARY_SCHEMA}.concept_relationship cr on cr.concept_id_1 = r.concept_id_2
+	join {VOCABULARY_SCHEMA}.concept c on cr.concept_id_2 = c.concept_id
 	where cr.relationship_id = 'Maps to'
 ), poss_eq_to AS(
 	select distinct b.source_code, b.source_concept_id, b.source_vocabulary_id, b.source_code_description, b.concept_id_2
