@@ -45,7 +45,7 @@ def main():
 					cdm_version = db_conf['cdm_version']
 					if cdm_version == '5.3':
 						fname = dir_sql + '4b_OMOPCDM_postgresql_5_3_ddl.sql'
-					elif cdm_version == '5.4':
+					elif cdm_version[:3] == '5.4':
 						fname = dir_sql + '4b_OMOPCDM_postgresql_5_4_ddl.sql'
 					print('Calling ' + fname + ' ...')
 					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
@@ -88,8 +88,15 @@ def main():
 						\'' + cdm_etl_reference + '\', \
 						TO_DATE(\'' + source_release_date + '\',\'YYYY-MM-DD\'), \
 						CURRENT_DATE, \'' + \
-						cdm_version + '\', \
-						(SELECT vocabulary_version FROM ' + vocabulary_schema + '.vocabulary WHERE vocabulary_id = \'None\')'
+						cdm_version + '\','
+					if cdm_version > '5.3':
+						query1 += '(select concept_id from ' + vocabulary_schema + '.concept WHERE domain_id = \'Metadata\' \
+									and standard_concept = \'S\' \
+									and invalid_reason is null \
+									and position(lower(\'OMOP CDM Version\') in lower(concept_name)) > 0 \
+									and position(\'' + cdm_version + '\' in concept_name) > 0), '
+					query1 += '(SELECT vocabulary_version FROM ' + vocabulary_schema + '.vocabulary WHERE vocabulary_id = \'None\')'
+					print(query1)
 					cursor1.execute(query1)
 # ---------------------------------------------------------
 # If this is a linked dataset, create/recreate _max_ids table
@@ -147,7 +154,7 @@ def main():
 				while qa not in ['y', 'n', 'yes', 'no']:
 					qa = input('I did not understand that. Do you want to CREATE/RECREATE the visit tables (VISIT_OCCURRENCE, VISIT_DETAIL)? (y/n):').lower()
 				if qa in ['y', 'yes']:
-					fname = dir_sql + '4e_' + database_type + '_map_tbl_visit.sql'
+					fname = dir_sql + '4e' + db_conf['cdm_version'][2] + '_' + database_type + '_map_tbl_visit.sql'
 					print('Executing ' + fname + ' ... (VISIT_OCCURRENCE, VISIT_DETAIL)')
 					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
 # ---------------------------------------------------------
@@ -225,7 +232,7 @@ def main():
 									print('Executing ' + fname + ' ... (STEM)')
 									ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
 								if ret == True:
-									fname = dir_sql + '4i_' + database_type + '_map_tbl_cdm.sql'
+									fname = dir_sql + '4i' + db_conf['cdm_version'][2] + '_' + database_type + '_map_tbl_cdm.sql'
 									print('Executing ' + fname + ' ... (CONDITION_OCCURRENCE, DRUG_EXPOSURE, DEVICE_EXPOSURE, PROCEDURE_OCCURRENCE, MEASUREMENT, OBSERVATION)')
 									ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
 								if ret == True:

@@ -62,7 +62,7 @@ def main():
 						cdm_version = db_conf['cdm_version']
 						if cdm_version == '5.3':
 							fname = dir_sql + '4b_OMOPCDM_postgresql_5_3_ddl.sql'
-						elif cdm_version == '5.4':
+						elif cdm_version[:3] == '5.4':
 							fname = dir_sql + '4b_OMOPCDM_postgresql_5_4_ddl.sql'
 						print('Calling ' + fname + ' ...')
 						ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, True)
