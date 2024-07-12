@@ -1,9 +1,8 @@
-﻿source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
-01,0,HESAPC_ACPSOUR_STCM,Same hospital ward,4023217,SNOMED,2002-01-31,2099-12-31,
-02,0,HESAPC_ACPSOUR_STCM,Same hospital HDU or immediate care,4262298,SNOMED,2003-01-31,2099-12-31,
-03,0,HESAPC_ACPSOUR_STCM,Same hospital ICU,4148981,SNOMED,2002-01-31,2099-12-31,
-04,0,HESAPC_ACPSOUR_STCM,Same hospital theatre or recovery,37017640,SNOMED,2016-01-31,2099-12-31,
-05,0,HESAPC_ACPSOUR_STCM,Same hospital A&E department,4021520,SNOMED,2002-01-31,2099-12-31,
-06,0,HESAPC_ACPSOUR_STCM,Same hospital X-ray or endoscopy,4023218,SNOMED,2002-01-31,2099-12-31,
-09,0,HESAPC_ACPSOUR_STCM,Clinic or home or other,44788859,SNOMED,2005-01-31,2099-12-31,
-99,0,HESAPC_ACPSOUR_STCM,Not known,4129922,SNOMED,2002-01-31,2099-12-31,
+source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
+01,0,HESAPC_ACPSOUR_STCM,Same hospital ward,8717,CMS Place of Service,1970-01-01,2099-12-31,
+02,0,HESAPC_ACPSOUR_STCM,Same hospital HDU or immediate care,32037,Visit,1970-01-01,2099-12-31,
+03,0,HESAPC_ACPSOUR_STCM,Same hospital ICU,32037,Visit,1970-01-01,2099-12-31,
+04,0,HESAPC_ACPSOUR_STCM,Same hospital theatre or recovery,32037,Visit,1970-01-01,2099-12-31,
+05,0,HESAPC_ACPSOUR_STCM,Same hospital A&E department,9203,Visit,1970-01-01,2099-12-31,
+06,0,HESAPC_ACPSOUR_STCM,Same hospital X-ray or endoscopy,38004352,NUCC,1970-01-01,2099-12-31,
+09,0,HESAPC_ACPSOUR_STCM,Clinic or home or other,38004226,NUCC,1970-01-01,2099-12-31,
