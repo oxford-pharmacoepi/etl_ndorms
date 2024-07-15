@@ -17,7 +17,6 @@ cte2 AS (
 ),
 cte3 AS (
 	SELECT
---	NEXTVAL('{TARGET_SCHEMA}.sequence_vo') AS visit_occurrence_id,
 	t1.patid AS person_id,
 	9201 AS visit_concept_id,
 	COALESCE(t1.admidate, t3.date_min, t1.discharged) AS visit_start_date, 
@@ -33,18 +32,13 @@ cte3 AS (
 	t4.target_concept_id AS admitted_from_concept_id,
 	NULL AS discharged_to_source_value,
 	NULL::int AS discharged_to_concept_id,
---	t5.source_code_description AS discharged_to_source_value,
---	t5.target_concept_id AS discharged_to_concept_id,
 	NULL::int AS preceding_visit_occurrence_id
 	FROM {SOURCE_SCHEMA}.hes_hospital AS t1
 	INNER JOIN cte1 as t2 ON t1.patid = t2.person_id
 	LEFT JOIN cte2 as t3 ON t1.spno = t3.spno
 	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t1.admimeth = t4.source_code and t4.source_vocabulary_id = 'HESAPC_ADMIMETH_STCM'
---	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t5 on t1.dismeth::varchar = t5.source_code and t5.source_vocabulary_id = 'HESAPC_DISMETH_STCM'
---	ORDER BY t1.patid, COALESCE(t1.admidate, t3.date_min, t1.discharged), COALESCE(t1.discharged, t3.date_max, t3.date_min), t1.spno
 ),
 cte4 AS (
---	SELECT visit_occurrence_id,
 	SELECT person_id, visit_source_value, 
 	CASE WHEN visit_start_date <= visit_end_date 
 		THEN visit_start_date ELSE visit_end_date 
@@ -131,7 +125,6 @@ SELECT
 	t1.discharged_to_concept_id,
 	t2.preceding_visit_occurrence_id
 	FROM cte5 AS t1
---	INNER JOIN cte5 AS t2 ON t1.visit_occurrence_id = t2.visit_occurrence_id
 	LEFT JOIN cte6 AS t2 ON t1.visit_occurrence_id = t2.visit_occurrence_id;
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_vo;
@@ -170,8 +163,6 @@ cte2 AS (
 	t2.target_concept_id AS admitted_from_concept_id,
 	NULL AS discharged_to_source_value,
 	NULL::int AS discharged_to_concept_id,
---	t3.source_code_description AS discharged_to_source_value,
---	t3.target_concept_id AS discharged_to_concept_id,
 	NULL::int AS preceding_visit_detail_id,
 	NULL::int AS parent_visit_detail_id,
 	NULL::int as visit_occurrence_id,
@@ -179,7 +170,6 @@ cte2 AS (
 	FROM cte1 as t0 
 	INNER JOIN {SOURCE_SCHEMA}.hes_episodes AS t1 ON t1.patid = t0.person_id
 	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t2 on t1.admimeth = t2.source_code and t2.source_vocabulary_id = 'HESAPC_ADMIMETH_STCM'
---	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t3 on t1.dismeth::varchar = t3.source_code and t3.source_vocabulary_id = 'HESAPC_DISMETH_STCM'
 
 ),
 cte3 AS (
