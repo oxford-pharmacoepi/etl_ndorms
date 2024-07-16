@@ -137,7 +137,6 @@ def check_stcm(fname, stcm, debug):
 		cursor1 = cnx.cursor()
 		cnx.autocommit = True	
 
-		print("Calling %s ..." %fname)
 		queries = mapping_util.parse_queries_file(db_conf, fname)
 
 		print("Checking %s in database..." %stcm)
@@ -488,7 +487,7 @@ def main():
 									
 									if '/1-to-1/' == sdir:
 										ret = generate_suggested_stcm(fname_1_to_1, sdir, stcm, False)
-									elif '/1-to-many/' == sdir:
+									if '/1-to-many/' == sdir:
 										ret = generate_suggested_stcm(fname_1_to_n, sdir, stcm, False)
 									
 									if ret == False:
@@ -586,21 +585,21 @@ def main():
 # ---------------------------------------------------------
 # MOVE ALL STCM TO PROCESSED 
 # ---------------------------------------------------------
-					if ret == True:
-						#loop by subdir
-						for sdir in subdir:
-							print('----- ' + sdir + ' -----')
-							dir_stcm_processed = dir_stcm + sdir + db_conf['dir_processed']
-							if not os.path.exists(dir_stcm_processed):
-								os.makedirs(dir_stcm_processed)
-					
-							for fstcm in glob.iglob(dir_stcm + sdir + '*.csv'):
-								file_processed = dir_stcm_processed + os.path.basename(fstcm)
-								os.rename(fstcm, file_processed)	#move to dir_stcm/processed
-								print( os.path.basename(fstcm) + ' is moved to processed')
-		
-						print('Finished moving ALL STCM csv files to processed')
-						#loop end by subdir
+			if ret == True:
+				#loop by subdir
+				for sdir in subdir:
+					print('----- ' + sdir + ' -----')
+					dir_stcm_processed = dir_stcm + sdir + db_conf['dir_processed']
+					if not os.path.exists(dir_stcm_processed):
+						os.makedirs(dir_stcm_processed)
+			
+					for fstcm in glob.iglob(dir_stcm + sdir + '*.csv'):
+						file_processed = dir_stcm_processed + os.path.basename(fstcm)
+						os.rename(fstcm, file_processed)	#move to dir_stcm/processed
+						print( os.path.basename(fstcm) + ' is moved to processed')
+
+				print('Finished moving ALL STCM csv files to processed')
+				#loop end by subdir
 # ---------------------------------------------------------
 # Move CODE to the processed directory?
 # ---------------------------------------------------------
