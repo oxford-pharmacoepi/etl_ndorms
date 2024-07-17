@@ -160,7 +160,7 @@ def check_stcm(fname, stcm, debug):
 	return(ret)	
 
 # ---------------------------------------------------------
-# Function: CHECK STCM 
+# Function: GENERATE SUGGESTED STCM 
 # - Select all non-standard, invalid target_concept_ids in every STCM
 # - Generate suggestion CSV for update 
 #       _update.csv for updating target_concept_ids if applicable
@@ -291,6 +291,24 @@ def generate_new_stcm(fstcm, subdir, debug):
 
 	return ret
 # ---------------------------------------------------------
+# Function: MOVE_STCM_TO_PROCESSED 
+# - move all STCM files to processed 
+# @param sdir		stcm subdirectory name
+# @param debug		flag of debug
+# ---------------------------------------------------------
+def move_stcm_to_processed(sdir, debug):
+	dir_stcm_processed = db_conf['dir_stcm'] + sdir + db_conf['dir_processed']
+	fcsv_list = sorted(glob.iglob(db_conf['dir_stcm'] + sdir + '*.csv'))
+	
+	if fcsv_list:
+		if not os.path.exists(dir_stcm_processed):
+			os.makedirs(dir_stcm_processed)
+
+	for fstcm in fcsv_list:
+		file_processed = dir_stcm_processed + os.path.basename(fstcm)
+		os.rename(fstcm, file_processed)	#move to dir_stcm/processed
+		print( os.path.basename(fstcm) + ' is moved to processed')
+# ---------------------------------------------------------
 # MAIN PROGRAM
 # ---------------------------------------------------------
 def main():
@@ -402,15 +420,16 @@ def main():
 # ---------------------------------------------------------
 # CREATE/LOAD source_to_..._map
 # ---------------------------------------------------------
+			csv_file_list = sorted(glob.iglob(dir_stcm + '/1-to-1/' + '*.csv'))
+			csv_file_list_1_to_n = sorted(glob.iglob(dir_stcm + '/1-to-many/' + '*.csv'))				
+			csv_file_list.extend(csv_file_list_1_to_n)
+
 			if ret == True:
 				qa = input('Are you sure you want to CREATE/LOAD source_to_..._map tables (y/n):') 
 				while qa.lower() not in ['y', 'n', 'yes', 'no']:
 					qa = input('I did not understand that. Are you sure you want to CREATE/LOAD source_to_..._map tables tables (y/n):') 
 				if qa.lower() in ['y', 'yes']:
-					csv_file_list = sorted(glob.iglob(dir_stcm + '/1-to-1/' + '*.csv'))
-					csv_file_list_1_to_n = sorted(glob.iglob(dir_stcm + '/1-to-many/' + '*.csv'))				
-					csv_file_list.extend(csv_file_list_1_to_n)
-					
+
 					if not csv_file_list:
 						print('NO STCM file found.')
 						ret = False;
@@ -422,11 +441,15 @@ def main():
 							ret = check_stcm_vocabulary_id(fname, False)
 					
 					if ret == True:
-						for fname in csv_file_list:
-							query = 'COPY ' + vocabulary_schema + '.source_to_concept_map FROM \'' + fname + '\' WITH DELIMITER E\',\' CSV HEADER QUOTE E\'"\'';
-							ret = mapping_util.execute_query(db_conf, query, True)
-							if ret == False:
-								break
+						#Truncate 
+						query = 'TRUNCATE TABLE ' + vocabulary_schema + '.source_to_concept_map CASCADE '
+						ret = mapping_util.execute_query(db_conf, query, True)
+						if ret == True:
+							for fname in csv_file_list:
+								query = 'COPY ' + vocabulary_schema + '.source_to_concept_map FROM \'' + fname + '\' WITH DELIMITER E\',\' CSV HEADER QUOTE E\'"\''
+								ret = mapping_util.execute_query(db_conf, query, True)
+								if ret == False:
+									break
 # ---------------------------------------------------------
 # CREATE/LOAD source_to_concept_map PK, IDXs, FKs
 # ---------------------------------------------------------
@@ -453,63 +476,66 @@ def main():
 # ---------------------------------------------------------
 # CHECK STCM 
 # ---------------------------------------------------------
-			if ret == True:
+			if ret == True and csv_file_list:
 				qa = input('Are you sure you want to CHECK ALL STCMs (y/n):') 
 				while qa.lower() not in ['y', 'n', 'yes', 'no']:
 					qa = input('I did not understand that. Are you sure you want to CHECK ALL STCMs (y/n):') 
 				if qa.lower() in ['y', 'yes']:
-# ---------------------------------------------------------					
-					csv_file_list = sorted(glob.iglob(dir_stcm + '/1-to-1/' + '*.csv'))
-					csv_file_list_1_to_n = sorted(glob.iglob(dir_stcm + '/1-to-many/' + '*.csv'))				
-					csv_file_list.extend(csv_file_list_1_to_n)
+# ---------------------------------------------------------							
+					fname = dir_sql + '3f_create_temp_stcm_tbl.sql'
+					#print('Calling ' + fname + ' ...')
+					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, True)
 					
-					if not csv_file_list:
-						print('NO STCM file found.')
-						ret = False #stop the function if no STCM is found
-					else:		
-						fname = dir_sql + '3f_create_temp_stcm_tbl.sql'
-						#print('Calling ' + fname + ' ...')
-						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, True)
-						
-						if ret == True:		
-							fname = dir_sql + '3g_check_stcm.sql'
-							fname_1_to_1 = dir_sql + '3h_generate_suggested_1_to_1_stcm.sql'
-							fname_1_to_n = dir_sql + '3h_generate_suggested_1_to_n_stcm.sql'
-						
-							#loop by subdir
-							for sdir in subdir:
-								print('----- ' + sdir + ' -----')
+					if ret == True:		
+						fname = dir_sql + '3g_check_stcm.sql'
+						fname_1_to_1 = dir_sql + '3h_generate_suggested_1_to_1_stcm.sql'
+						fname_1_to_n = dir_sql + '3h_generate_suggested_1_to_n_stcm.sql'
+					
+						#loop by subdir
+						for sdir in subdir:
+							print('----- ' + sdir + ' -----')
 
-								for fcsv in glob.iglob(dir_stcm + sdir + '*.csv'):		# iterator can't loop twice
-									stcm = os.path.basename(fcsv).replace('.csv', '')
-									ret = check_stcm(fname, stcm, False)
-									if ret == False:
-										break
-									
-									if '/1-to-1/' == sdir:
-										ret = generate_suggested_stcm(fname_1_to_1, sdir, stcm, False)
-									elif '/1-to-many/' == sdir:
-										ret = generate_suggested_stcm(fname_1_to_n, sdir, stcm, False)
-									
-									if ret == False:
-										break
-							#loop end by subdir
-							
-						if ret == True:	
-							query = 'DROP TABLE ' + vocabulary_schema + '.temp_stcm';
-							#print('Calling ' + query + ' ...')
-							ret = mapping_util.execute_query(db_conf, query, False)
+							for fcsv in glob.iglob(dir_stcm + sdir + '*.csv'):		# iterator can't loop twice
+								stcm = os.path.basename(fcsv).replace('.csv', '')
+								ret = check_stcm(fname, stcm, False)
+								if ret == False:
+									break
+								
+								if '/1-to-1/' == sdir:
+									ret = generate_suggested_stcm(fname_1_to_1, sdir, stcm, False)
+								elif '/1-to-many/' == sdir:
+									ret = generate_suggested_stcm(fname_1_to_n, sdir, stcm, False)
+								
+								if ret == False:
+									break
+						#loop end by subdir
+						
+					if ret == True:	
+						query = 'DROP TABLE ' + vocabulary_schema + '.temp_stcm';
+						#print('Calling ' + query + ' ...')
+						ret = mapping_util.execute_query(db_conf, query, False)
 
-						if ret == True:
-							print('Finished checking ALL STCMs.')
+					if ret == True:
+						csv_file_list = sorted(glob.iglob(dir_stcm + '/1-to-1/' + "suggestion\\" + '*.csv'))
+						csv_file_list_1_to_n = sorted(glob.iglob(dir_stcm + '/1-to-many/' + "suggestion\\" + '*.csv'))
+						csv_file_list.extend(csv_file_list_1_to_n)
+						
+						if not csv_file_list:
+							#All are standard
+							move_stcm_to_processed('/1-to-1/', False)
+							move_stcm_to_processed('/1-to-many/', False)
+					
+						print('Finished checking ALL STCMs.')
 # ---------------------------------------------------------
 # UPDATE STCM 
 # ---------------------------------------------------------
 			if ret == True:
 				found = False
 				
+				csv_file_list_1_to_1 = sorted(glob.iglob(dir_stcm + '/1-to-1/' + "suggestion\\" + '*.csv'))
+				csv_file_list_1_to_n = sorted(glob.iglob(dir_stcm + '/1-to-many/' + "suggestion\\" + '*.csv'))
+				
 				csv_file_list = sorted(glob.iglob(dir_stcm + '/1-to-1/' + "suggestion\\" + '*.csv'))
-				csv_file_list_1_to_n = sorted(glob.iglob(dir_stcm + '/1-to-many/' + "suggestion\\" + '*.csv'))				
 				csv_file_list.extend(csv_file_list_1_to_n)
 			
 				if csv_file_list:
@@ -525,14 +551,15 @@ def main():
 						#loop by subdir
 						for sdir in subdir:
 							print('----- ' + sdir + ' -----')
-							
-							dir_processed =  dir_stcm + sdir + 'suggestion\\'  + db_conf['dir_processed']
-							if not os.path.exists(dir_processed):
-								os.makedirs(dir_processed)
-								
-							dir_stcm_old = dir_stcm + sdir + 'old\\'
-							if not os.path.exists(dir_stcm_old):
-								os.makedirs(dir_stcm_old)
+
+							if ('/1-to-1/' == sdir and csv_file_list_1_to_1) or ('/1-to-many/' == sdir and csv_file_list_1_to_n):
+								dir_processed =  dir_stcm + sdir + 'suggestion\\'  + db_conf['dir_processed']
+								if not os.path.exists(dir_processed):
+									os.makedirs(dir_processed)
+									
+								dir_stcm_old = dir_stcm + sdir + 'old\\'
+								if not os.path.exists(dir_stcm_old):
+									os.makedirs(dir_stcm_old)
 
 							for fcsv in glob.iglob(dir_stcm + sdir + "suggestion\\" + '*.csv'):
 								ret = update_stcm(fname, fcsv, debug)
@@ -586,21 +613,13 @@ def main():
 # ---------------------------------------------------------
 # MOVE ALL STCM TO PROCESSED 
 # ---------------------------------------------------------
-					if ret == True:
-						#loop by subdir
-						for sdir in subdir:
-							print('----- ' + sdir + ' -----')
-							dir_stcm_processed = dir_stcm + sdir + db_conf['dir_processed']
-							if not os.path.exists(dir_stcm_processed):
-								os.makedirs(dir_stcm_processed)
-					
-							for fstcm in glob.iglob(dir_stcm + sdir + '*.csv'):
-								file_processed = dir_stcm_processed + os.path.basename(fstcm)
-								os.rename(fstcm, file_processed)	#move to dir_stcm/processed
-								print( os.path.basename(fstcm) + ' is moved to processed')
-		
-						print('Finished moving ALL STCM csv files to processed')
-						#loop end by subdir
+						if ret == True:
+							#loop by subdir
+							for sdir in subdir:
+								print('----- ' + sdir + ' -----')
+								move_stcm_to_processed(sdir, False)
+							#loop end by subdir
+							print('Finished moving ALL STCM csv files to processed')
 # ---------------------------------------------------------
 # Move CODE to the processed directory?
 # ---------------------------------------------------------
