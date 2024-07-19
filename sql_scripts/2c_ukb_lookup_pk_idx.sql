@@ -1,0 +1,2 @@
+alter table {SOURCE_SCHEMA}."269" add constraint pk_269 primary key (code) USING INDEX TABLESPACE pg_default;
+alter table {SOURCE_SCHEMA}."270" add constraint pk_270 primary key (code) USING INDEX TABLESPACE pg_default;

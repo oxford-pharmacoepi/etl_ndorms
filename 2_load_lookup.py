@@ -135,7 +135,11 @@ def main():
 						if ret == True:
 							tbl_lookup = 'tbl_' + database_type + '_lookup'
 							tbl_lookup_list =  [tbl for tbl in db_conf[tbl_lookup]]
-							file_lookup_list = [[dir_lookup + '*' + tbl + '*.txt'] for tbl in tbl_lookup_list]
+							if 'ukb' == database_type:
+								file_lookup_list = [[dir_lookup + '*' + tbl + '*.tsv'] for tbl in tbl_lookup_list]
+							else:
+								file_lookup_list = [[dir_lookup + '*' + tbl + '*.txt'] for tbl in tbl_lookup_list]
+
 							if not os.path.exists(dir_lookup_processed):
 								os.makedirs(dir_lookup_processed)
 							ret = mapping_util.load_files_parallel(db_conf, source_schema, tbl_lookup_list, file_lookup_list, dir_lookup_processed)
