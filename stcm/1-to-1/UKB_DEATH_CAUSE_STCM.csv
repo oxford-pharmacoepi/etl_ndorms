@@ -61,6 +61,8 @@ V49.8,45585442,UKB_DEATH_CAUSE_STCM,Car occupant [any] injured in other specifie
 V49.9,45566025,UKB_DEATH_CAUSE_STCM,Car occupant [any] injured in unspecified traffic accident,444074,SNOMED,2002-01-31,2099-12-31,
 V80.0,45546945,UKB_DEATH_CAUSE_STCM,Rider or occupant injured by fall from or being thrown from animal or animal-drawn vehicle in noncollision accident,4064258,SNOMED,2002-01-31,2099-12-31,
 V89.2,45561324,UKB_DEATH_CAUSE_STCM,"Person injured in unspecified motor-vehicle accident, traffic",444074,SNOMED,2002-01-31,2099-12-31,
+X04,45756364,UKB_DEATH_CAUSE_STCM,Exposure to ignition of highly flammable material,439605,SNOMED,1990-05-01,2099-12-31,
+X08,45756367,UKB_DEATH_CAUSE_STCM,"Exposure to other specified smoke, fire and flames",432504,SNOMED,2002-01-31,2099-12-31,
 X47.8,710676,UKB_DEATH_CAUSE_STCM,Accidental poisoning by and exposure to other specified gases and vapours,40484966,SNOMED,2010-01-31,2099-12-31,
 X67.0,710678,UKB_DEATH_CAUSE_STCM,Intentional self-poisoning by and exposure to carbon monoxide from combustion engine exhaust,435433,SNOMED,2002-01-31,2099-12-31,
 X67.3,710681,UKB_DEATH_CAUSE_STCM,Intentional self-poisoning by and exposure to carbon monoxide from other sources,435433,SNOMED,2002-01-31,2099-12-31,
