@@ -35,6 +35,7 @@ db_conf = dict({
 	'tbl_hesae': ['hesae_patient', 'hesae_attendance', 'hesae_diagnosis', 'hesae_investigation', 'hesae_treatment', 'hesae_hrg', 'hesae_pathway'],
 	'tbl_ons': ['ons_death'],
 	'tbl_ncras': ['tumour', 'treatment'],
+	'tbl_ukb_lookup': ['lookup269', 'lookup270', 'lookup626', 'lookup10'],
 	'tbl_ukb': ['baseline', 'death', 'death_cause', 'gp_clinical', 'gp_registrations', 'gp_scripts', 'hesin', 'hesin_critical', 'hesin_delivery', 'hesin_diag', 'hesin_maternity', 'hesin_oper', 'hesin_psych', 'cancer'],
 	'tbl_cprd': ['denominator', 'documentation', 'lookups', 'reference'],
 	'tbl_cdm': ['care_site', 'condition_era', 'condition_occurrence', 'death', 'device_exposure', 'dose_era', 'drug_era', 'drug_exposure', 'location', 'measurement', 'observation', 'observation_period', 'person', 'procedure_occurrence', 'provider', 'visit_detail', 'visit_occurrence'],
