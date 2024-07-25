@@ -136,7 +136,7 @@ def main():
 							tbl_lookup = 'tbl_' + database_type + '_lookup'
 							tbl_lookup_list =  [tbl for tbl in db_conf[tbl_lookup]]
 							if 'ukb' == database_type:
-								file_lookup_list = [[dir_lookup + '*' + tbl + '*.tsv'] for tbl in tbl_lookup_list]
+								file_lookup_list = [[dir_lookup + '*' + tbl.replace("lookup", "coding") + '*.tsv'] for tbl in tbl_lookup_list]
 							else:
 								file_lookup_list = [[dir_lookup + '*' + tbl + '*.txt'] for tbl in tbl_lookup_list]
 
