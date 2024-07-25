@@ -2,8 +2,8 @@
 -- PROVIDER
 --------------------------------
 With ukb_spec AS(
-	select CONCAT('269-', t1.code) as specialty_source_value, t2.*
-	from {SOURCE_SCHEMA}."269" as t1
+	select CONCAT('269-', t1.code) as specialty_source_value, t1.description, t2.*
+	from {SOURCE_SCHEMA}.lookup269 as t1
 	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_code = CONCAT('269-', t1.code)
 	and (t2.source_vocabulary_id = 'UKB_SPEC_STCM' or t2.source_vocabulary_id = 'UK Biobank')
 	and t2.target_domain_id = 'Provider'
@@ -11,8 +11,8 @@ With ukb_spec AS(
 	
 	union
 	
-	select CONCAT('270-', t1.code) as specialty_source_value, t2.*
-	from {SOURCE_SCHEMA}."270" as t1
+	select CONCAT('270-', t1.code) as specialty_source_value, t1.description, t2.*
+	from {SOURCE_SCHEMA}.lookup270 as t1
 	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_code = CONCAT('270-', t1.code)
 	and (t2.source_vocabulary_id = 'UKB_SPEC_STCM' or t2.source_vocabulary_id = 'UK Biobank')
 	and t2.target_domain_id = 'Provider'
@@ -41,7 +41,7 @@ select
 	null, 
 	null, 
 	null, 
-	null, 
+	description, 
 	specialty_source_value,
 	CASE
 		when source_concept_id = 0 THEN null
@@ -50,6 +50,37 @@ select
 	null,
 	null 
 from ukb_spec;
+
+INSERT INTO {TARGET_SCHEMA}.provider(
+	provider_id, 
+	provider_name, 
+	npi, dea, 
+	specialty_concept_id, 
+	care_site_id,
+	year_of_birth, 
+	gender_concept_id, 
+	provider_source_value, 
+	specialty_source_value,
+	specialty_source_concept_id, 
+	gender_source_value, 
+	gender_source_concept_id
+)
+select 
+(max(provider_id) + 1), 
+null,
+null,
+null, 
+38004446,
+null, 
+null, 
+null, 
+'General Practice', 
+'GP',
+null,
+null,
+null 
+from {TARGET_SCHEMA}.provider;
+
 
 --------------------------------
 -- PERSON
@@ -135,12 +166,12 @@ With ICD10_1 AS(
 	from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map 
 	where source_vocabulary_id = 'UKB_DEATH_CAUSE_STCM'	
 ), death_cause_1 AS(
-	select t1.eid, t1.ins_index, t1.cause_icd10, t2.concept_id, t2.concept_id as source_concept_id
+	select t1.eid, t1.ins_index, t1.cause_icd10, t2.concept_id, t2.concept_id as source_concept_id, t2.concept_code as source_code
 	from source.death_cause as t1
 	join {VOCABULARY_SCHEMA}.concept as t2 on t1.cause_icd10 = t2.concept_code or t1.cause_icd10 = replace(t2.concept_code, '.', '')
 	where t2.vocabulary_id = 'ICD10'
 ), death_cause_2 AS(
-	select t1.eid, t1.ins_index, t1.cause_icd10, t3.concept_id, 0 as source_concept_id
+	select t1.eid, t1.ins_index, t1.cause_icd10, t3.concept_id, 0 as source_concept_id, t1.cause_icd10 as source_code
 	from source.death_cause as t1
 	left join death_cause_1 as t2 on t1.eid = t2.eid and t1.ins_index = t2.ins_index
 	join {VOCABULARY_SCHEMA}.concept as t3 on left(t1.cause_icd10, 3) = t3.concept_code 
@@ -150,7 +181,7 @@ With ICD10_1 AS(
 	union 
 	select * from death_cause_2
 ), dead_patient AS(
-	select distinct t1.eid, t1.date_of_death, t2.cause_icd10, t2.concept_id, t2.source_concept_id
+	select distinct t1.eid, t1.date_of_death, t2.cause_icd10, t2.source_code, t2.concept_id, t2.source_concept_id
 	from {SOURCE_SCHEMA}.death as t1
 	left join death_cause as t2 on t1.eid = t2.eid and t1.ins_index = t2.ins_index
 )
@@ -171,7 +202,7 @@ t1.date_of_death,
 CASE 
 	WHEN t1.cause_icd10 is not null THEN COALESCE(t2.target_concept_id, 0) 
 END, 
-t1.cause_icd10, 
+t1.source_code, 
 t1.source_concept_id
 from dead_patient as t1
 left join ICD10 as t2 on t1.concept_id = t2.source_concept_id
