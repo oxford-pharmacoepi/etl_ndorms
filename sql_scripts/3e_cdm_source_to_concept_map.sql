@@ -1,7 +1,7 @@
-DROP INDEX IF EXISTS idx_source_to_concept_map_3 CASCADE;
-DROP INDEX IF EXISTS idx_source_to_concept_map_1 CASCADE;
-DROP INDEX IF EXISTS idx_source_to_concept_map_2 CASCADE;
-DROP INDEX IF EXISTS idx_source_to_concept_map_c CASCADE;
+DROP INDEX IF EXISTS {VOCABULARY_SCHEMA}.idx_source_to_concept_map_3 CASCADE;
+DROP INDEX IF EXISTS {VOCABULARY_SCHEMA}.idx_source_to_concept_map_1 CASCADE;
+DROP INDEX IF EXISTS {VOCABULARY_SCHEMA}.idx_source_to_concept_map_2 CASCADE;
+DROP INDEX IF EXISTS {VOCABULARY_SCHEMA}.idx_source_to_concept_map_c CASCADE;
 
 ALTER TABLE {VOCABULARY_SCHEMA}.source_to_concept_map DROP CONSTRAINT IF EXISTS fpk_source_to_concept_map_source_concept_id;
 ALTER TABLE {VOCABULARY_SCHEMA}.source_to_concept_map DROP CONSTRAINT IF EXISTS fpk_source_to_concept_map_target_concept_id;
