@@ -115,7 +115,8 @@ DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.observation_period_seq;
 CREATE SEQUENCE {TARGET_SCHEMA}.observation_period_seq;
 
 with cte as ( 
-	select t1.patid, LEAST(MIN(t1.admidate), MIN(t2.epistart)) as min_date, GREATEST(MAX(t1.discharged), MAX(t2.epiend)) as max_date --sometimes discharged is null
+	select t1.patid, LEAST(MIN(t1.admidate), MIN(t2.epistart)) as min_date, 
+	GREATEST(MAX(t1.discharged), MAX(t2.epiend)) as max_date --sometimes discharged is null
 	from {SOURCE_SCHEMA}.hes_hospital as t1 
 	inner join {SOURCE_SCHEMA}.hes_episodes as t2 on t2.patid = t1.patid 
 	inner join {TARGET_SCHEMA}.person as t3 on t3.person_id = t1.patid 
