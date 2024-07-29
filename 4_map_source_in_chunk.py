@@ -142,7 +142,7 @@ def main():
 					while qa not in ['y', 'n', 'yes', 'no']:
 						qa = input('I did not understand that. Do you want to CREATE/RECREATE the temp tables (TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL? (y/n):').lower()
 					if qa in ['y', 'yes']:
-						fname = dir_sql + '4d_' + database_type + '_map_tbl_tmp.sql'
+						fname = dir_sql + '4d' + db_conf['cdm_version'][2] + '_' + database_type + '_map_tbl_tmp.sql'
 						print('Executing ' + fname + ' ... (TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL)')
 						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
 # ---------------------------------------------------------
