@@ -22,7 +22,7 @@ with cte1 as (
 		s.source_value as condition_source_value,
 		s.source_concept_id as condition_source_concept_id,
 		NULL as condition_status_source_value
-	from chunks.stem_{CHUNK_ID} s
+	from {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
 	join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id
 	where s.domain_id = 'Condition'
 )
@@ -68,7 +68,7 @@ with cte2 as (
 		s.source_concept_id as drug_source_concept_id,
 		s.route_source_value,
 		s.dose_unit_source_value
-from chunks.stem_{CHUNK_ID} s
+from {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
 left join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id	--AD: 2023_05_18 changed JOIN to LEFT JOIN - it was always empty?????? as stem does not have visit_occurrence_ids for drugs without links to Problem. INTEGRATED WITH THE FOLLOWING, which is removed
 where s.domain_id = 'Drug'
 )
@@ -104,7 +104,7 @@ select * from cte2;
 --AD: INTEGRATED IN PREVIOUS QUERY		s.source_concept_id as drug_source_concept_id,
 --AD: INTEGRATED IN PREVIOUS QUERY		s.route_source_value,
 --AD: INTEGRATED IN PREVIOUS QUERY		s.dose_unit_source_value
---AD: INTEGRATED IN PREVIOUS QUERY	from chunks.stem_{CHUNK_ID} s
+--AD: INTEGRATED IN PREVIOUS QUERY	from {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
 --AD: INTEGRATED IN PREVIOUS QUERY	where s.source_concept_id in (
 --AD: INTEGRATED IN PREVIOUS QUERY		35891522,--AstraZeneca vaccine
 --AD: INTEGRATED IN PREVIOUS QUERY		35891709,--Pfizer vaccine
@@ -147,7 +147,7 @@ with cte4 as (
 		s.visit_detail_id,
 		s.source_value as device_source_value,
 		s.source_concept_id as device_source_concept_id
-	from chunks.stem_{CHUNK_ID} s
+	from {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
 	join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id
 	where s.domain_id = 'Device'
 )
@@ -187,13 +187,14 @@ with cte5 as (
 		s.source_value as procedure_source_value,
 		s.source_concept_id as procedure_source_concept_id,
 		s.modifier_source_value
-	from chunks.stem_{CHUNK_ID} s
+	from {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
 	join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id
 	where s.domain_id = 'Procedure'
 )
 
-insert into {TARGET_SCHEMA}.procedure_occurrence(procedure_occurrence_id, person_id, procedure_concept_id, procedure_date,
-												  procedure_datetime, procedure_type_concept_id, modifier_concept_id, quantity,
+insert into {TARGET_SCHEMA}.procedure_occurrence(procedure_occurrence_id, person_id, procedure_concept_id, procedure_date, procedure_datetime, 
+												  procedure_end_date, procedure_end_datetime, 
+												  procedure_type_concept_id, modifier_concept_id, quantity,
 												  provider_id, visit_occurrence_id, visit_detail_id, procedure_source_value,
 												  procedure_source_concept_id, modifier_source_value)
 select * from cte5;
@@ -228,9 +229,9 @@ with cte6 as (
 		s.source_concept_id as measurement_source_concept_id,
 		s.unit_source_value,
 		s.value_source_value
-	from chunks.stem_{CHUNK_ID} s
+	from {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
 	left join {TARGET_SCHEMA}.source_to_standard_vocab_map stsvm
-		on s.unit_source_value = stsvm.source_code
+		on lower(s.unit_source_value) = lower(stsvm.source_code)
 		and stsvm.source_vocabulary_id = 'UCUM'
 	join {TARGET_SCHEMA}.visit_occurrence v
 		on s.visit_occurrence_id = v.visit_occurrence_id
@@ -285,9 +286,9 @@ with cte7 as (
 		s.source_concept_id as observation_source_concept_id,
 		s.unit_source_value,
 		s.qualifier_source_value
-	from chunks.stem_{CHUNK_ID} s
+	from {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
 	left join {TARGET_SCHEMA}.source_to_standard_vocab_map stsvm
-		on s.unit_source_value = stsvm.source_code
+		on lower(s.unit_source_value) = lower(stsvm.source_code)
 		and stsvm.source_vocabulary_id = 'UCUM'
 	join {TARGET_SCHEMA}.visit_occurrence v
 		on s.visit_occurrence_id = v.visit_occurrence_id
@@ -303,7 +304,7 @@ select * from cte7;
 -----------------------------------------
 -- UPDATE CHUNK
 -----------------------------------------
-update chunks.chunk 
+update {CHUNK_SCHEMA}.chunk 
 set 
 completed = 1
 where chunk_id = {CHUNK_ID};

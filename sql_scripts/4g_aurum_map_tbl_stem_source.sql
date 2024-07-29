@@ -1,9 +1,9 @@
 --insert into temp table from observation
-CREATE TABLE chunks.stem_source_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM_SOURCE);
+CREATE TABLE {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM_SOURCE);
 
 WITH cte0 as (
 		select person_id
-		from chunks.chunk_person
+		from {CHUNK_SCHEMA}.chunk_person
 		where chunk_id = {CHUNK_ID}
 	),
 	t1 as (
@@ -32,7 +32,7 @@ WITH cte0 as (
 		left join {SOURCE_SCHEMA}.medicaldictionary m on t1.medcodeid = m.medcodeid
 		left join {SOURCE_SCHEMA}.temp_concept_map t on t1.medcodeid = t.medcodeid
 	)
-insert into chunks.stem_source_{CHUNK_ID} (domain_id, person_id, visit_occurrence_id, visit_detail_id, provider_id, concept_id, source_value,
+insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (domain_id, person_id, visit_occurrence_id, visit_detail_id, provider_id, concept_id, source_value,
 					 source_concept_id, type_concept_id, start_date, end_date, start_time, days_supply, dose_unit_concept_id,
 					 dose_unit_source_value, effective_drug_dose, lot_number, modifier_source_value, 
 					 operator_concept_id, qualifier_concept_id, qualifier_source_value, quantity, 
@@ -93,7 +93,7 @@ WHERE v.source_table = 'Observation';
 --insert into stem_source from consultation
 WITH cte1 as (
 		select person_id
-		from chunks.chunk_person
+		from {CHUNK_SCHEMA}.chunk_person
 		where chunk_id = {CHUNK_ID}
 	),
 	t1 as (
@@ -110,7 +110,7 @@ WITH cte1 as (
 		left join {TARGET_SCHEMA}.visit_detail vd on v.visit_detail_id = vd.visit_detail_id
 		where v.source_table = 'Consultation'
 	)
-insert into chunks.stem_source_{CHUNK_ID} (domain_id, person_id, visit_occurrence_id, visit_detail_id, provider_id, concept_id, source_value,
+insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (domain_id, person_id, visit_occurrence_id, visit_detail_id, provider_id, concept_id, source_value,
 										 source_concept_id, type_concept_id, start_date, end_date, start_time, days_supply, dose_unit_concept_id,
 										 dose_unit_source_value, effective_drug_dose, lot_number, modifier_source_value, operator_concept_id, qualifier_concept_id,
 										 qualifier_source_value, quantity, range_high, range_low, refills, route_concept_id, route_source_value,
@@ -175,7 +175,7 @@ left join {SOURCE_SCHEMA}.temp_concept_map t on t2.consmedcodeid = t.medcodeid;
 --insert into stem_source table from drugissue
 WITH cte2 as (
 		select person_id
-		from chunks.chunk_person
+		from {CHUNK_SCHEMA}.chunk_person
 		where chunk_id = {CHUNK_ID}
 	),
 	t1 as (
@@ -189,7 +189,7 @@ WITH cte2 as (
 		left join {SOURCE_SCHEMA}.temp_visit_detail v on t1.probobsid = v.visit_detail_source_id
 		and v.source_table = 'Observation'
 	)		
-insert into chunks.stem_source_{CHUNK_ID} (domain_id, person_id, visit_occurrence_id, visit_detail_id, provider_id, concept_id, source_value,
+insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (domain_id, person_id, visit_occurrence_id, visit_detail_id, provider_id, concept_id, source_value,
 										 source_concept_id, type_concept_id, start_date, end_date, start_time, days_supply, dose_unit_concept_id,
 										 dose_unit_source_value, effective_drug_dose, lot_number, modifier_source_value, operator_concept_id, qualifier_concept_id,
 										 qualifier_source_value, quantity, range_high, range_low, refills, route_concept_id, route_source_value,
@@ -254,7 +254,7 @@ left join {TARGET_SCHEMA}.visit_detail vd on t2.visit_detail_id = vd.visit_detai
 --insert into stem_source table from referral
 WITH cte3 as (
 		select person_id
-		from chunks.chunk_person
+		from {CHUNK_SCHEMA}.chunk_person
 		where chunk_id = {CHUNK_ID}
 	),
 	t1 as (
@@ -269,7 +269,7 @@ WITH cte3 as (
 		inner join {TARGET_SCHEMA}.visit_detail vd on v.visit_detail_id = vd.visit_detail_id
 		where v.source_table = 'Observation'
 	)
-insert into chunks.stem_source_{CHUNK_ID} (domain_id, person_id, visit_occurrence_id, visit_detail_id, provider_id, concept_id, source_value,
+insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (domain_id, person_id, visit_occurrence_id, visit_detail_id, provider_id, concept_id, source_value,
 										 source_concept_id, type_concept_id, start_date, end_date, start_time, days_supply, dose_unit_concept_id,
 										 dose_unit_source_value, effective_drug_dose, lot_number, modifier_source_value, operator_concept_id, qualifier_concept_id,
 										 qualifier_source_value, quantity, range_high, range_low, refills, route_concept_id, route_source_value,
@@ -337,11 +337,11 @@ from t2
 left join {SOURCE_SCHEMA}.refservicetype rs on t2.refservicetypeid = rs.refservicetypeid;
 --	where v.visit_detail_start_date is not null  -- visit_detail_start_date was made NULL in map_in_chunks_initial
 
-create index idx_stem_source_{CHUNK_ID} on chunks.stem_source_{CHUNK_ID} (source_concept_id);
+create index idx_stem_source_{CHUNK_ID} on {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (source_concept_id);
 
 -----------------------------------------
 -- UPDATE CHUNK
 -----------------------------------------
-update chunks.chunk 
+update {CHUNK_SCHEMA}.chunk 
 set stem_source_tbl = concat('stem_source_',{CHUNK_ID}::varchar)
 where chunk_id = {CHUNK_ID};
