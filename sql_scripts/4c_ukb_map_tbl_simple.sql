@@ -118,8 +118,8 @@ INSERT INTO {TARGET_SCHEMA}.person (
 select 
 	t1.eid,
 	t2.target_concept_id,
-	t1."34",
-	t1."52",
+	t1.p34,
+	t1.p52,
 	NULL::int,
 	NULL::timestamp,
 	COALESCE(t3.target_concept_id, 0),
@@ -128,17 +128,17 @@ select
 	NULL::bigint,
 	NULL::int, 
 	t1.eid, 
-	CONCAT('9-', t1."31"),
+	CONCAT('9-', t1.p31),
 	t2.source_concept_id,
 	CASE
-		WHEN t1."21000" is not null then CONCAT('1001-', t1."21000")
+		WHEN t1.p21000_i0::integer is not null then CONCAT('1001-', t1.p21000_i0::integer)
 	END,
 	t3.source_concept_id,
 	null, 
 	NULL::int
 from {SOURCE_SCHEMA}.baseline as t1
-join ukb as t2 on CONCAT('9-', t1."31") = t2.source_code and t2.target_domain_id = 'Gender'
-left join ukb as t3 on CONCAT('1001-', t1."21000") = t3.source_code;
+join ukb as t2 on CONCAT('9-', t1.p31) = t2.source_code and t2.target_domain_id = 'Gender'
+left join ukb as t3 on CONCAT('1001-', t1.p21000_i0::integer) = t3.source_code;
 
 ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default;
 CREATE UNIQUE INDEX idx_person_id ON {TARGET_SCHEMA}.person (person_id ASC) TABLESPACE pg_default;
