@@ -92,6 +92,7 @@ def main():
 	try:
 		(ret, dir_study, db_conf, debug) = mapping_util.get_parameters()
 		if ret == True and dir_study != '':
+			data_provider = db_conf['data_provider']
 			database_type = db_conf['database_type']
 			if database_type[:3].upper() == 'HES':
 				database_type = 'hes'
@@ -135,7 +136,7 @@ def main():
 						if ret == True:
 							tbl_lookup = 'tbl_' + database_type + '_lookup'
 							tbl_lookup_list =  [tbl for tbl in db_conf[tbl_lookup]]
-							if 'ukb' == database_type:
+							if 'ukb' == data_provider:
 								file_lookup_list = [[dir_lookup + '*' + tbl.replace("lookup", "coding") + '*.tsv'] for tbl in tbl_lookup_list]
 							else:
 								file_lookup_list = [[dir_lookup + '*' + tbl + '*.txt'] for tbl in tbl_lookup_list]
