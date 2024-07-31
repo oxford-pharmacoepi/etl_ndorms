@@ -373,7 +373,7 @@ def main():
 						data_provider = db_conf['data_provider']
 						prefix = ''
 						with_quotes = True
-						if data_provider == 'cprd':
+						if data_provider == 'cprd' or data_provider == 'ukb':
 							extension = '.csv'
 							separator = '	'
 							with_quotes = False
