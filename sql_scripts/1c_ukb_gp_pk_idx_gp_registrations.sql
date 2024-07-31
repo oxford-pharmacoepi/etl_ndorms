@@ -5,6 +5,6 @@
 
 -- Theorotically, a patient should register the service once on a single day. 
 -- But I never see the real data, so I am not sure if I can make a PK as following.  
-alter table {SOURCE_SCHEMA}.gp_registrations add constraint pk_gp_registrations primary key (eid, data_provider, reg_date) USING INDEX TABLESPACE pg_default;
+-- alter table {SOURCE_SCHEMA}.gp_registrations add constraint pk_gp_registrations primary key (eid, data_provider, reg_date) USING INDEX TABLESPACE pg_default;
 
 CREATE INDEX IF NOT EXISTS idx_gp_registrations_eid ON {SOURCE_SCHEMA}.gp_registrations (eid) TABLESPACE pg_default;

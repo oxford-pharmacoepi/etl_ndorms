@@ -1,0 +1,1 @@
+alter table {SOURCE_SCHEMA}.lookup626 add constraint pk_626 primary key (code) USING INDEX TABLESPACE pg_default;
