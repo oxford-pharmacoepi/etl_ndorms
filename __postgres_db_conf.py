@@ -3,7 +3,7 @@ db_conf = dict({
 	'password': 'pwd',
 	'database': 'database_name',
 	'data_provider': 'name_of_provider',	#e.g. 'cprd', 'thin', 'ukb'('ukbiobank' for the exisiting mapped one)
-	'database_type': 'type of database',	#e.g. 'gold, 'aurum', 'hesapc'
+	'database_type': 'type of database',	#e.g. 'gold, 'aurum', 'hesapc', 'ukb'(baseline), 'ukb_gp', 'ukb_hesin'
 	'source_release_date': 'date',			#e.g. '2022-05-01'
 	'cdm_version': '5.3',					#e.g. '5.3', '5.4'
 	'cdm_etl_reference': 'name of developer',
@@ -35,8 +35,10 @@ db_conf = dict({
 	'tbl_hesae': ['hesae_patient', 'hesae_attendance', 'hesae_diagnosis', 'hesae_investigation', 'hesae_treatment', 'hesae_hrg', 'hesae_pathway'],
 	'tbl_ons': ['ons_death'],
 	'tbl_ncras': ['tumour', 'treatment'],
-	'tbl_ukb_lookup': ['lookup269', 'lookup270', 'lookup626', 'lookup10'],
-	'tbl_ukb': ['baseline', 'death', 'death_cause', 'gp_clinical', 'gp_registrations', 'gp_scripts', 'hesin', 'hesin_critical', 'hesin_delivery', 'hesin_diag', 'hesin_maternity', 'hesin_oper', 'hesin_psych', 'cancer'],
+	'tbl_ukb_gp_lookup': ['lookup626'],
+	'tbl_ukb': ['baseline', 'death', 'death_cause', 'cancer'],
+	'tbl_ukb_gp': ['baseline', 'death', 'death_cause', 'gp_clinical', 'gp_registrations', 'gp_scripts'],
+	'tbl_ukb_hesin': ['baseline', 'death', 'death_cause', 'hesin', 'hesin_critical', 'hesin_delivery', 'hesin_diag', 'hesin_maternity', 'hesin_oper', 'hesin_psych'],
 	'tbl_cprd': ['denominator', 'documentation', 'lookups', 'reference'],
 	'tbl_cdm': ['care_site', 'condition_era', 'condition_occurrence', 'death', 'device_exposure', 'dose_era', 'drug_era', 'drug_exposure', 'location', 'measurement', 'observation', 'observation_period', 'person', 'procedure_occurrence', 'provider', 'visit_detail', 'visit_occurrence'],
 	'tbl_cdm_voc': ['drug_strength', 'concept', 'concept_relationship', 'concept_ancestor', 'concept_synonym', 'vocabulary', 'relationship', 'concept_class', 'domain']
