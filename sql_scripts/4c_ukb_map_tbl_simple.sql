@@ -83,12 +83,12 @@ With ICD10_1 AS(
 	where source_vocabulary_id = 'UKB_DEATH_CAUSE_STCM'	
 ), death_cause_1 AS(
 	select t1.eid, t1.ins_index, t1.cause_icd10, t2.concept_id, t2.concept_id as source_concept_id, t2.concept_code as source_code
-	from source.death_cause as t1
+	from {SOURCE_SCHEMA}.death_cause as t1
 	join {VOCABULARY_SCHEMA}.concept as t2 on t1.cause_icd10 = t2.concept_code or t1.cause_icd10 = replace(t2.concept_code, '.', '')
 	where t2.vocabulary_id = 'ICD10'
 ), death_cause_2 AS(
 	select t1.eid, t1.ins_index, t1.cause_icd10, t3.concept_id, 0 as source_concept_id, t1.cause_icd10 as source_code
-	from source.death_cause as t1
+	from {SOURCE_SCHEMA}.death_cause as t1
 	left join death_cause_1 as t2 on t1.eid = t2.eid and t1.ins_index = t2.ins_index
 	join {VOCABULARY_SCHEMA}.concept as t3 on left(t1.cause_icd10, 3) = t3.concept_code 
 	where t2.eid is null and t3.vocabulary_id = 'ICD10'
