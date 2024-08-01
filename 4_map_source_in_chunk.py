@@ -258,7 +258,7 @@ def main():
 				while qa.lower() not in ['y', 'n', 'yes', 'no']:
 					qa = input('I did not understand that. Are you sure you want to MOVE all the mapping CODE in the "processed" folder (y/n):') 
 				if qa.lower() in ['y', 'yes']:
-					for f in glob.iglob(dir_sql + '3*.sql'):
+					for f in glob.iglob(dir_sql + '4*.sql'):
 						file_processed = dir_sql_processed + os.path.basename(f)
 						os.rename(f, file_processed)
 					print('Finished MOVING code files')	
