@@ -25,7 +25,7 @@ db_conf = dict({
 	'dir_lookup': '<project_directory>/lookups',
 	'dir_voc': '<project_directory>/vocabulary', #Do not change below here
 	'tbl_gold': ['additional', 'clinical', 'consultation', 'immunisation', 'patient', 'practice', 'referral', 'staff', 'test', 'therapy'],
-	'tbl_gold_lookup':['batchnumber', 'bnfcodes', 'common_dosages', 'entity', 'medical', 'packtype', 'product', 'scoremethod', 'txtfiles\\*.txt'],
+	'tbl_gold_lookup':['bnfcodes', 'common_dosages', 'entity', 'medical', 'packtype', 'product', 'scoremethod', 'txtfiles\\*.txt'],
 	'tbl_aurum' : ['practice', 'staff', 'patient', 'consultation', 'observation', 'problem', 'referral', 'drugissue'],
 	'tbl_aurum_lookup': ['gender', 'region', 'jobcat', 'numunit', 'quantunit', 'refservicetype', 'medicaldictionary', 'productdictionary', 'visiontoemismigrators'],
 	'tbl_aurum_denom': ['aurum_acceptablepats', 'aurum_practices'],
