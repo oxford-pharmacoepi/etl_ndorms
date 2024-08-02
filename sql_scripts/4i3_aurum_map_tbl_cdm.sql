@@ -23,7 +23,7 @@ with cte1 as (
 		s.source_concept_id as condition_source_concept_id,
 		NULL as condition_status_source_value
 	from {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
-	join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id
+	inner join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id
 	where s.domain_id = 'Condition'
 )
 insert into {TARGET_SCHEMA}.condition_occurrence(condition_occurrence_id, person_id, condition_concept_id, condition_start_date,
@@ -59,7 +59,9 @@ with cte2 as (
 		s.quantity,
 		s.days_supply,
 		s.sig,
-		s.route_concept_id,
+		case when t2.target_concept_id is NULL
+			then 0
+			else t2.target_concept_id end as route_concept_id,
 		s.lot_number,
 		s.provider_id,
 		s.visit_occurrence_id,
@@ -69,6 +71,7 @@ with cte2 as (
 		s.route_source_value,
 		s.dose_unit_source_value
 from {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
+left join {TARGET_SCHEMA}.source_to_standard_vocab_map t2 on t2.source_code = s.route_source_value and t2.source_vocabulary_id = 'AURUM_ROUTE_STCM'
 left join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id	--AD: 2023_05_18 changed JOIN to LEFT JOIN - it was always empty?????? as stem does not have visit_occurrence_ids for drugs without links to Problem. INTEGRATED WITH THE FOLLOWING, which is removed
 where s.domain_id = 'Drug'
 )
@@ -78,51 +81,6 @@ insert into {TARGET_SCHEMA}.drug_exposure(drug_exposure_id, person_id, drug_conc
 											sig, route_concept_id, lot_number, provider_id, visit_occurrence_id, visit_detail_id,
 											drug_source_value, drug_source_concept_id, route_source_value, dose_unit_source_value)
 select * from cte2;
-
---AD: INTEGRATED IN PREVIOUS QUERY--insert vaccinations that don't have a visit_occurrence_id
---AD: INTEGRATED IN PREVIOUS QUERYwith cte3 as (
---AD: INTEGRATED IN PREVIOUS QUERY	SELECT s.id as drug_exposure_id,
---AD: INTEGRATED IN PREVIOUS QUERY		s.person_id,
---AD: INTEGRATED IN PREVIOUS QUERY		s.concept_id as drug_concept_id,
---AD: INTEGRATED IN PREVIOUS QUERY		s.start_date as drug_exposure_start_date,
---AD: INTEGRATED IN PREVIOUS QUERY		s.start_date::TIMESTAMP as drug_exposure_start_datetime,
---AD: INTEGRATED IN PREVIOUS QUERY		s.end_date as drug_exposure_end_date,
---AD: INTEGRATED IN PREVIOUS QUERY		s.end_date::TIMESTAMP as drug_exposure_end_datetime,
---AD: INTEGRATED IN PREVIOUS QUERY		NULL::date as verbatim_end_date,
---AD: INTEGRATED IN PREVIOUS QUERY		s.type_concept_id as drug_type_concept_id,
---AD: INTEGRATED IN PREVIOUS QUERY		s.stop_reason,
---AD: INTEGRATED IN PREVIOUS QUERY		s.refills,
---AD: INTEGRATED IN PREVIOUS QUERY		s.quantity,
---AD: INTEGRATED IN PREVIOUS QUERY		s.days_supply,
---AD: INTEGRATED IN PREVIOUS QUERY		s.sig,
---AD: INTEGRATED IN PREVIOUS QUERY		s.route_concept_id,
---AD: INTEGRATED IN PREVIOUS QUERY		s.lot_number,
---AD: INTEGRATED IN PREVIOUS QUERY		s.provider_id,
---AD: INTEGRATED IN PREVIOUS QUERY		s.visit_occurrence_id,
---AD: INTEGRATED IN PREVIOUS QUERY		s.visit_detail_id,
---AD: INTEGRATED IN PREVIOUS QUERY		s.source_value as drug_source_value,
---AD: INTEGRATED IN PREVIOUS QUERY		s.source_concept_id as drug_source_concept_id,
---AD: INTEGRATED IN PREVIOUS QUERY		s.route_source_value,
---AD: INTEGRATED IN PREVIOUS QUERY		s.dose_unit_source_value
---AD: INTEGRATED IN PREVIOUS QUERY	from {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
---AD: INTEGRATED IN PREVIOUS QUERY	where s.source_concept_id in (
---AD: INTEGRATED IN PREVIOUS QUERY		35891522,--AstraZeneca vaccine
---AD: INTEGRATED IN PREVIOUS QUERY		35891709,--Pfizer vaccine
---AD: INTEGRATED IN PREVIOUS QUERY		35896177,--Jansen vaccine
---AD: INTEGRATED IN PREVIOUS QUERY		36122814,--Novavax Baxter vaccine
---AD: INTEGRATED IN PREVIOUS QUERY		35895095,--Spikevax Moderna vaccine
---AD: INTEGRATED IN PREVIOUS QUERY		36122820,--Valneva vaccine
---AD: INTEGRATED IN PREVIOUS QUERY		36122811 --Medicago vaccine
---AD: INTEGRATED IN PREVIOUS QUERY	)
---AD: INTEGRATED IN PREVIOUS QUERY	and s.domain_id = 'Drug'
---AD: INTEGRATED IN PREVIOUS QUERY	and s.visit_occurrence_id is null
---AD: INTEGRATED IN PREVIOUS QUERY)
---AD: INTEGRATED IN PREVIOUS QUERYinsert into {TARGET_SCHEMA}.drug_exposure(drug_exposure_id, person_id, drug_concept_id, drug_exposure_start_date,
---AD: INTEGRATED IN PREVIOUS QUERY											drug_exposure_start_datetime, drug_exposure_end_date, drug_exposure_end_datetime,
---AD: INTEGRATED IN PREVIOUS QUERY											verbatim_end_date, drug_type_concept_id, stop_reason, refills, quantity, days_supply,
---AD: INTEGRATED IN PREVIOUS QUERY											sig, route_concept_id, lot_number, provider_id, visit_occurrence_id, visit_detail_id,
---AD: INTEGRATED IN PREVIOUS QUERY											drug_source_value, drug_source_concept_id, route_source_value, dose_unit_source_value)
---AD: INTEGRATED IN PREVIOUS QUERYselect * from cte3;
 
 --------------------------------
 --insert into device_exposure from stem
@@ -148,7 +106,7 @@ with cte4 as (
 		s.source_value as device_source_value,
 		s.source_concept_id as device_source_concept_id
 	from {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
-	join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id
+	inner join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id
 	where s.domain_id = 'Device'
 )
 
@@ -182,7 +140,7 @@ with cte5 as (
 		s.source_concept_id as procedure_source_concept_id,
 		s.modifier_source_value
 	from {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
-	join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id
+	inner join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id
 	where s.domain_id = 'Procedure'
 )
 
@@ -195,7 +153,20 @@ select * from cte5;
 --------------------------------
 --insert into measurement from stem
 --------------------------------
-with cte6 as (
+with cte6a as (
+	SELECT distinct unit_source_value
+	from {CHUNK_SCHEMA}.stem_{CHUNK_ID}
+),
+cte6b as (select t1.unit_source_value,
+	CASE WHEN t2.target_concept_id is NOT NULL THEN t2.target_concept_id 
+		 WHEN t3.target_concept_id is NOT NULL THEN t3.target_concept_id
+		 ELSE 0 END AS unit_concept_id
+	from cte6a as t1
+	left join {TARGET_SCHEMA}.source_to_standard_vocab_map t2 on lower(t1.unit_source_value) = lower(t2.source_code) and t2.source_vocabulary_id = 'UCUM'
+	left join {TARGET_SCHEMA}.source_to_standard_vocab_map t3 on t2.target_concept_id is NULL AND lower(t1.unit_source_value) = lower(t3.source_code) 
+		and t3.source_vocabulary_id = 'AURUM_UNIT_STCM'
+),
+cte6 as	(
 	SELECT s.id as measurement_id,
 		s.person_id,
 		s.concept_id as measurement_concept_id,
@@ -210,9 +181,7 @@ with cte6 as (
 		s.operator_concept_id,
 		s.value_as_number,
 		s.value_as_concept_id,
-		case when stsvm.target_concept_id is NULL
-			then 0
-			else stsvm.target_concept_id end as unit_concept_id,
+		t2.unit_concept_id,
 		s.range_low,
 		s.range_high,
 		s.provider_id,
@@ -223,11 +192,9 @@ with cte6 as (
 		s.unit_source_value,
 		s.value_source_value
 	from {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
-	left join {TARGET_SCHEMA}.source_to_standard_vocab_map stsvm
-		on s.unit_source_value = stsvm.source_code
-		and stsvm.source_vocabulary_id = 'UCUM'
-	join {TARGET_SCHEMA}.visit_occurrence v
-		on s.visit_occurrence_id = v.visit_occurrence_id
+--	left join {TARGET_SCHEMA}.source_to_standard_vocab_map stsvm on s.unit_source_value = stsvm.source_code and stsvm.source_vocabulary_id = 'UCUM'
+	left join cte6b as t2 on lower(s.unit_source_value) = lower(t2.unit_source_value)
+	inner join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id
 	where s.domain_id = 'Measurement'
 )
 
@@ -239,22 +206,23 @@ insert into {TARGET_SCHEMA}.measurement(measurement_id, person_id, measurement_c
 										 value_source_value)
 select * FROM cte6;
 
--- Update covid tests in measurement with concept_id and value_as_concept_id from covid_test_mappings
---update {TARGET_SCHEMA}.measurement m
---set value_as_concept_id = t.value_as_concept_id
---from {SOURCE_SCHEMA}.covid_test_mappings t
---where m.measurement_source_value = t.measurement_source_value
---;
---update {TARGET_SCHEMA}.measurement m
---set measurement_concept_id = t.concept_id
---from {SOURCE_SCHEMA}.covid_test_mappings t
---where m.measurement_source_value = t.measurement_source_value
---	and t.concept_id is not null
---;
 --------------------------------
 --insert into observation from stem. To increase performance, could we change the "not in" into "in" ?
 --------------------------------
-with cte7 as (
+with cte7a as (
+	SELECT distinct unit_source_value
+	from {CHUNK_SCHEMA}.stem_{CHUNK_ID}
+),
+cte7b as (select t1.unit_source_value,
+	CASE WHEN t2.target_concept_id is NOT NULL THEN t2.target_concept_id 
+		 WHEN t3.target_concept_id is NOT NULL THEN t3.target_concept_id
+		 ELSE 0 END AS unit_concept_id
+	from cte7a as t1
+	left join {TARGET_SCHEMA}.source_to_standard_vocab_map t2 on lower(t1.unit_source_value) = lower(t2.source_code) and t2.source_vocabulary_id = 'UCUM'
+	left join {TARGET_SCHEMA}.source_to_standard_vocab_map t3 on t2.target_concept_id is NULL AND lower(t1.unit_source_value) = lower(t3.source_code) 
+		and t3.source_vocabulary_id = 'AURUM_UNIT_STCM'
+),
+cte7 as (
 	SELECT s.id as observation_id,
 		s.person_id,
 		s.concept_id as observation_concept_id,
@@ -269,9 +237,7 @@ with cte7 as (
 		s.value_as_string,
 		s.value_as_concept_id,
 		s.qualifier_concept_id,
-		case when stsvm.target_concept_id is NULL
-			then 0
-			else stsvm.target_concept_id end as unit_concept_id,
+		t3.unit_concept_id,
 		s.provider_id,
 		s.visit_occurrence_id,
 		s.visit_detail_id,
@@ -280,12 +246,12 @@ with cte7 as (
 		s.unit_source_value,
 		s.qualifier_source_value
 	from {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
-	left join {TARGET_SCHEMA}.source_to_standard_vocab_map stsvm
-		on s.unit_source_value = stsvm.source_code
-		and stsvm.source_vocabulary_id = 'UCUM'
-	join {TARGET_SCHEMA}.visit_occurrence v
-		on s.visit_occurrence_id = v.visit_occurrence_id
-	where s.domain_id not in ('Condition', 'Procedure', 'Measurement', 'Drug', 'Device')
+	left join (values('Condition', 'Procedure', 'Measurement', 'Drug', 'Device')) as t2(domain_id) on t2.domain_id = s.domain_id
+--	left join {TARGET_SCHEMA}.source_to_standard_vocab_map stsvm on s.unit_source_value = stsvm.source_code and stsvm.source_vocabulary_id = 'UCUM'
+	left join cte7b as t3 on lower(s.unit_source_value) = lower(t3.unit_source_value)
+	inner join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id
+--	where s.domain_id not in ('Condition', 'Procedure', 'Measurement', 'Drug', 'Device')
+	where t2.domain_id is null
 )
 insert into {TARGET_SCHEMA}.observation (observation_id, person_id, observation_concept_id, observation_date,
 										  observation_datetime, observation_type_concept_id, value_as_number, value_as_string,
