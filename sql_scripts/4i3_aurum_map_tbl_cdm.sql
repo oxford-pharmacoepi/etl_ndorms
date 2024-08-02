@@ -207,7 +207,7 @@ insert into {TARGET_SCHEMA}.measurement(measurement_id, person_id, measurement_c
 select * FROM cte6;
 
 --------------------------------
---insert into observation from stem. To increase performance, could we change the "not in" into "in" ?
+--insert into observation from stem.
 --------------------------------
 with cte7a as (
 	SELECT distinct unit_source_value
