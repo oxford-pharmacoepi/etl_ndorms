@@ -17,7 +17,6 @@ cte2 AS (
 ),
 cte3 AS (
 	SELECT
---	NEXTVAL('{TARGET_SCHEMA}.sequence_vo') AS visit_occurrence_id,
 	t1.patid AS person_id,
 	9201 AS visit_concept_id,
 	COALESCE(t1.admidate, t3.date_min, t1.discharged) AS visit_start_date, 
@@ -40,7 +39,7 @@ cte3 AS (
 	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t1.admimeth = t4.source_code and t4.source_vocabulary_id = 'HESAPC_ADMIMETH_STCM'
 ),
 cte4 AS (
-	SELECT visit_occurrence_id,
+	SELECT visit_occurrence_id, visit_source_value,
 	CASE WHEN visit_start_date <= visit_end_date 
 		THEN visit_start_date ELSE visit_end_date 
 	END AS visit_start_date,
@@ -75,7 +74,7 @@ cte5 AS (
 	t1.discharge_to_concept_id,
 	t1.preceding_visit_occurrence_id
 	from cte3 as t1
-	inner join cte4 as t2 on t1.person_id = t2.person_id
+	inner join cte4 as t2 on t1.person_id = t2.person_id and t1.visit_source_value = t2.visit_source_value
 	inner join cte1 as t3 on t1.person_id = t3.person_id
 	WHERE t2.visit_start_date >= t3.observation_period_start_date
 	AND t2.visit_end_date <= t3.observation_period_end_date
@@ -126,7 +125,6 @@ SELECT
 	t1.discharge_to_concept_id,
 	t2.preceding_visit_occurrence_id
 	FROM cte5 AS t1
---	INNER JOIN cte5 AS t2 ON t1.visit_occurrence_id = t2.visit_occurrence_id
 	LEFT JOIN cte6 AS t2 ON t1.visit_occurrence_id = t2.visit_occurrence_id;
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_vo;
