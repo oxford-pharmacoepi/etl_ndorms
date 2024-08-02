@@ -170,7 +170,6 @@ cte2 AS (
 	FROM cte1 as t0 
 	INNER JOIN {SOURCE_SCHEMA}.hes_episodes AS t1 ON t1.patid = t0.person_id
 	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t2 on t1.admimeth = t2.source_code and t2.source_vocabulary_id = 'HESAPC_ADMIMETH_STCM'
-
 ),
 cte3 AS (
 	SELECT person_id, visit_detail_source_value,
