@@ -13,14 +13,14 @@ CREATE TABLE {CHUNK_SCHEMA}.stem_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM) TABLESPA
 with cte1 as (
 	SELECT 	v.target_domain_id, v.target_concept_id, s.*
 	from {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} s
-	left join {TARGET_SCHEMA}.source_to_standard_vocab_map v
+	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map v
 		on s.source_concept_id = v.source_concept_id AND v.source_vocabulary_id = 'ICD10'
 	WHERE s.source_concept_id <> 0
 ),
 cte2 AS (
 	SELECT 	v.target_domain_id, v.target_concept_id, s.*
 	from {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} s
-	left join {TARGET_SCHEMA}.source_to_standard_vocab_map v
+	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map v
 		on s.source_value = v.source_code AND v.source_vocabulary_id = 'HESAE_DIAG_STCM'
 	WHERE s.source_concept_id = 0 
 ),
