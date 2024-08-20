@@ -149,7 +149,7 @@ def main():
 						curation = True
 					elif database_type == 'ons':
 						curation = True
-					elif database_type == 'ukb':
+					elif database_type == 'ukb' or database_type == 'ukb_gp':
 						curation = True
 					if ret == True and curation == True:
 						fname = dir_sql + '1d_' + database_type + '_curation.sql'
