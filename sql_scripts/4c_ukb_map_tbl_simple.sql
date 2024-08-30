@@ -38,7 +38,10 @@ select
 	t1.p52,
 	NULL::int,
 	NULL::timestamp,
-	COALESCE(t3.target_concept_id, 0),
+	CASE 
+		WHEN t3.target_domain_id <> 'Race' THEN 0
+		ELSE COALESCE(t3.target_concept_id, 0)
+	END as race_concept_id,
 	0,
 	NULL::bigint,
 	NULL::bigint,
@@ -70,17 +73,21 @@ With ICD10_1 AS(
 	where source_vocabulary_id = 'ICD10' 
 	group by source_concept_id, source_code
 	having count(*)=1 
+), STCM AS(
+	select source_concept_id, source_code, target_concept_id, source_vocabulary_id
+	from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map 
+	where source_vocabulary_id = 'UKB_DEATH_CAUSE_STCM'	
 ), ICD10 AS(
 	select t1.source_concept_id, t1.target_concept_id, t1.source_vocabulary_id
 	from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t1
 	join ICD10_1 as t2 on t1.source_concept_id = t2.source_concept_id
-	where t1.source_vocabulary_id = 'ICD10' 
-	
+	left join STCM as t3 on t3.source_concept_id = t1.source_concept_id
+	where t1.source_vocabulary_id = 'ICD10' and t3.source_concept_id is null
+
 	union
 	
 	select source_concept_id, target_concept_id, source_vocabulary_id
-	from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map 
-	where source_vocabulary_id = 'UKB_DEATH_CAUSE_STCM'	
+	from STCM 
 ), death_cause_1 AS(
 	select t1.eid, t1.ins_index, t1.cause_icd10, t2.concept_id, t2.concept_id as source_concept_id, t2.concept_code as source_code
 	from {SOURCE_SCHEMA}.death_cause as t1
