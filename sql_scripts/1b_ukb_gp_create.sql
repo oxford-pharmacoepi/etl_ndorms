@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.gp_registrations (
 )TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.gp_clinical (
+	id					BIGSERIAL 	NOT NULL,
 	eid					bigint,
 	data_provider		int,
 	event_dt			date,
@@ -60,6 +61,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.gp_clinical (
 )TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.gp_scripts (
+	id					BIGSERIAL 	NOT NULL,
 	eid					bigint,	
 	data_provider		int,
 	issue_date			date,

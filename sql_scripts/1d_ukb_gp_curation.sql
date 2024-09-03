@@ -1,11 +1,35 @@
+DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.gp_clinical CASCADE;
+
 DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.baseline CASCADE;
 DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.death CASCADE;
 DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.death_cause CASCADE;
+
+CREATE TABLE {SOURCE_NOK_SCHEMA}.gp_clinical (LIKE {SOURCE_SCHEMA}.gp_clinical) TABLESPACE pg_default;
 
 CREATE TABLE {SOURCE_NOK_SCHEMA}.baseline (LIKE {SOURCE_SCHEMA}.baseline) TABLESPACE pg_default;
 CREATE TABLE {SOURCE_NOK_SCHEMA}.death (LIKE {SOURCE_SCHEMA}.death) TABLESPACE pg_default;
 CREATE TABLE {SOURCE_NOK_SCHEMA}.death_cause (LIKE {SOURCE_SCHEMA}.death_cause) TABLESPACE pg_default;
 
+--------------------------------
+-- gp_clinical
+--------------------------------
+INSERT INTO {SOURCE_NOK_SCHEMA}.gp_clinical
+select * from {SOURCE_SCHEMA}.gp_clinical
+where read_2 = '.....' or read_3 = '.....' or read_2 = '@A2..';
+
+-- read_2 = 22A.. value1 = ^
+INSERT INTO {SOURCE_NOK_SCHEMA}.gp_clinical
+select * from {SOURCE_SCHEMA}.gp_clinical
+where read_2 = '22A..'
+and COALESCE(value1, value3) = '^';
+
+DELETE FROM {SOURCE_SCHEMA}.gp_clinical as t1 
+using {SOURCE_NOK_SCHEMA}.gp_clinical as t2
+WHERE t1.id = t2.id;
+
+--------------------------------
+-- baseline
+--------------------------------
 With cte AS(
 	select distinct eid 
 	from {SOURCE_SCHEMA}.gp_registrations 
@@ -30,6 +54,10 @@ DELETE FROM {SOURCE_SCHEMA}.baseline as t1
 using {SOURCE_NOK_SCHEMA}.baseline as t2
 WHERE t1.eid = t2.eid;
 
+
+--------------------------------
+-- death
+--------------------------------
 INSERT INTO {SOURCE_NOK_SCHEMA}.death
 (
 	select t1.*
@@ -44,6 +72,9 @@ using {SOURCE_NOK_SCHEMA}.death as t2
 WHERE t1.eid = t2.eid
 and t1.ins_index = t2.ins_index;
 
+--------------------------------
+-- death_cause
+--------------------------------
 With tmp AS(
 	select distinct t1.eid, t2.cause_icd10
 	from {SOURCE_SCHEMA}.death as t1
