@@ -24,6 +24,14 @@ def updatefromDeathONS():
 		)
 		cnx.autocommit = False
 		cursor1 = cnx.cursor()
+#################
+##Before update: show the count in {target_schema_to_link}.Death
+#################
+		print('----- Before Update -----')
+		cursor1.execute('select count(*) from ' + db_conf['target_schema_to_link']  + '.death')
+		death_n = cursor1.fetchone()[0]
+		print(db_conf['target_schema_to_link']  + '.death row count: ' + str(death_n))
+		
 #check if _patid_deleted exists
 		query1 = 'SELECT to_regclass(\'' + db_conf['target_schema_to_link'] + '._patid_deleted\')';
 		cursor1.execute(query1)
@@ -38,21 +46,36 @@ def updatefromDeathONS():
 		print('Calling ' + fname + ' ...')
 		queries = mapping_util.parse_queries_file(db_conf, fname)
 		cursor1.execute(queries[0]);
+		insert_death_n = cursor1.fetchone()[0]
+		print('INSERT ' + str(insert_death_n) + ' row(s)')
 			
 #update death from death_ond	
 		up_death_fname = dir_sql + '4d_ons_update_tbl_death.sql'
 		print('Calling ' + up_death_fname + ' ...')
 		queries2 = mapping_util.parse_queries_file(db_conf, up_death_fname)
 		cursor1.execute(queries2[0]);
+		update_death_n = cursor1.fetchone()[0]
+		print('UPDATE ' + str(update_death_n) + ' row(s)')
 
 #update observation_period
 		up_op_fname = dir_sql + '4d_ons_update_tbl_observation_period.sql'
 		print('Calling ' + up_op_fname + ' ...')
 		queries3 = mapping_util.parse_queries_file(db_conf, up_op_fname)
 		cursor1.execute(queries3[0]);
+		update_op_np = cursor1.fetchone()[0]
+		print('UPDATE ' + str(update_op_np) + ' row(s)')
 
 ## insert and update are in a single transaction
 		cnx.commit()
+		
+################
+##After update: show the count in {target_schema_to_link}.Death 
+################
+		print('----- After Update -----')
+		cursor1.execute('select count(*) from ' + db_conf['target_schema_to_link']  + '.death')
+		new_death_n = cursor1.fetchone()[0]
+		print(db_conf['target_schema_to_link']  + '.death row count: ' + str(new_death_n))
+		
 		cursor1.close()
 		cursor1 = None
 		cnx.close()
@@ -60,7 +83,7 @@ def updatefromDeathONS():
 	except:
 		ret = False
 		err = sys.exc_info()
-		print("Function = {0}, Error = {1}, {2}".format("get_table_max_ids", err[0], err[1]))
+		print("Function = {0}, Error = {1}, {2}".format("updatefromDeathONS", err[0], err[1]))
 		print('Transaction Rollback!!!')
 		if cursor1 != None:
 			cursor1.close()
@@ -115,7 +138,7 @@ def main():
 				qa = input('Do you want to update Death and Observation Period from Death_ONS (y/n):') 
 				while qa.lower() not in ['y', 'n', 'yes', 'no']:
 					qa = input('I did not understand that. Are you sure you want to update Death and Observation Period from Death_ONS (y/n):') 
-				if qa.lower() in ['y', 'yes']:
+				if qa.lower() in ['y', 'yes']:			
 					ret = updatefromDeathONS()
 # ---------------------------------------------------------
 # Report total time
