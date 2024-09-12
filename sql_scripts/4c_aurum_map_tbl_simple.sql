@@ -136,7 +136,7 @@ WITH cte3 as (
 		p.patid,
 		p.regstartdate,
 		least(p.cprd_ddate, p.regenddate, pr.lcd),
-		32882
+		32880
 	FROM {SOURCE_SCHEMA}.patient p
 	INNER JOIN {SOURCE_SCHEMA}.practice pr on p.pracid = pr.pracid
 )
