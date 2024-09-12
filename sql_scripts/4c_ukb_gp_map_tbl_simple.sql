@@ -258,7 +258,7 @@ INSERT INTO {TARGET_SCHEMA}.observation_period(
 		t1.person_id, 
 		LEAST(t2.reg_date, t3.min_event_dt, t4.min_issue_date), 
 		COALESCE(LEAST(t5.death_date, GREATEST(t3.max_event_dt, t4.max_issue_date)), to_date(RIGHT(current_database(), 8), 'YYYYMMDD')),
-		32882		-- same as AURUM 32880 (GOLD and HESAPC)
+		32880		-- same as GOLD 
 	from {TARGET_SCHEMA}.person as t1
 	left join reg as t2 on t1.person_id = t2.eid
 	left join clinical as t3 on t1.person_id = t3.eid
@@ -268,5 +268,6 @@ INSERT INTO {TARGET_SCHEMA}.observation_period(
 
 ALTER TABLE {TARGET_SCHEMA}.death DROP CONSTRAINT xpk_death;  
 
+ALTER TABLE {TARGET_SCHEMA}.observation_period ADD CONSTRAINT xpk_observation_period PRIMARY KEY (observation_period_id) USING INDEX TABLESPACE pg_default;
 CREATE INDEX IF NOT EXISTS idx_observation_period_id ON {TARGET_SCHEMA}.observation_period (person_id ASC) TABLESPACE pg_default;
 CLUSTER {TARGET_SCHEMA}.observation_period USING idx_observation_period_id;
