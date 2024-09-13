@@ -43,9 +43,9 @@ def main():
 			cursor1 = cnx.cursor()
 			query_str = "CREATE SCHEMA IF NOT EXISTS " + schema3;
 			cursor1.execute(query_str)
-			procedure_name = "public.merge_db_linked"
-#			query_str = "DROP PROCEDURE IF EXISTS " + procedure_name + "(IN schema1 text, IN schema2, IN schema3)";
-#			cursor1.execute(query_str)
+			procedure_name = schema3 + ".merge_db_linked"
+			query_str = "DROP PROCEDURE IF EXISTS " + procedure_name + "(IN schema1 text, IN schema2, IN schema3)";
+			cursor1.execute(query_str)
 			fname = dir_sql + 'merge_db_linked.sql'
 			query_str = open(fname).read()
 			print(query_str)
