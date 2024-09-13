@@ -175,7 +175,7 @@ GROUP BY
 	, ft.days_exposed
 ),
 cte0 AS (
-	SELECT CASE WHEN ('{TARGET_SCHEMA_TO_LINK}' = '') IS NOT FALSE 
+	SELECT CASE WHEN '{TARGET_SCHEMA_TO_LINK}' = ''
 		THEN 0 ELSE (SELECT COALESCE(max_id,0) from {TARGET_SCHEMA_TO_LINK}._max_ids 
 		WHERE lower(tbl_name) = 'drug_era') 
 		END as start_id
