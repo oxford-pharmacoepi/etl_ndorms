@@ -12,7 +12,7 @@ db_conf = dict({
 	'source_nok_schema': 'source_nok',
 	'target_schema': 'public',
 	'vocabulary_schema': 'public',			#e.g. 'public', 'vocabulary'
-	'target_schema_to_link': 'schema to which we want to link the data',	#e.g. 'public_old'
+	'target_schema_to_link': 'schema to which we want to link the data. If no link is required, it MUST be equal to target_schema',	#e.g. 'public_aurum'
 	'chunk_schema': 'chunk_hesop',
 	'max_workers' : 5,
 	'chunk_size': 1000,
