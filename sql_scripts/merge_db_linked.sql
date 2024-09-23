@@ -23,7 +23,10 @@ BEGIN
 	schema3 := 'public_gold_hesapc';
 	tbl_to_delete := '_patid_deleted';
 ------------------------------------------------------
--- 1. Create all tables in schema3 without constraints as they are in the main data source (schema1)
+-- 1. Vocabularies needs to be built BEFORE running the following code
+------------------------------------------------------
+-- 2. Create all tables in schema3 without constraints as they are in the main data source (schema1).
+-- Vocabulary tables will not be affected as already created
 ------------------------------------------------------
     FOR query1 IN 
 		SELECT format('CREATE TABLE IF NOT EXISTS %I.%I (LIKE %I.%I EXCLUDING CONSTRAINTS) TABLESPACE pg_default;', schema3, tablename, schema1, tablename)
@@ -35,19 +38,6 @@ BEGIN
 		RAISE NOTICE 'appliying %', query1;
 		EXECUTE query1;
     END LOOP;
-------------------------------------------------------
--- 2. Insert content to all vocabularies in schema3 (copy the more recent from schema1 or schema2 as appropriate)
-------------------------------------------------------
-    FOR query1 IN 
-		SELECT format('INSERT INTO %I.%I SELECT * FROM %I.%I', schema3, tablename, schema2, tablename)
-		FROM pg_tables WHERE schemaname = schema2
-		AND tablename IN ('drug_strength', 'concept', 'concept_relationship', 'concept_ancestor', 'concept_synonym', 'vocabulary', 'relationship', 'concept_class', 'domain')
-    LOOP
-		RAISE NOTICE 'appliying %', query1;
-		EXECUTE query1;
-    END LOOP;
-------------------------------------------------------
--- 2.B Add CONSTRAINTS for VOCABULARY AND recreate source_to_concept_map + related tables (py 3_load_cdm_vocabulary.py -FD:\cprd\...)
 ------------------------------------------------------
 -- 3. Insert content to schema3 from primary source (schema1) of all CDM tables non-patient related
 ------------------------------------------------------
@@ -86,7 +76,7 @@ BEGIN
 					race_source_value = t2.race_source_value
 					FROM %I.person AS t2 
 					WHERE t1.person_id = t2.person_id
-					AND t1.race_concept_id is null;', schema3, schema2);
+					AND (t1.race_concept_id = 0 OR t1.race_concept_id is null);', schema3, schema2);
 	RAISE NOTICE 'appliying %', query1;
 	EXECUTE query1;
 ------------------------------------------------------
@@ -158,7 +148,7 @@ BEGIN
 -- 11. Update schema3.CDM_SOURCE
 ------------------------------------------------------
 	query1 = format('UPDATE %I.cdm_source 
-					SET source_description = CONCAT(source_description, '' + '', upper(substring(%I, ''[^-]*$'')));', schema3, schema3);
+					SET source_description = CONCAT(source_description, '' + '', upper(substring(''%I'', ''[^_]*$'')));', schema3, schema3);
 	RAISE NOTICE 'appliying %', query1;
 	EXECUTE query1;
 -- 12. Add CONSTRAINTS for CDM (py 5_build_cdm_pk_idx_fk.py -FD:\cprd\...)
