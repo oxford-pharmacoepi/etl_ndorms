@@ -12,27 +12,35 @@ DECLARE
 	schema3 TEXT;
 	tbl_to_delete TEXT;
 	query1 TEXT;
+	results INTEGER;
 BEGIN
-	schema1 := 'public_old';
-	schema2 := 'public_hesae';
-	schema3 := 'public';
+--	schema1 := 'public_aurum';
+--	schema2 := 'public_hesapc';
+--	schema3 := 'public_aurum_hesapc';
+
+	schema1 := 'public_gold';
+	schema2 := 'public_hesapc';
+	schema3 := 'public_gold_hesapc';
 	tbl_to_delete := '_patid_deleted';
 ------------------------------------------------------
 -- 1. Create all tables in schema3 without constraints as they are in the main data source (schema1)
 ------------------------------------------------------
     FOR query1 IN 
 		SELECT format('CREATE TABLE IF NOT EXISTS %I.%I (LIKE %I.%I EXCLUDING CONSTRAINTS) TABLESPACE pg_default;', schema3, tablename, schema1, tablename)
-		FROM pg_tables WHERE schemaname = schema1
+		FROM pg_tables 
+		WHERE schemaname = schema1
+		AND RIGHT(tablename,4) <> '_tmp'
+		AND RIGHT(tablename,4) <> '_old'
     LOOP
 		RAISE NOTICE 'appliying %', query1;
 		EXECUTE query1;
     END LOOP;
 ------------------------------------------------------
--- 2. Insert content to all vocabularies in schema3 (in this case from the linked source, as more recent, schema2)
+-- 2. Insert content to all vocabularies in schema3 (copy the more recent from schema1 or schema2 as appropriate)
 ------------------------------------------------------
     FOR query1 IN 
-		SELECT format('INSERT INTO %I.%I SELECT * FROM %I.%I', schema3, tablename, schema2, tablename)
-		FROM pg_tables WHERE schemaname = schema2
+		SELECT format('INSERT INTO %I.%I SELECT * FROM %I.%I', schema3, tablename, schema1, tablename)
+		FROM pg_tables WHERE schemaname = schema1
 		AND tablename IN ('drug_strength', 'concept', 'concept_relationship', 'concept_ancestor', 'concept_synonym', 'vocabulary', 'relationship', 'concept_class', 'domain')
     LOOP
 		RAISE NOTICE 'appliying %', query1;
@@ -58,7 +66,7 @@ BEGIN
 			WHERE t2.patid is null;', schema3, tablename, schema1, tablename, schema1, tbl_to_delete)
 		FROM pg_tables WHERE schemaname = schema1
 		AND tablename IN ('condition_era', 'condition_occurrence', 'death', 'device_exposure', 'drug_era', 'drug_exposure', 'measurement', 'observation', 'observation_period', 'person', 'procedure_occurrence', 'visit_detail', 'visit_occurrence')
-    LOOP
+   LOOP
 		RAISE NOTICE 'appliying %', query1;
 		EXECUTE query1;
     END LOOP;
@@ -89,40 +97,61 @@ BEGIN
 -- 7. Insert content to source3.PROVIDER from source2.PROVIDER
 ------------------------------------------------------
    FOR query1 IN 
-		SELECT format('INSERT INTO %I.%I SELECT * FROM %I.%I;', schema3, tablename, schema2, tablename)
+		SELECT format('INSERT INTO %I.provider SELECT * FROM %I.provider;', schema3, schema2)
 		FROM pg_tables WHERE schemaname = schema1
-		AND tablename IN ('provider')
     LOOP
 		RAISE NOTICE 'appliying %', query1;
 		EXECUTE query1;
     END LOOP;
 ------------------------------------------------------
 -- 8. Update source3.OBSERVATION_PERIOD to consider all merged data sources (schema1, schema2)
--- NOT SURE WE HAVE TO CHANGE OBSERVATION_PERIOD in PUBLIC
+-- We leave the OBSERVATION_PERIOD records from Primary Care (GOLD/AURUM) unchanged (period_type_concept_id=32880)
+-- We insert/update an OBSERVATION_PERIOD record per patient with the "summary" of all observation_periods (period_type_concept_id=32882)
 ------------------------------------------------------
---	query1 = format('UPDATE %I.%I AS t1
---					SET 
---					observation_period_start_date = LEAST(t2.observation_period_start_date, t3.observation_period_start_date),
---					observation_period_end_date = GREATEST(t2.observation_period_end_date, t3.observation_period_end_date)
---					FROM %I.%I AS t2 
---					INNER JOIN %I.%I AS t3 ON t2.person_id = t3.person_id
---					WHERE t1.person_id = t2.person_id;', schema3, 'observation_period', schema1, 'observation_period', schema2, 'observation_period');
---	EXECUTE query1;
+	query1 = format('WITH cte as (SELECT 1 FROM %I.%I WHERE period_type_concept_id = 32882 LIMIT 1) SELECT count(*) FROM cte;', schema3, 'observation_period');
+	EXECUTE query1 INTO results;
+	IF results = 0
+		THEN 
+			query1 = format('DROP SEQUENCE IF EXISTS %I.sequence_op;',schema3);
+			EXECUTE query1;
+			query1 = format('CREATE SEQUENCE %I.sequence_op INCREMENT 1;',schema3);
+			EXECUTE query1;
+			query1 = format('SELECT SETVAL(''%I.sequence_op'', (SELECT max_id from %I._max_ids WHERE lower(tbl_name) = ''observation_period''));',schema3, schema1);
+			EXECUTE query1;
+			query1 = format('INSERT INTO %I.observation_period
+				SELECT 
+				NEXTVAL(''%I.sequence_op'') AS observation_period_id, 
+				t1.person_id,
+				LEAST(t1.observation_period_start_date, t2.observation_period_start_date) as observation_period_start_date,
+				GREATEST(t1.observation_period_end_date, t2.observation_period_end_date) as observation_period_end_date,
+				32882 as period_type_concept_id
+				FROM %I.observation_period AS t1
+				LEFT JOIN %I.observation_period AS t2 ON t1.person_id = t2.person_id
+				ORDER BY t1.person_id', schema3, schema3, schema1, schema2);
+			EXECUTE query1;
+			query1 = format('DROP SEQUENCE IF EXISTS %I.sequence_op;',schema3);
+			EXECUTE query1;
+		ELSE 
+			query1 = format('UPDATE %I.observation_period AS t1
+				SET 
+				observation_period_start_date = LEAST(t1.observation_period_start_date, t2.observation_period_start_date),
+				observation_period_end_date = GREATEST(t1.observation_period_end_date, t2.observation_period_end_date)
+				FROM %I.observation_period AS t2 
+				WHERE t1.person_id = t2.person_id
+				AND t1.period_type_concept_id = 32882
+				AND t2.period_type_concept_id = 32880;', schema3, schema2);
+			EXECUTE query1;
+	END IF;
 ------------------------------------------------------
--- 9. Insert content to source3._PATID_DELETED from source1._PATID_DELETED, if present
+-- 9. Insert content to source3._PATID_DELETED from source1._PATID_DELETED (always present)
 ------------------------------------------------------
-   FOR query1 IN 
-		SELECT format('INSERT INTO %I.%I SELECT * FROM %I.%I;', schema3, tablename, schema1, tablename)
-		FROM pg_tables WHERE schemaname = schema1
-		AND tablename IN ('_patid_deleted')
-    LOOP
-		RAISE NOTICE 'appliying %', query1;
-		EXECUTE query1;
-    END LOOP;
+	query1 = format('INSERT INTO %I._patid_deleted SELECT * FROM %I._patid_deleted;', schema3, schema1);
+	RAISE NOTICE 'appliying %', query1;
+	EXECUTE query1;
 -- 10. Add CONSTRAINTS for VOCABULARY AND recreate source_to_concept_map + related tables (py 3_load_cdm_vocabulary.py -FD:\cprd\...)
 -- 11. Add CONSTRAINTS for CDM (py 5_build_cdm_pk_idx_fk.py -FD:\cprd\...)
 -- 12. Create table _records (py 7_count_cdm_records.py -FD:\cprd\...)
--- 13. Run Achilles
--- 14. Check Tablespaces
+-- 13. Check Tablespaces
+-- 14. Run Achilles, DQD
 END
 $$;
