@@ -8,7 +8,6 @@ import sys
 import time
 import os
 from datetime import datetime
-#from importlib import import_module
 import psycopg2 as sql
 from importlib.machinery import SourceFileLoader
 
@@ -36,7 +35,7 @@ def main():
 				password=db_conf['password'],
 				database=database
 			)
-			schema1 = db_conf['target_schema_to_link'];	#public_old
+			schema1 = db_conf['target_schema_to_link'];	#public_aurum
 			schema2 = db_conf['target_schema']; 		#public_hesop
 			schema3 = 'public';
 			dir_sql = os.getcwd() + "\\sql_scripts\\"
