@@ -109,9 +109,8 @@ def main():
 			if qa.lower() in ['y', 'yes']:
 				print('Build PKs and IDXs ...')
 				sql_file_list = sorted(glob.iglob(dir_sql + '5a_cdm_pk_idx_*.sql'))
-				if ret == True:
-					sql_file_list.extend(sorted(glob.iglob(dir_sql + '5a' + db_conf['cdm_version'][2] + '_cdm_pk_idx_*.sql')))
-				if db_conf['source_schema'] == '': # For data provided already mapped
+				sql_file_list.extend(sorted(glob.iglob(dir_sql + '5a' + db_conf['cdm_version'][2] + '_cdm_pk_idx_*.sql')))
+				if db_conf['source_schema'] == '': # For data provided already mapped or data being merged
 					sql_file_list.extend(sorted(glob.iglob(dir_sql + '5a__cdm_pk_idx_*.sql')))
 				ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, True)
 # ---------------------------------------------------------
