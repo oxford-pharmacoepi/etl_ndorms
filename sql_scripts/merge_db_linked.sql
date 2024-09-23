@@ -154,9 +154,17 @@ BEGIN
 	query1 = format('INSERT INTO %I._patid_deleted SELECT * FROM %I._patid_deleted;', schema3, schema1);
 	RAISE NOTICE 'appliying %', query1;
 	EXECUTE query1;
--- 11. Add CONSTRAINTS for CDM (py 5_build_cdm_pk_idx_fk.py -FD:\cprd\...)
--- 12. Create table _records (py 7_count_cdm_records.py -FD:\cprd\...)
--- 13. Check Tablespaces
--- 14. Run Achilles, DQD
+------------------------------------------------------
+-- 11. Update schema3.CDM_SOURCE
+------------------------------------------------------
+	query1 = format('UPDATE %I.cdm_source 
+					SET source_description = CONCAT(source_description, '' + '', upper(substring(%I, ''[^-]*$'')));', schema3, schema3);
+	RAISE NOTICE 'appliying %', query1;
+	EXECUTE query1;
+-- 12. Add CONSTRAINTS for CDM (py 5_build_cdm_pk_idx_fk.py -FD:\cprd\...)
+-- 13. Create table _records (py 7_count_cdm_records.py -FD:\cprd\...)
+-- When all merges are complete, 
+-- 		14. Check Tablespaces
+-- 		15. Run Achilles, DQD
 END
 $$;
