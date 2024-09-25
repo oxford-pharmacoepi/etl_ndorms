@@ -162,7 +162,6 @@ def main():
 						qa = input('I did not understand that. Are you sure you want to CREATE PK/IDXs for all the LOOKUP tables (y/n):') 
 					if qa.lower() in ['y', 'yes']:
 						fname = dir_sql + '2c_' + database_type + '_lookup_pk_idx.sql'
-						print(fname + ' ...')
 						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
 						if ret == True:
 							print('Finished applying indexes LOOKUP tables')	
