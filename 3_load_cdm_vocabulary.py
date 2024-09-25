@@ -27,7 +27,7 @@ def check_stcm_vocabulary_id(fcsv, debug):
 			reader = csv.DictReader(csvFile)		
 			stcm_id = os.path.basename(fcsv).replace('.csv', '')
 			for row in reader:
-				if(stcm_id != row['source_vocabulary_id']):
+				if (stcm_id != row['source_vocabulary_id']):
 					ret = False
 					print("source_vocabulary_id is not as same as the stcm csv file name: " + stcm_id)
 					break
@@ -439,7 +439,8 @@ def main():
 # ---------------------------------------------------------
 						for fname in csv_file_list:
 							ret = check_stcm_vocabulary_id(fname, False)
-					
+							if ret == False:
+								break
 					if ret == True:
 						#Truncate 
 						query = 'TRUNCATE TABLE ' + vocabulary_schema + '.source_to_concept_map CASCADE '
