@@ -96,6 +96,8 @@ def main():
 			database_type = db_conf['database_type']
 			if database_type[:3].upper() == 'HES':
 				database_type = 'hes'
+			elif database_type[:5].upper() == 'NCRAS':
+				database_type = 'ncras'
 			source_schema = db_conf['source_schema']
 			dir_sql = os.getcwd() + '\\sql_scripts\\'
 			dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
