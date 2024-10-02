@@ -26,8 +26,8 @@ SELECT row_number() over (order by person_id, visit_start_date, care_site_id) as
 		0 as visit_source_concept_id,
 		0 as admitted_from_concept_id,
 		NULL::varchar(50) as admitted_from_source_value,
-		0 as discharged_to_source_value,
-		NULL::varchar(50) as discharge_to_source_value,
+		0 as discharged_to_concept_id,
+		NULL::varchar(50) as discharged_to_source_value,
 		NULL::bigint as preceding_visit_occurrence_id
 INTO {TARGET_SCHEMA}.visit_occurrence 
 FROM cte1;
@@ -43,6 +43,7 @@ CREATE INDEX idx_visit_concept_id ON {TARGET_SCHEMA}.visit_occurrence (visit_con
 drop table if exists {TARGET_SCHEMA}.visit_detail CASCADE;
 --this first round does not take into account the field preceding_visit_detail_id
 --AD: preceding_visit_detail_id is always NULL in the final table. Check!
+
 with cte2 as (
 select t1.visit_detail_id,
 	t1.person_id,
@@ -56,10 +57,10 @@ select t1.visit_detail_id,
 	t1.care_site_id,
 	NULL::varchar(50) as visit_detail_source_value,
 	0 as visit_detail_source_concept_id,
-	NULL::varchar(50) as admitted_from_source_value,
 	0 as admitted_from_concept_id,
-	NULL::varchar(50) as discharge_to_source_value,
-	0 as discharged_to_source_value,
+	NULL::varchar(50) as admitted_from_source_value,
+	NULL::varchar(50) as discharged_to_source_value,
+	0 as discharged_to_concept_id,
 	NULL::bigint preceding_visit_detail_id,
 	t2.visit_detail_id as parent_visit_detail_id
 from {SOURCE_SCHEMA}.temp_visit_detail t1
