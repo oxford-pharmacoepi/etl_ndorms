@@ -43,7 +43,7 @@ def main():
 				ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)
 				if ret == True:
 					cdm_version = db_conf['cdm_version']
-					if cdm_version == '5.3':
+					if cdm_version[:3] == '5.3':
 						fname = dir_sql + '4b_OMOPCDM_postgresql_5_3_ddl.sql'
 					elif cdm_version[:3] == '5.4':
 						fname = dir_sql + '4b_OMOPCDM_postgresql_5_4_ddl.sql'
@@ -98,10 +98,10 @@ def main():
 					query1 += '(SELECT vocabulary_version FROM ' + vocabulary_schema + '.vocabulary WHERE vocabulary_id = \'None\')'
 					cursor1.execute(query1)
 # ---------------------------------------------------------
-# If this is a linked dataset, create/recreate _max_ids table
+# If this is a linked dataset, create/recreate _max_ids table in target_schema_to_link
 # ---------------------------------------------------------
 			if ret == True:
-				if 'target_schema_to_link' in db_conf and db_conf['target_schema_to_link'] != '':
+				if 'target_schema_to_link' in db_conf and db_conf['target_schema_to_link'] != db_conf['target_schema']:
 					target_schema_to_link = db_conf['target_schema_to_link']
 					qa = input('Do you want to CREATE/RECREATE the _max_ids table in ' + target_schema_to_link + '? (y/n):').lower() 
 					while qa not in ['y', 'n', 'yes', 'no']:
@@ -132,7 +132,7 @@ def main():
 				if qa in ['y', 'yes']:
 					fname = dir_sql + '4c_' + database_type + '_map_tbl_simple.sql'
 					print('Executing ' + fname + ' ... (PERSON, OBSERVATION_PERIOD, etc.)')
-					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
+					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)
 # ---------------------------------------------------------
 # Tables to load: TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL
 # ---------------------------------------------------------
@@ -144,7 +144,7 @@ def main():
 					if qa in ['y', 'yes']:
 						fname = dir_sql + '4d' + db_conf['cdm_version'][2] + '_' + database_type + '_map_tbl_tmp.sql'
 						print('Executing ' + fname + ' ... (TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL)')
-						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)
 # ---------------------------------------------------------
 # Tables to load: VISIT_OCCURRENCE, VISIT_DETAIL
 # ---------------------------------------------------------
@@ -155,7 +155,7 @@ def main():
 				if qa in ['y', 'yes']:
 					fname = dir_sql + '4e' + db_conf['cdm_version'][2] + '_' + database_type + '_map_tbl_visit.sql'
 					print('Executing ' + fname + ' ... (VISIT_OCCURRENCE, VISIT_DETAIL)')
-					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
+					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)
 # ---------------------------------------------------------
 # Create/Recreate CHUNK table and any chunk job previously done?
 # ---------------------------------------------------------
@@ -183,11 +183,11 @@ def main():
 									cursor1.execute(query1)
 						fname = dir_sql + '4f_' + database_type + '_map_tbl_chunk.sql'
 						print('Executing ' + fname + ' ... (CHUNK)')
-						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)
 # Necessary to recall 4b here if the CDM tables were deleted
 						if ret == True:
 							cdm_version = db_conf['cdm_version']
-							if cdm_version == '5.3':
+							if cdm_version[:3] == '5.3':
 								fname = dir_sql + '4b_OMOPCDM_postgresql_5_3_ddl.sql'
 							elif cdm_version[:3] == '5.4':
 								fname = dir_sql + '4b_OMOPCDM_postgresql_5_4_ddl.sql'
@@ -202,6 +202,14 @@ def main():
 							qa = input('I did not understand that. Would you like to progress with chunking? (y/n):').lower()
 						if qa in ['y', 'yes']:
 # ---------------------------------------------------------
+# Analyse already created tables before chunking
+# ---------------------------------------------------------
+							tbl_list = [target_schema + "." + tbl for tbl in ('care_site', 'death', 'location', 'observation_period', 'person', 'provider', 'visit_detail', 'visit_occurrence')]
+							for tbl in tbl_list:
+								query1 = 'VACUUM (ANALYZE) ' + tbl
+								print('Executing ' + query1)
+								cursor1.execute(query1)
+# ---------------------------------------------------------
 # Select not completed chunk ids
 # ---------------------------------------------------------
 							cnx.autocommit = False
@@ -214,6 +222,11 @@ def main():
 							cursor1.execute(query1)
 							chunk_id_array = cursor1.fetchall()
 							chunk_id_list = list(map(lambda x: x[0], chunk_id_array))
+# Temporary disable Autovacuum while chunking
+							tbl_list = [target_schema + "." + tbl for tbl in db_conf['tbl_cdm']]
+							for tbl in tbl_list:
+								query1 = 'ALTER TABLE ' + tbl + ' SET (autovacuum_enabled = False)'
+								cursor1.execute(query1)
 # ---------------------------------------------------------
 # Loop through the chunks executing 4g, 4h and 4i each time before commit
 # ---------------------------------------------------------
@@ -232,7 +245,7 @@ def main():
 									ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
 								if ret == True:
 									fname = dir_sql + '4i' + db_conf['cdm_version'][2] + '_' + database_type + '_map_tbl_cdm.sql'
-									print('Executing ' + fname + ' ... (CONDITION_OCCURRENCE, DRUG_EXPOSURE, DEVICE_EXPOSURE, PROCEDURE_OCCURRENCE, MEASUREMENT, OBSERVATION)')
+									print('Executing ' + fname + ' ... (CONDITION_OCCURRENCE, DEVICE_EXPOSURE, DRUG_EXPOSURE, MEASUREMENT, OBSERVATION, PROCEDURE_OCCURRENCE, SPECIMEN)')
 									ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
 								if ret == True:
 									cnx.commit()
@@ -241,6 +254,16 @@ def main():
 								if ret == False:
 									break
 							if ret == True:
+# Analyse tables after chunking
+								cnx.autocommit = True
+								for tbl in tbl_list:
+									query1 = 'VACUUM (ANALYZE) ' + tbl
+									print('Executing ' + query1)
+									cursor1.execute(query1)
+# Re-enable Autovacuum after chunking
+								for tbl in tbl_list:
+									query1 = 'ALTER TABLE ' + tbl + ' SET (autovacuum_enabled = True)'
+									cursor1.execute(query1)
 								msg = mapping_util.calc_time(time.time() - chunks_time1)
 								print(f'Full CHUNK process completed in {msg}')
 			cnx.close()
