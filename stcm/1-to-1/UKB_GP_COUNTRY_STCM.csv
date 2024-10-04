@@ -1,5 +1,0 @@
-﻿source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
-1,0,UKB_GP_COUNTRY_STCM,England (Vision),42035287,OSM,1970-01-01,2099-12-31,
-2,0,UKB_GP_COUNTRY_STCM,Scotland,42035289,OSM,1970-01-01,2099-12-31,
-3,0,UKB_GP_COUNTRY_STCM,England (TPP),42035287,OSM,1970-01-01,2099-12-31,
-4,0,UKB_GP_COUNTRY_STCM,Wales,42034589,OSM,1970-01-01,2099-12-31,
