@@ -161,7 +161,7 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DEVICE_EXPOSURE (
 			device_source_value varchar(250) NULL,
 			device_source_concept_id integer NULL,
 			unit_concept_id integer NULL,
-			unit_source_value varchar(50) NULL,
+			unit_source_value varchar(75) NULL,
 			unit_source_concept_id integer NULL )
 			TABLESPACE pg_default;
 
@@ -185,10 +185,10 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.MEASUREMENT (
 			visit_detail_id bigint NULL,
 			measurement_source_value varchar(250) NULL,
 			measurement_source_concept_id integer NULL,
-			unit_source_value varchar(50) NULL,
+			unit_source_value varchar(60) NULL,
 			unit_source_concept_id integer NULL,
 			value_source_value varchar(50) NULL,
-			measurement_event_id integer NULL,
+			measurement_event_id bigint NULL,
 			meas_event_field_concept_id integer NULL )
 			TABLESPACE pg_default;
 
@@ -201,7 +201,7 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.OBSERVATION (
 			observation_datetime TIMESTAMP NULL,
 			observation_type_concept_id integer NOT NULL,
 			value_as_number NUMERIC NULL,
-			value_as_string varchar(60) NULL,
+			value_as_string varchar(350) NULL,
 			value_as_concept_id integer NULL,
 			qualifier_concept_id integer NULL,
 			unit_concept_id integer NULL,
@@ -210,7 +210,7 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.OBSERVATION (
 			visit_detail_id bigint NULL,
 			observation_source_value varchar(250) NULL,
 			observation_source_concept_id integer NULL,
-			unit_source_value varchar(50) NULL,
+			unit_source_value varchar(100) NULL,
 			qualifier_source_value varchar(50) NULL,
 			value_source_value varchar(50) NULL,
 			observation_event_id integer NULL,
@@ -477,7 +477,7 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem_source
     provider_id bigint,
     id bigint,
     concept_id integer,
-    source_value character varying(250) COLLATE pg_catalog."default",
+    source_value character varying(500) COLLATE pg_catalog."default",
     source_concept_id integer,
     type_concept_id integer,
     start_date date,
@@ -502,10 +502,11 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem_source
     stop_reason character varying(20) COLLATE pg_catalog."default",
     unique_device_id character varying(50) COLLATE pg_catalog."default",
     unit_concept_id integer,
-    unit_source_value character varying(50) COLLATE pg_catalog."default",
+    unit_source_value character varying(300) COLLATE pg_catalog."default",
+	unit_source_concept_id integer,
     value_as_concept_id integer,
     value_as_number double precision,
-    value_as_string character varying(50) COLLATE pg_catalog."default",
+    value_as_string character varying(800) COLLATE pg_catalog."default",
     value_source_value character varying(50) COLLATE pg_catalog."default",
     anatomic_site_concept_id integer,
     disease_status_concept_id integer,
@@ -513,6 +514,10 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem_source
     anatomic_site_source_value character varying(50) COLLATE pg_catalog."default",
     disease_status_source_value character varying(50) COLLATE pg_catalog."default",
     modifier_concept_id integer,
+	measurement_event_id bigint,
+	meas_event_field_concept_id integer,
+	observation_event_id bigint,
+	obs_event_field_concept_id integer,
     stem_source_table character varying(255) COLLATE pg_catalog."default",
     stem_source_id character varying(255) COLLATE pg_catalog."default")
 	TABLESPACE pg_default;
@@ -551,10 +556,11 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem
     stop_reason character varying(20) COLLATE pg_catalog."default",
     unique_device_id character varying(50) COLLATE pg_catalog."default",
     unit_concept_id integer,
-    unit_source_value character varying(50) COLLATE pg_catalog."default",
+    unit_source_value character varying(250) COLLATE pg_catalog."default",
+	unit_source_concept_id integer,
     value_as_concept_id integer,
     value_as_number double precision,
-    value_as_string character varying(50) COLLATE pg_catalog."default",
+    value_as_string character varying(800) COLLATE pg_catalog."default",
     value_source_value character varying(50) COLLATE pg_catalog."default",
     anatomic_site_concept_id integer,
     disease_status_concept_id integer,
@@ -562,6 +568,10 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem
     anatomic_site_source_value character varying(50) COLLATE pg_catalog."default",
     disease_status_source_value character varying(50) COLLATE pg_catalog."default",
     modifier_concept_id integer,
+	measurement_event_id bigint,
+	meas_event_field_concept_id integer,
+	observation_event_id bigint,
+	obs_event_field_concept_id integer,
     stem_source_table character varying(255) COLLATE pg_catalog."default",
     stem_source_id character varying(255) COLLATE pg_catalog."default")
 	TABLESPACE pg_default;
