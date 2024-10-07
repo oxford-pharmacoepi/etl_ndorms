@@ -137,7 +137,7 @@ def main():
 # Tables to load: TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL
 # ---------------------------------------------------------
 			if ret == True:
-				if database_type == 'aurum':
+				if database_type == 'aurum' or 'ukb_gp'== database_type or 'ukb_cancer'== database_type:
 					qa = input('Do you want to CREATE/RECREATE the temp tables (TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL)? (y/n):').lower() 
 					while qa not in ['y', 'n', 'yes', 'no']:
 						qa = input('I did not understand that. Do you want to CREATE/RECREATE the temp tables (TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL? (y/n):').lower()
@@ -149,18 +149,19 @@ def main():
 # Tables to load: VISIT_OCCURRENCE, VISIT_DETAIL
 # ---------------------------------------------------------
 			if ret == True:
-				qa = input('Do you want to CREATE/RECREATE the visit tables (VISIT_OCCURRENCE, VISIT_DETAIL)? (y/n):').lower() 
-				while qa not in ['y', 'n', 'yes', 'no']:
-					qa = input('I did not understand that. Do you want to CREATE/RECREATE the visit tables (VISIT_OCCURRENCE, VISIT_DETAIL)? (y/n):').lower()
-				if qa in ['y', 'yes']:
-					fname = dir_sql + '4e' + db_conf['cdm_version'][2] + '_' + database_type + '_map_tbl_visit.sql'
-					print('Executing ' + fname + ' ... (VISIT_OCCURRENCE, VISIT_DETAIL)')
-					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)
+				if 'ukb'!= database_type: #ukb baseline has no event tables
+					qa = input('Do you want to CREATE/RECREATE the visit tables (VISIT_OCCURRENCE, VISIT_DETAIL)? (y/n):').lower() 
+					while qa not in ['y', 'n', 'yes', 'no']:
+						qa = input('I did not understand that. Do you want to CREATE/RECREATE the visit tables (VISIT_OCCURRENCE, VISIT_DETAIL)? (y/n):').lower()
+					if qa in ['y', 'yes']:
+						fname = dir_sql + '4e' + db_conf['cdm_version'][2] + '_' + database_type + '_map_tbl_visit.sql'
+						print('Executing ' + fname + ' ... (VISIT_OCCURRENCE, VISIT_DETAIL)')
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)
 # ---------------------------------------------------------
 # Create/Recreate CHUNK table and any chunk job previously done?
 # ---------------------------------------------------------
 			if ret == True:
-				if database_type not in ('hesop'): #HES_OP does not use STEM and does not need chunking
+				if database_type not in ('hesop', 'ukb'): #HES_OP does not use STEM and does not need chunking #ukb baseline does not need chunking
 					qa = input('Do you want to CREATE/RECREATE the chunk table and remove any chunk work previously done? (y/n):').lower() 
 					while qa not in ['y', 'n', 'yes', 'no']:
 						qa = input('I did not understand that. Do you want to CREATE/RECREATE the chunk table and remove any chunk work previously done? (y/n):').lower()
