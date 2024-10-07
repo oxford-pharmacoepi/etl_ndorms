@@ -1,0 +1,1 @@
+alter table {SOURCE_SCHEMA}.cancer add constraint pk_cancer primary key (eid) USING INDEX TABLESPACE pg_default;
