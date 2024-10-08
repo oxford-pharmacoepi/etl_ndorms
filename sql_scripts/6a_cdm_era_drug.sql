@@ -103,20 +103,22 @@ WITH ctePreDrugTarget(drug_exposure_id, person_id, ingredient_concept_id, drug_e
  *This means no persistence window was implemented. Now we CAN add the persistence window to calculate eras.
  */
 --------------------------------------------------------------------------------------------------------------
-, cteFinalTarget(row_number, person_id, ingredient_concept_id, drug_sub_exposure_start_date, drug_sub_exposure_end_date, drug_exposure_count, days_exposed) AS
-(
+--, cteFinalTarget(row_number, person_id, ingredient_concept_id, drug_sub_exposure_start_date, drug_sub_exposure_end_date, drug_exposure_count, days_exposed) AS
+--(
 	SELECT
 		row_number
 		, person_id
-		, drug_concept_id
+		, drug_concept_id as ingredient_concept_id
 		, drug_sub_exposure_start_date
 		, drug_sub_exposure_end_date
 		, drug_exposure_count
 		, drug_sub_exposure_end_date - drug_sub_exposure_start_date AS days_exposed
-	FROM cteSubExposures
-)
---------------------------------------------------------------------------------------------------------------
-, cteEndDates (person_id, ingredient_concept_id, end_date) AS -- the magic
+	INTO cteFinalTarget
+	FROM cteSubExposures;
+	
+CREATE INDEX idx_cteFinalTarget ON cteFinalTarget (person_id ASC, ingredient_concept_id ASC, drug_sub_exposure_start_date ASC);
+	
+WITH cteEndDates (person_id, ingredient_concept_id, end_date) AS -- the magic
 (
 	SELECT
 		person_id
@@ -195,6 +197,8 @@ SELECT drug_era_id + cte0.start_id as drug_era_id, person_id, drug_concept_id,
 FROM cteDrugEraEnds
 GROUP BY person_id, drug_concept_id, drug_era_end_date
 ORDER BY person_id, drug_concept_id) as t;
+
+DROP TABLE IF EXISTS cteFinalTarget;
 
 --------------------------------
 -- Add PK / IDX / FK to DRUG_ERA
