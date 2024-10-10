@@ -10,7 +10,7 @@ With base AS(
 	from base AS b
 	join {VOCABULARY_SCHEMA}.concept_relationship cr on cr.concept_id_1 = b.target_concept_id
 	join {VOCABULARY_SCHEMA}.concept c on b.concept_id_2 = c.concept_id
-	where b.relationship_id = 'Maps to'
+	where b.relationship_id in ('Maps to', 'Maps to value')
 ), rep_by AS(
 	select distinct b.source_code, b.source_concept_id, b.source_vocabulary_id, b.source_code_description, b.concept_id_2
 	from base AS b
@@ -25,7 +25,7 @@ With base AS(
 	from rep_by r
 	join {VOCABULARY_SCHEMA}.concept_relationship cr on cr.concept_id_1 = r.concept_id_2
 	join {VOCABULARY_SCHEMA}.concept c on cr.concept_id_2 = c.concept_id
-	where cr.relationship_id = 'Maps to'
+	where cr.relationship_id in ('Maps to', 'Maps to value')
 ), poss_eq_to AS(
 	select distinct b.source_code, b.source_concept_id, b.source_vocabulary_id, b.source_code_description, b.concept_id_2
 	from base AS b
@@ -40,7 +40,7 @@ With base AS(
 	from poss_eq_to r
 	join {VOCABULARY_SCHEMA}.concept_relationship cr on cr.concept_id_1 = r.concept_id_2
 	join {VOCABULARY_SCHEMA}.concept c on cr.concept_id_2 = c.concept_id
-	where cr.relationship_id = 'Maps to'
+	where cr.relationship_id in ('Maps to', 'Maps to value')
 ), poss_eq_from AS(
 	select distinct b.source_code, b.source_concept_id, b.source_vocabulary_id, b.source_code_description, b.concept_id_2
 	from base AS b
@@ -58,7 +58,7 @@ insert into {VOCABULARY_SCHEMA}.temp_stcm(
 		from poss_eq_from r
 		join {VOCABULARY_SCHEMA}.concept_relationship cr on cr.concept_id_1 = r.concept_id_2
 		join {VOCABULARY_SCHEMA}.concept c on cr.concept_id_2 = c.concept_id
-		where cr.relationship_id = 'Maps to'
+		where cr.relationship_id in ('Maps to', 'Maps to value')
 	) result
 	order by source_code
 );
