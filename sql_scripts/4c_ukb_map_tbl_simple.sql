@@ -1,4 +1,28 @@
 --------------------------------
+-- LOCATION
+--------------------------------
+With cte as(
+select distinct target_concept_id, target_concept_name
+from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map
+where source_vocabulary_id = 'UKB_COUNTRY_STCM'
+)
+insert into {TARGET_SCHEMA}.location
+select 
+	row_number() over (order by target_concept_name) as location_id, 
+	NULL as address_1,
+	NULL as address_2, 
+	NULL as city, 
+	NULL as state, 
+	NULL as zip, 
+	target_concept_name as county,
+	NULL as location_source_value,
+	target_concept_id as country_concept_id,
+	target_concept_name as country_source_value,
+	NULL as latitude,
+	NULL as longitude
+from cte;
+
+--------------------------------
 -- PERSON
 --------------------------------
 With ukb AS(
@@ -10,6 +34,12 @@ With ukb AS(
 	from {VOCABULARY_SCHEMA}.concept as t1
 	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t1.concept_id = t2.source_concept_id and t2.source_vocabulary_id = 'UK Biobank'
 	where t1.vocabulary_id = 'UK Biobank' and (t1.concept_code like '1001-%' or t1.concept_code like '9-%')
+), loc AS(
+	select 	t1.source_code, 
+			t2.location_id
+	from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t1
+	join {TARGET_SCHEMA}.location as t2 on t2.country_concept_id = t1.target_concept_id
+	where t1.source_vocabulary_id = 'UKB_COUNTRY_STCM'
 )
 INSERT INTO {TARGET_SCHEMA}.person (
   person_id					,
@@ -43,7 +73,7 @@ select
 		ELSE COALESCE(t3.target_concept_id, 0)
 	END as race_concept_id,
 	0,
-	NULL::bigint,
+	t4.location_id as location_id,
 	NULL::bigint,
 	NULL::int, 
 	t1.eid, 
@@ -57,7 +87,8 @@ select
 	NULL::int
 from {SOURCE_SCHEMA}.baseline as t1
 join ukb as t2 on CONCAT('9-', t1.p31) = t2.source_code and t2.target_domain_id = 'Gender'
-left join ukb as t3 on CONCAT('1001-', t1.p21000_i0::integer) = t3.source_code;
+left join ukb as t3 on CONCAT('1001-', t1.p21000_i0::integer) = t3.source_code
+left join loc as t4 on t1.p54_i0::text = t4.source_code;
 
 ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default;
 CREATE UNIQUE INDEX idx_person_id ON {TARGET_SCHEMA}.person (person_id ASC) TABLESPACE pg_default;
