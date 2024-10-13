@@ -5,6 +5,7 @@ nav_order: 2
 parent: UK BIOBANK
 has_children: true
 description: "UK Biobank Hospital Episode Statistics Inpatient ETL Documentation"
+permalink: /docs/UK_BIOBANK/UKB_HESIN/
 
 ---
 
@@ -14,7 +15,7 @@ These materials are meant to serve as documentation and reference for how the UK
 
 **UKB HESIN source Data Mapping for CDM v5.4**
 
-![](images/image1.png)
+![](../images/image1.png)
 
 **Figure.1**
 

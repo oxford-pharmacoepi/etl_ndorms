@@ -1,8 +1,8 @@
 ---
 layout: default
-title: UKB_HESIN to STEM
+title: UKB HESIN to STEM
 nav_order: 6
-parent: UKB_HESIN
+parent: UKB HESIN
 description: "Stem table description"
 
 ---
@@ -11,7 +11,7 @@ description: "Stem table description"
 
 ## Reading from hesin_diag
 
-![](images/image9.png)
+![](../images/image9.png)
 
 **Figure.1**
 
@@ -35,7 +35,7 @@ description: "Stem table description"
  
 ## Reading from hesin_oper
 
-![](images/image10.png)
+![](../images/image10.png)
 
 **Figure.1**
 

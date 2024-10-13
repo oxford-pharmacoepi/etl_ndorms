@@ -11,7 +11,7 @@ description: "Person mapping from HES AE hesae_patient table"
 
 ## Reading from hesin
 
-![](images/image2.png)
+![](../images/image2.png)
 
 **Figure.1**
 

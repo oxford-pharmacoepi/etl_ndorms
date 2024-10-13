@@ -12,7 +12,7 @@ description: "visit_detail mapping from hesin_critical & hesin_psych tables"
 ## Reading from hesin_critical
 
 
-![](images/image4.png)
+![](../images/image4.png)
 
 **Figure.1**
 
@@ -40,7 +40,7 @@ description: "visit_detail mapping from hesin_critical & hesin_psych tables"
 
 ## Reading from hesin_psych
 
-![](images/image5.png)
+![](../images/image5.png)
 
 **Figure.2**
 

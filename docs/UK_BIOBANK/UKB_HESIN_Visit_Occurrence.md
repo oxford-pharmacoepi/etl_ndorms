@@ -12,7 +12,7 @@ description: "VISIT_OCCURRENCE mapping from HESIN table"
 ## Reading from HESIN
 
 
-![](images/image6.png)
+![](../images/image6.png)
 
 **Figure.1**
 
@@ -21,8 +21,8 @@ description: "VISIT_OCCURRENCE mapping from HESIN table"
 | visit_occurrence_id |  |  nextval('public.sequence_vo') AS visit_occurrence_id | Autogenerate | 
 | person_id | eid |  |  |
 | visit_concept_id |  | 9201 = Inpatient visit |  |
-| visit_start_date | admidate | COALESCE(admidate, MIN(epistart), disdate)|    |
-| visit_start_datetime | admidate | COALESCE(admidate, MIN(epistart), disdate)|  |
+| visit_start_date | epistart | COALESCE(admidate, MIN(epistart), disdate)|    |
+| visit_start_datetime | epistart | COALESCE(admidate, MIN(epistart), disdate)|  |
 | visit_end_date | disdate| COALESCE(disdate, MAX(epiend), admidate, MIN(epistart))|  |
 | visit_end_datetime | disdate | COALESCE(disdate, MAX(epiend), admidate, MIN(epistart)) | |
 | visit_type_concept_id |  | 32818 = EHR administration record |  |
