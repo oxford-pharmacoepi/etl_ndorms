@@ -137,7 +137,7 @@ def main():
 # Tables to load: TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL
 # ---------------------------------------------------------
 			if ret == True:
-				if database_type == 'aurum' or 'ukb_gp'== database_type or 'ukb_cancer'== database_type:
+				if database_type in ['aurum', 'ukb_gp', 'ukb_cancer']:
 					qa = input('Do you want to CREATE/RECREATE the temp tables (TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL)? (y/n):').lower() 
 					while qa not in ['y', 'n', 'yes', 'no']:
 						qa = input('I did not understand that. Do you want to CREATE/RECREATE the temp tables (TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL? (y/n):').lower()
@@ -161,7 +161,7 @@ def main():
 # Create/Recreate CHUNK table and any chunk job previously done?
 # ---------------------------------------------------------
 			if ret == True:
-				if database_type not in ('hesop', 'ukb'): #HES_OP does not use STEM and does not need chunking #ukb baseline does not need chunking
+				if database_type not in ('hesop', 'ukb'): #HES_OP does not use STEM and does not need chunking 
 					qa = input('Do you want to CREATE/RECREATE the chunk table and remove any chunk work previously done? (y/n):').lower() 
 					while qa not in ['y', 'n', 'yes', 'no']:
 						qa = input('I did not understand that. Do you want to CREATE/RECREATE the chunk table and remove any chunk work previously done? (y/n):').lower()
