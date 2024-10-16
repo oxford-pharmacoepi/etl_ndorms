@@ -1,0 +1,9 @@
+source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
+264-2001,0,UKB_ADMIMETH_STCM,A&E,9203,Visit,1970-01-01,2099-12-31,
+264-2002,0,UKB_ADMIMETH_STCM,GP-requested,38004247,NUCC,1970-01-01,2099-12-31,
+264-2016,0,UKB_ADMIMETH_STCM,A&E at another provider,9203,Visit,1970-01-01,2099-12-31,
+264-2019,0,UKB_ADMIMETH_STCM,Other emergency admission,38004337,NUCC,1970-01-01,2099-12-31,
+264-3001,0,UKB_ADMIMETH_STCM,Post-partum,8650,CMS Place of Service,1970-01-01,2099-12-31,
+264-3002,0,UKB_ADMIMETH_STCM,Ante-partum,8650,CMS Place of Service,1970-01-01,2099-12-31,
+264-3003,0,UKB_ADMIMETH_STCM,In-Hospital Birth,8650,CMS Place of Service,1970-01-01,2099-12-31,
+264-3004,0,UKB_ADMIMETH_STCM,In-Hospital Birthat another provider,8650,CMS Place of Service,1970-01-01,2099-12-31,
