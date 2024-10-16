@@ -1,7 +1,7 @@
 ---
 layout: default
 title: UKB GP
-nav_order: 3
+nav_order: 4
 parent: UK BIOBANK
 description: "Person mapping from HES AE hesae_patient table"
 permalink: /docs/UK_BIOBANK/UKB_GP/
