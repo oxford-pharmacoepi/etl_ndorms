@@ -30,8 +30,8 @@ description: "visit_detail mapping from hesin_critical & hesin_psych tables"
 | care_site_id| NULL | | |
 | visit_detail_source_value| ins_index | | |
 | visit_detail_source_concept_id| NULL | | |
-| admitted_from_concept_id| ccadmisorc | use ccadmisorc to retrieve the target_concept_id from source_to_standard_vocab_map by doing a LEFT JOIN to source_to_standard_vocab_map as t2 on CONCAT('7004-',hesin_critical.ccadmisorc) = t2.source_code AND t2.source_vocabulary_id = “HESIN_CCADMISORC_STCM”.| |
-| admitted_from_source_value| ccadmisorc | use ccadmisorc to retrieve the source_code_description from source_to_standard_vocab_map by doing a LEFT JOIN to source_to_standard_vocab_map as t2 on CONCAT('7004-',hesin_critical.ccadmisorc) = t2.source_code AND t2.source_vocabulary_id = “HESIN_CCADMISORC_STCM”.| |
+| admitted_from_concept_id| ccadmisorc | use ccadmisorc to retrieve the target_concept_id from source_to_standard_vocab_map by doing a LEFT JOIN to source_to_standard_vocab_map as t2 on CONCAT('7004-',hesin_critical.ccadmisorc) = t2.source_code AND t2.source_vocabulary_id = “UKB_CCADMISORC_STCM”.| |
+| admitted_from_source_value| ccadmisorc | use ccadmisorc to retrieve the source_code_description from source_to_standard_vocab_map by doing a LEFT JOIN to source_to_standard_vocab_map as t2 on CONCAT('7004-',hesin_critical.ccadmisorc) = t2.source_code AND t2.source_vocabulary_id = “UKB_CCADMISORC_STCM”.| |
 | discharged_to_source_value| NULL | | |
 | discharged_to_concept_id| NULL | | |
 | preceding_visit_detail_id| NULL | | |

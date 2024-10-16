@@ -11,9 +11,9 @@ WITH cte0 as (
 		t2.eid as person_id, 
 		NULL::bigint as provider_id, 
 		t2.ins_index::varchar as visit_source_value, 
-		t2.arr_index::varchar as visit_detail_source_value, 
+		t2.ins_index::varchar as visit_detail_source_value, 
 		t3.epistart as start_date, 
-		t3.epistart as end_date,
+		t3.epiend as end_date,
 		CASE 
 			WHEN LENGTH(COALESCE(t2.diag_icd9, t2.diag_icd10)) = 4 
 			THEN CONCAT(LEFT(COALESCE(t2.diag_icd9, t2.diag_icd10), 3), '.', RIGHT(COALESCE(t2.diag_icd9, t2.diag_icd10), 1)) 
@@ -105,7 +105,7 @@ WITH cte0 as (
 		select t2.eid as person_id, 
 		NULL::bigint as provider_id, 
 		t2.ins_index::varchar as visit_source_value, 
-		t2.arr_index::varchar as visit_detail_source_value, 
+		t2.ins_index::varchar as visit_detail_source_value, 
 		COALESCE(t2.opdate,t3.epistart) as start_date, 
 		COALESCE(t2.opdate,t3.epistart) as end_date,
 		CASE 
