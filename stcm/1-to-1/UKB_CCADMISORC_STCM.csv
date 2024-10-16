@@ -1,0 +1,5 @@
+source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
+7004-1,0,UKB_CCADMISORC_STCM,Same NHS hospital site,8717,CMS Place of Service,1970-01-01,2099-12-31,
+7004-2,0,UKB_CCADMISORC_STCM,Other NHS hospital site,38004515,Medicare Specialty,1970-01-01,2099-12-31,
+7004-3,0,UKB_CCADMISORC_STCM,Independent hospital provider in the UK,38004515,Medicare Specialty,1970-01-01,2099-12-31,
+7004-4,0,UKB_CCADMISORC_STCM,Non-hospital source within the UK,42898160,Visit,1970-01-01,2099-12-31,
