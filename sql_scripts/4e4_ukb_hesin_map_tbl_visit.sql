@@ -37,7 +37,7 @@ cte3 AS (
 	FROM {SOURCE_SCHEMA}.hesin AS t1
 	INNER JOIN cte2 as t2 ON t1.eid = t2.eid and t1.ins_index = t2.ins_index
 	INNER JOIN cte1 as t3 ON t2.eid = t3.person_id
-	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t4.source_code = CONCAT('264-',t1.admimeth_uni) and t4.target_domain_id = 'visit' and t4.source_vocabulary_id = 'HESIN_ADMIMETH_STCM'
+	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t4.source_code = CONCAT('264-',t1.admimeth_uni) and t4.target_domain_id = 'visit' and t4.source_vocabulary_id = 'UKB_ADMIMETH_STCM'
 ),
 cte4 AS (
 	SELECT person_id,visit_source_value,
@@ -170,7 +170,7 @@ cte2 AS (
 	t1.arr_index AS arr_index
 	FROM cte1 as t0 
 	INNER JOIN {SOURCE_SCHEMA}.hesin_critical AS t1 ON t1.eid = t0.person_id
-	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t2 on CONCAT('7004-',t1.ccadmisorc)  = t2.source_code and t2.source_vocabulary_id = 'HESIN_CCADMISORC_STCM'
+	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t2 on CONCAT('7004-',t1.ccadmisorc)  = t2.source_code and t2.source_vocabulary_id = 'UKB_CCADMISORC_STCM'
 ),
 cte3 AS (
 	SELECT person_id, visit_detail_source_value,arr_index,

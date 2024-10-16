@@ -30,8 +30,8 @@ description: "VISIT_OCCURRENCE mapping from HESIN table"
 | care_site_id | NULL| |  |
 | visit_source_value | ins_index |  | This will allow us to retrieve Visit_occurrence_id. |
 | visit_source_concept_id |NULL  |  |  |
-| admitted_from_concept_id | admimeth_uni | use admimeth_uni to retrieve the target_concept_id from source_to_standard_vocab_map by doing a INNER JOIN to source_to_standard_vocab_map as t1 on CONCAT('264-',hesin.admimeth_uni) = t1.source_code AND t1.target_domain_id = 'visit' AND t1.source_vocabulary_id = “HESIN_ADMIMETH_STCM”. |  |
-| admitted_from_source_value | admimeth_uni | use admimeth_uni to retrieve the source_code_description from source_to_standard_vocab_map by doing a INNER JOIN to source_to_standard_vocab_map as t1 on CONCAT('264-',hesin.admimeth_uni) = t1.source_code AND t1.target_domain_id = 'visit' AND t1.source_vocabulary_id = “HESIN_ADMIMETH_STCM”.|  |
+| admitted_from_concept_id | admimeth_uni | use admimeth_uni to retrieve the target_concept_id from source_to_standard_vocab_map by doing a INNER JOIN to source_to_standard_vocab_map as t1 on CONCAT('264-',hesin.admimeth_uni) = t1.source_code AND t1.target_domain_id = 'visit' AND t1.source_vocabulary_id = “UKB_ADMIMETH_STCM”. |  |
+| admitted_from_source_value | admimeth_uni | use admimeth_uni to retrieve the source_code_description from source_to_standard_vocab_map by doing a INNER JOIN to source_to_standard_vocab_map as t1 on CONCAT('264-',hesin.admimeth_uni) = t1.source_code AND t1.target_domain_id = 'visit' AND t1.source_vocabulary_id = “UKB_ADMIMETH_STCM”.|  |
 | discharged_to_concept_id | NULL | |  |
 | discharged_to_source_value | NULL | |  |
 | preceding_visit_occurrence_id |  | Using eid+ins_index, look up the episode that occurs prior to this and put the visit_occurrence_id here. |  |

@@ -20,9 +20,9 @@ description: "Stem table description"
 | id|||Removed for performance reasons|
 | domain_id | NULL | | | 
 | person_id | eid | | | 
-| visit_occurrence_id |eid,ins_index,arr_index | | Use eid+ins_index+arr_index to retrieve visit_occurrence_id |
-| visit_detail_id|eid,ins_index,arr_index ||Use eid+ins_index+arr_index to retrieve visit_detail_id |
-| source_value| diag_icd9,diag_icd10 |||
+| visit_occurrence_id |eid,ins_index | | Use eid+ins_index to retrieve visit_occurrence_id |
+| visit_detail_id|eid,ins_index ||Use eid+ins_index to retrieve visit_detail_id |
+| source_value| diag_icd9,diag_icd10 |CONCAT(LEFT(COALESCE(diag_icd9, diag_icd10), 3), '.', RIGHT(COALESCE(diag_icd9, diag_icd10), 1))||
 | source_concept_id | diag_icd9,diag_icd10 | concept_id of either diag_icd9 or diag_icd10 | |
 | type_concept_id |  | 32829 | |
 | start_date | epistart | | |
@@ -30,7 +30,7 @@ description: "Stem table description"
 | start_datetime | epistart |   | |
 | concept_id  | NULL |  |  |
 | end_datetime | epiend| | |
-| disease_status_source_value | level| | |
+| disease_status_source_value | | | |
 | stem_source_table | | "hesin_diag" | |
  
 ## Reading from hesin_oper
@@ -44,9 +44,9 @@ description: "Stem table description"
 | id|||Removed for performance reasons|
 | domain_id | NULL | | | 
 | person_id | eid | | | 
-| visit_occurrence_id |eid,ins_index,arr_index | | Use eid+ins_index+arr_index to retrieve visit_occurrence_id |
-| visit_detail_id|eid,ins_index,arr_index ||Use eid+ins_index+arr_index to retrieve visit_detail_id |
-| source_value| oper4|||
+| visit_occurrence_id |eid,ins_index | | Use eid+ins_index to retrieve visit_occurrence_id |
+| visit_detail_id|eid,ins_index ||Use eid+ins_index to retrieve visit_detail_id |
+| source_value| oper4 | CONCAT(LEFT(oper4, 3), '.', RIGHT(oper4, 1))||
 | source_concept_id | oper4 | concept_id of oper4 | |
 | type_concept_id |  | 32829 | |
 | modifier_source_value | level | | |
@@ -55,5 +55,5 @@ description: "Stem table description"
 | end_date | opdate | | |
 | end_datetime | opdate | | |
 | end_datetime | opdate | | |
-| concept_id  | oper4 | WHEN LENGTH(hesin_oper.oper4) = 4 THEN CONCAT(LEFT(hesin_oper.oper4, 3), '.', RIGHT(hesin_oper.oper4, 1))  |  |
+| concept_id  | NULL  |  |  |
 | stem_source_table | | "hesin_oper" | |
