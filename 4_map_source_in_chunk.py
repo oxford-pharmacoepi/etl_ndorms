@@ -88,8 +88,8 @@ def main():
 						\'' + cdm_etl_reference + '\', \
 						TO_DATE(\'' + source_release_date + '\',\'YYYY-MM-DD\'), \
 						CURRENT_DATE, \'' + \
-						cdm_version [0:3] + '\','				#the minor-version will fail to run DQD
-					if cdm_version [0:3]>= '5.4':
+						cdm_version[0:3] + '\','				#the minor-version will fail to run DQD
+					if cdm_version[0:3] >= '5.4':
 						query1 += '(select concept_id from ' + vocabulary_schema + '.concept WHERE domain_id = \'Metadata\' \
 									and standard_concept = \'S\' \
 									and invalid_reason is null \
