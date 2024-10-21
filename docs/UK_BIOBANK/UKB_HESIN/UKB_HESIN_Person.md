@@ -17,15 +17,15 @@ description: "Person mapping from HES AE hesae_patient table"
 
 | Destination Field | Source field | Logic | Comment field |
 | --- | --- | :---: | --- |
-| person_id | eid |  |  Data like gender, year_of_birth, month_of_birth, race_source_value comes from ukb baseline as the data are linked.|
-| gender_concept_id | 0 | | |
+| person_id | eid |  |  Data like gender, year_of_birth, month_of_birth, race_source_value, location comes from ukb baseline as the data are linked.|
+| gender_concept_id | baseline.p31| p31 will be mapped to Gender Concept_id by using UK Biobank vocabulary.| |
 | year_of_birth | baseline.p34 | | |
 | month_of_birth |baseline.p52 |  | |
 | day_of_birth |NULL  |  |  |
 | birth_datetime |NULL  |  |  |
-| race_concept_id |  | | |
+| race_concept_id | baseline.p21000 | 	p21000 will be mapped to Race Concept_id by using UK Biobank vocabulary.| |
 | ethnicity_concept_id | 0 |  |   |
-| location_id |NULL  |  |  |
+| location_id | baseline.p54_i0 | p54_i0 will be mapped to a standard Concept_id by retrieving the target_concept_id from source_to_standard_vocab_map where source_vocabulary_id = 'UKB_COUNTRY_STCM' |  |
 | provider_id |NULL  |  |  |
 | care_site_id |NULL | |  |
 | person_source_value | eid |  |  |

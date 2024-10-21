@@ -1,4 +1,27 @@
 --------------------------------
+-- LOCATION
+--------------------------------
+With cte as(
+select distinct target_concept_id, target_concept_name
+from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map
+where source_vocabulary_id = 'UKB_COUNTRY_STCM'
+)
+insert into {TARGET_SCHEMA}.location
+select 
+	row_number() over (order by target_concept_name) as location_id, 
+	NULL as address_1,
+	NULL as address_2, 
+	NULL as city, 
+	NULL as state, 
+	NULL as zip, 
+	target_concept_name as county,
+	NULL as location_source_value,
+	target_concept_id as country_concept_id,
+	target_concept_name as country_source_value,
+	NULL as latitude,
+	NULL as longitude
+from cte;
+--------------------------------
 -- PERSON
 --------------------------------
 with cte1 as ( 
@@ -14,6 +37,12 @@ ukb AS(
 	from {VOCABULARY_SCHEMA}.concept as t1
 	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t1.concept_id = t2.source_concept_id and t2.source_vocabulary_id = 'UK Biobank'
 	where t1.vocabulary_id = 'UK Biobank' and (t1.concept_code like '1001-%' or t1.concept_code like '9-%')
+), loc AS(
+	select 	t1.source_code, 
+			t2.location_id
+	from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t1
+	join {TARGET_SCHEMA}.location as t2 on t2.country_concept_id = t1.target_concept_id
+	where t1.source_vocabulary_id = 'UKB_COUNTRY_STCM'
 )
 INSERT INTO {TARGET_SCHEMA}.person (
   person_id					,
@@ -42,9 +71,12 @@ SELECT
 	t2.p52 AS month_of_birth,
 	NULL::int AS day_of_birth,
 	NULL::timestamp AS birth_datetime,
-	COALESCE(t4.target_concept_id, 0) AS race_concept_id,
+	CASE 
+		WHEN t4.target_domain_id <> 'Race' THEN 0
+		ELSE COALESCE(t4.target_concept_id, 0) 
+	END	AS race_concept_id,
 	0 AS ethnicity_concept_id,
-	NULL::bigint AS location_id,
+	t5.location_id as location_id,
 	NULL::bigint AS provider_id,
 	NULL::int AS care_site_id,
 	t1.eid::varchar AS person_source_value,
@@ -60,7 +92,8 @@ SELECT
 FROM cte1 as t1
 INNER JOIN {SOURCE_SCHEMA}.baseline AS t2 ON t1.eid = t2.eid 
 JOIN ukb as t3 on CONCAT('9-', t2.p31) = t3.source_code and t3.target_domain_id = 'Gender'
-LEFT JOIN ukb as t4 on CONCAT('1001-', t2.p21000_i0::integer) = t4.source_code;
+LEFT JOIN ukb as t4 on CONCAT('1001-', t2.p21000_i0::integer) = t4.source_code
+LEFT JOIN loc as t5 on t2.p54_i0::text = t5.source_code;
 
 ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default;
 CREATE UNIQUE INDEX idx_person_id ON {TARGET_SCHEMA}.person (person_id ASC) TABLESPACE pg_default;
