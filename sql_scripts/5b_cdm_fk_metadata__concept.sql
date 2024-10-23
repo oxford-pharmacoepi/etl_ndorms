@@ -1,3 +1,3 @@
-ALTER TABLE {TARGET_SCHEMA}.METADATA ADD CONSTRAINT fpk_METADATA_metadata_concept_id FOREIGN KEY (metadata_concept_id) REFERENCES {TARGET_SCHEMA}.concept (concept_id); 
-ALTER TABLE {TARGET_SCHEMA}.METADATA ADD CONSTRAINT fpk_METADATA_metadata_type_concept_id FOREIGN KEY (metadata_type_concept_id) REFERENCES {TARGET_SCHEMA}.concept (concept_id);
-ALTER TABLE {TARGET_SCHEMA}.METADATA ADD CONSTRAINT fpk_METADATA_value_as_concept_id FOREIGN KEY (value_as_concept_id) REFERENCES {TARGET_SCHEMA}.concept (concept_id);
+ALTER TABLE {TARGET_SCHEMA}.METADATA ADD CONSTRAINT fpk_METADATA_metadata_concept_id FOREIGN KEY (metadata_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id); 
+ALTER TABLE {TARGET_SCHEMA}.METADATA ADD CONSTRAINT fpk_METADATA_metadata_type_concept_id FOREIGN KEY (metadata_type_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id);
+ALTER TABLE {TARGET_SCHEMA}.METADATA ADD CONSTRAINT fpk_METADATA_value_as_concept_id FOREIGN KEY (value_as_concept_id) REFERENCES {VOCABULARY_SCHEMA}.concept (concept_id);
