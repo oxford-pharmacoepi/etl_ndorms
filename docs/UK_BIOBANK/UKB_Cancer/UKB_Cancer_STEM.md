@@ -1,7 +1,7 @@
 ---
 layout: default
-title: UKB Cancer STEM
-nav_order: 1
+title: UKB CANCER to STEM
+nav_order: 4
 parent: UKB CANCER
 has_children: true
 description: "UKB Cancer to STEM"
