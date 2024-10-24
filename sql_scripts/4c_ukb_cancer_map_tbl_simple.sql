@@ -53,17 +53,23 @@ With cancer AS(
 			max(p40005) as max_p40005
 	from {SOURCE_SCHEMA}.cancer2
 	group by eid
-)
-INSERT INTO {TARGET_SCHEMA}.observation_period(
-	select 
-		ROW_NUMBER () OVER ( ORDER BY t1.person_id) as observation_period_id,
-		t1.person_id, 
-		min_p40005, 
-		max_p40005,
-		32879			--Registry		
+), cte1 as(
+	select distinct
+		t2.eid as person_id,
+		t2.min_p40005,
+		COALESCE(LEAST(t3.death_date, max_p40005), to_date(RIGHT(current_database(), 8), 'YYYYMMDD')) as op_end_date
 	from {TARGET_SCHEMA}.person as t1
 	join cancer as t2 on t1.person_id = t2.eid
-);
+	left join {TARGET_SCHEMA}.death as t3 on t1.person_id = t3.person_id
+)
+INSERT INTO {TARGET_SCHEMA}.observation_period
+select 
+	ROW_NUMBER () OVER ( ORDER BY person_id) as observation_period_id,
+	person_id, 
+	min_p40005, 
+	op_end_date,		
+	32879				--Registry		
+from cte1;
 
 ALTER TABLE {TARGET_SCHEMA}.death DROP CONSTRAINT xpk_death;  
 
