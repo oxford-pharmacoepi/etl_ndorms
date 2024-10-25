@@ -14,13 +14,13 @@ DECLARE
 	query1 TEXT;
 	results INTEGER;
 BEGIN
---	schema1 := 'public_aurum';
---	schema2 := 'public_hesapc';
---	schema3 := 'public_aurum_hesapc';
-
-	schema1 := 'public_gold';
+	schema1 := 'public_aurum';
 	schema2 := 'public_hesapc';
-	schema3 := 'public_gold_hesapc';
+	schema3 := 'public_aurum_hesapc';
+
+--	schema1 := 'public_gold';
+--	schema2 := 'public_hesapc';
+--	schema3 := 'public_gold_hesapc';
 	tbl_to_delete := '_patid_deleted';
 ------------------------------------------------------
 -- 1. Vocabularies needs to be built BEFORE running the following code
@@ -80,7 +80,8 @@ BEGIN
 	RAISE NOTICE 'appliying %', query1;
 	EXECUTE query1;
 ------------------------------------------------------
--- 7. Insert content from linked source (schema2) of all CDM tables patient related (escluding DEATH, OBSERVATION_PERIOD, PERSON) and exclude those records belonging to `tbl_to_delete`
+-- 7. Insert content from linked source (schema2) of all CDM tables patient related (escluding DEATH, OBSERVATION_PERIOD, PERSON) 
+--    and exclude those records belonging to `tbl_to_delete`
 ------------------------------------------------------
     FOR query1 IN 
 		SELECT format('INSERT INTO %I.%I 
@@ -100,7 +101,13 @@ BEGIN
 	RAISE NOTICE 'appliying %', query1;
 	EXECUTE query1;
 ------------------------------------------------------
--- 9. Update source3.OBSERVATION_PERIOD to consider all merged data sources (schema1, schema2)
+-- 9. Insert content to source3._PATID_DELETED from source1._PATID_DELETED (always present)
+------------------------------------------------------
+	query1 = format('INSERT INTO %I.%I SELECT * FROM %I.%I;', schema3, tbl_to_delete, schema1, tbl_to_delete);
+	RAISE NOTICE 'appliying %', query1;
+	EXECUTE query1;
+------------------------------------------------------
+-- 10. Update source3.OBSERVATION_PERIOD to consider all merged data sources (schema1, schema2)
 -- We leave the OBSERVATION_PERIOD records from Primary Care (GOLD/AURUM) unchanged (period_type_concept_id=32880)
 -- We insert/update an OBSERVATION_PERIOD record per patient with the "summary" of all observation_periods (period_type_concept_id=32882)
 ------------------------------------------------------
@@ -123,7 +130,9 @@ BEGIN
 				32882 as period_type_concept_id
 				FROM %I.observation_period AS t1
 				LEFT JOIN %I.observation_period AS t2 ON t1.person_id = t2.person_id
-				ORDER BY t1.person_id', schema3, schema3, schema1, schema2);
+				LEFT JOIN %I.%I AS t3 on t1.person_id = t3.patid
+				WHERE t3.patid is null
+				ORDER BY t1.person_id;', schema3, schema3, schema1, schema2, schema3, tbl_to_delete);
 			EXECUTE query1;
 			query1 = format('DROP SEQUENCE IF EXISTS %I.sequence_op;',schema3);
 			EXECUTE query1;
@@ -139,16 +148,10 @@ BEGIN
 			EXECUTE query1;
 	END IF;
 ------------------------------------------------------
--- 10. Insert content to source3._PATID_DELETED from source1._PATID_DELETED (always present)
-------------------------------------------------------
-	query1 = format('INSERT INTO %I._patid_deleted SELECT * FROM %I._patid_deleted;', schema3, schema1);
-	RAISE NOTICE 'appliying %', query1;
-	EXECUTE query1;
-------------------------------------------------------
 -- 11. Update schema3.CDM_SOURCE
 ------------------------------------------------------
 	query1 = format('UPDATE %I.cdm_source 
-					SET source_description = CONCAT(source_description, '' + '', upper(substring(''%I'', ''[^_]*$'')));', schema3, schema3);
+					SET source_description = CONCAT(upper(source_description), '' + '', upper(substring(''%I'', ''[^_]*$'')));', schema3, schema3);
 	RAISE NOTICE 'appliying %', query1;
 	EXECUTE query1;
 -- 12. Add CONSTRAINTS for CDM (py 5_build_cdm_pk_idx_fk.py -FD:\cprd\...)
