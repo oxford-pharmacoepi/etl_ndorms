@@ -3,8 +3,8 @@
 --------------------------------
 INSERT INTO {TARGET_SCHEMA}.person
 select 
-	eid,
-	0,
+	t1.eid,
+	t2.target_concept_id,
 	0,
 	NULL::int,
 	NULL::int,
@@ -14,14 +14,16 @@ select
 	NULL::bigint,
 	NULL::bigint,
 	NULL::int, 
-	eid,
-	NULL,
+	t1.eid,
+	CONCAT('9-', t1.p31),
 	NULL::int,
 	NULL, 
 	NULL::int,
 	NULL, 
 	NULL::int
-from {SOURCE_SCHEMA}.baseline;
+from {SOURCE_SCHEMA}.baseline as t1
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on CONCAT('9-', t1.p31) = t2.source_code
+and t2.source_vocabulary_id = 'UK Biobank' and t2.source_code like '9-%';
 
 ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default;
 CREATE UNIQUE INDEX idx_person_id ON {TARGET_SCHEMA}.person (person_id ASC) TABLESPACE pg_default;
@@ -53,23 +55,17 @@ With cancer AS(
 			max(p40005) as max_p40005
 	from {SOURCE_SCHEMA}.cancer2
 	group by eid
-), cte1 as(
-	select distinct
-		t2.eid as person_id,
-		t2.min_p40005,
-		COALESCE(LEAST(t3.death_date, max_p40005), to_date(RIGHT(current_database(), 8), 'YYYYMMDD')) as op_end_date
+)
+INSERT INTO {TARGET_SCHEMA}.observation_period(
+	select 
+		ROW_NUMBER () OVER ( ORDER BY t1.person_id) as observation_period_id,
+		t1.person_id, 
+		min_p40005, 
+		max_p40005,
+		32879			--Registry		
 	from {TARGET_SCHEMA}.person as t1
 	join cancer as t2 on t1.person_id = t2.eid
-	left join {TARGET_SCHEMA}.death as t3 on t1.person_id = t3.person_id
-)
-INSERT INTO {TARGET_SCHEMA}.observation_period
-select 
-	ROW_NUMBER () OVER ( ORDER BY person_id) as observation_period_id,
-	person_id, 
-	min_p40005, 
-	op_end_date,		
-	32879				--Registry		
-from cte1;
+);
 
 ALTER TABLE {TARGET_SCHEMA}.death DROP CONSTRAINT xpk_death;  
 
