@@ -50,5 +50,5 @@ The cancer data in ukb_cancer.cancer is stored in a latitudinal format, meaning 
 | start_date | [p40005](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40005) | |
 | end_date | [p40005](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40005) | |
 | start_time | | 00:00:00 |
-| measurement_event_id | cancer2.id<br>source_value |  Link the [Condition Modifiers](https://ohdsi.github.io/OncologyWG/conventions.html#:~:text=Overview%20of%20Condition%20Modifiers&text=What%20we%20are%20calling%20'Condition,using%20the%20Cancer%20Modifier%20vocabulary) by using cancer2.id | | 
-| meas_event_field_concept_id | domain_id | domain_id = 'Condition' [1147127](https://athena.ohdsi.org/search-terms/terms/1147127)<br>domain_id = 'Procedure' [1147810](https://athena.ohdsi.org/search-terms/terms/1147810)<br>domain_id = 'Observation' [1147762](https://athena.ohdsi.org/search-terms/terms/1147762) | | 
+| measurement_event_id | cancer2.id |  Link the [Condition Modifiers](https://ohdsi.github.io/OncologyWG/conventions.html#:~:text=Overview%20of%20Condition%20Modifiers&text=What%20we%20are%20calling%20'Condition,using%20the%20Cancer%20Modifier%20vocabulary) by using cancer2.id and put the primary key of the linked record.| | 
+| meas_event_field_concept_id | domain_id | if the related records belongs to<br>domain_id = 'Condition' [1147127](https://athena.ohdsi.org/search-terms/terms/1147127)<br>domain_id = 'Procedure' [1147810](https://athena.ohdsi.org/search-terms/terms/1147810)<br>domain_id = 'Observation' [1147762](https://athena.ohdsi.org/search-terms/terms/1147762) | | 
