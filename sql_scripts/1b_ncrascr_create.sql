@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.tumour (
 	
 --------------Creating treatment Table ---------------------------------------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.treatment (
+	treatment_id			bigserial,		--to allow for a PK
 	e_patid					bigint,
 	e_cr_id					bigint,
 	e_cr_patid				bigint,
