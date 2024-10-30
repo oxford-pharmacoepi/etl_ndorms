@@ -3,8 +3,8 @@
 --------------------------------
 INSERT INTO {TARGET_SCHEMA}.person
 select 
-	eid,
-	0,
+	t1.eid,
+	t2.target_concept_id,
 	0,
 	NULL::int,
 	NULL::int,
@@ -14,14 +14,16 @@ select
 	NULL::bigint,
 	NULL::bigint,
 	NULL::int, 
-	eid,
-	NULL,
+	t1.eid,
+	CONCAT('9-', t1.p31),
 	NULL::int,
 	NULL, 
 	NULL::int,
 	NULL, 
 	NULL::int
-from {SOURCE_SCHEMA}.baseline;
+from {SOURCE_SCHEMA}.baseline as t1
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on CONCAT('9-', t1.p31) = t2.source_code
+and t2.source_vocabulary_id = 'UK Biobank' and t2.source_code like '9-%';
 
 ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default;
 CREATE UNIQUE INDEX idx_person_id ON {TARGET_SCHEMA}.person (person_id ASC) TABLESPACE pg_default;
