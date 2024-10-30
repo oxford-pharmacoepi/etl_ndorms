@@ -1,26 +1,21 @@
 --------------------------------
 -- LOCATION
 --------------------------------
-With cte as(
-select distinct target_concept_id, target_concept_name
-from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map
-where source_vocabulary_id = 'UKB_COUNTRY_STCM'
-)
-insert into {TARGET_SCHEMA}.location
-select 
-	row_number() over (order by target_concept_name) as location_id, 
-	NULL as address_1,
-	NULL as address_2, 
-	NULL as city, 
-	NULL as state, 
-	NULL as zip, 
-	target_concept_name as county,
-	NULL as location_source_value,
-	target_concept_id as country_concept_id,
-	target_concept_name as country_source_value,
-	NULL as latitude,
-	NULL as longitude
-from cte;
+INSERT INTO {TARGET_SCHEMA}.location
+SELECT 
+	location_id, 
+	address_1,
+	address_2, 
+	city, 
+	state, 
+	zip, 
+	county,
+	location_source_value,
+	country_concept_id,
+	country_source_value,
+	latitude,
+	longitude
+FROM {target_schema_to_link}.location;
 --------------------------------
 -- PERSON
 --------------------------------
@@ -99,47 +94,64 @@ ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person
 CREATE UNIQUE INDEX idx_person_id ON {TARGET_SCHEMA}.person (person_id ASC) TABLESPACE pg_default;
 CLUSTER {TARGET_SCHEMA}.person USING xpk_person;
 CREATE INDEX idx_gender ON {TARGET_SCHEMA}.person (gender_concept_id ASC) TABLESPACE pg_default;
+--------------------------------
+-- PROVIDER from hesin
+--------------------------------
+DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_pro;
+CREATE SEQUENCE {TARGET_SCHEMA}.sequence_pro INCREMENT 1;
+SELECT setval('{TARGET_SCHEMA}.sequence_pro', 
+				(SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'provider'));
 
+with cte1 AS (
+	select DISTINCT CASE WHEN tretspef <> '&' THEN tretspef ELSE mainspef END as specialty
+	from {SOURCE_SCHEMA}.hesin
+	WHERE (tretspef <> '&' OR mainspef <> '&')
+),
+cte2 AS (
+	SELECT 
+	DISTINCT t2.target_concept_id AS specialty_concept_id, 
+	t2.source_code_description AS specialty_source_value
+	FROM cte1 as t1
+	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t2 on t1.specialty = t2.source_code 
+	and t2.source_vocabulary_id = 'HES_SPEC_STCM'
+)
+INSERT INTO {TARGET_SCHEMA}.PROVIDER (
+	provider_id,
+	provider_name,
+	npi,
+	dea,
+	specialty_concept_id,
+	care_site_id,
+	year_of_birth,
+	gender_concept_id,
+	provider_source_value,
+	specialty_source_value,
+	specialty_source_concept_id,
+	gender_source_value,
+	gender_source_concept_id
+)
+SELECT 
+	nextval('{TARGET_SCHEMA}.sequence_pro') AS provider_id,
+	NULL AS provider_name,
+	NULL AS npi,
+	NULL AS dea,
+	specialty_concept_id, 
+	NULL::int AS care_site_id,
+	NULL::int AS year_of_birth,
+	NULL::int AS gender_concept_id,
+	NULL AS provider_source_value,
+	specialty_source_value,
+	NULL::int AS specialty_source_concept_id,
+	NULL AS gender_source_value,
+	NULL::int AS gender_source_concept_id
+FROM cte2;
+
+DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_pro;
+--The following is used in the mapping
+CREATE UNIQUE INDEX idx_provider_source ON {TARGET_SCHEMA}.provider (specialty_source_value ASC);
 --------------------------------
 -- DEATH
 --------------------------------
-With ICD10_1 AS(
-	select source_concept_id, source_code
-	from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map
-	where source_vocabulary_id = 'ICD10' 
-	group by source_concept_id, source_code
-	having count(*)=1 
-), ICD10 AS(
-	select t1.source_concept_id, t1.target_concept_id, t1.source_vocabulary_id
-	from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t1
-	join ICD10_1 as t2 on t1.source_concept_id = t2.source_concept_id
-	where t1.source_vocabulary_id = 'ICD10' 
-	
-	union
-	
-	select source_concept_id, target_concept_id, source_vocabulary_id
-	from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map 
-	where source_vocabulary_id = 'UKB_DEATH_CAUSE_STCM'	
-), death_cause_1 AS(
-	select t1.eid, t1.ins_index, t1.cause_icd10, t2.concept_id, t2.concept_id as source_concept_id, t2.concept_code as source_code
-	from {SOURCE_SCHEMA}.death_cause as t1
-	join {VOCABULARY_SCHEMA}.concept as t2 on t1.cause_icd10 = t2.concept_code or t1.cause_icd10 = replace(t2.concept_code, '.', '')
-	where t2.vocabulary_id = 'ICD10'
-), death_cause_2 AS(
-	select t1.eid, t1.ins_index, t1.cause_icd10, t3.concept_id, 0 as source_concept_id, t1.cause_icd10 as source_code
-	from {SOURCE_SCHEMA}.death_cause as t1
-	left join death_cause_1 as t2 on t1.eid = t2.eid and t1.ins_index = t2.ins_index
-	join {VOCABULARY_SCHEMA}.concept as t3 on left(t1.cause_icd10, 3) = t3.concept_code 
-	where t2.eid is null and t3.vocabulary_id = 'ICD10'
-), death_cause AS(
-	select * from death_cause_1
-	union 
-	select * from death_cause_2
-), dead_patient AS(
-	select distinct t1.eid, t1.date_of_death, t2.cause_icd10, t2.source_code, t2.concept_id, t2.source_concept_id
-	from {SOURCE_SCHEMA}.death as t1
-	left join death_cause as t2 on t1.eid = t2.eid and t1.ins_index = t2.ins_index
-)
 INSERT INTO {TARGET_SCHEMA}.death(
 	person_id, 
 	death_date, 
@@ -150,18 +162,18 @@ INSERT INTO {TARGET_SCHEMA}.death(
 	cause_source_concept_id
 )
 select 
-t1.eid,
-t1.date_of_death, 
-t1.date_of_death, 
-32879, --same as cdm_ukb_202003
-CASE 
-	WHEN t1.cause_icd10 is not null THEN COALESCE(t2.target_concept_id, 0) 
-END, 
-t1.source_code, 
-t1.source_concept_id
-from dead_patient as t1
-left join ICD10 as t2 on t1.concept_id = t2.source_concept_id
-and (t2.source_vocabulary_id = 'UKB_DEATH_CAUSE_STCM' or t2.source_vocabulary_id = 'ICD10');
+	t1.person_id, 
+	t1.death_date, 
+	t1.death_datetime, 
+	t1.death_type_concept_id,
+	t1.cause_concept_id, 
+	t1.cause_source_value, 
+	t1.cause_source_concept_id
+From {target_schema_to_link}.death as t1
+inner join {TARGET_SCHEMA}.person as t2 on t1.person_id = t2.person_id;
+
+ALTER TABLE {TARGET_SCHEMA}.death ADD CONSTRAINT xpk_death PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default;
+
 
 --------------------------------
 -- OBSERVATION_PERIOD --
