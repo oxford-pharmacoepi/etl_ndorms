@@ -137,7 +137,7 @@ def main():
 # Tables to load: TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL
 # ---------------------------------------------------------
 			if ret == True:
-				if database_type in ['aurum', 'ukb_gp', 'ukb_cancer']:
+				if database_type in ['aurum', 'ukb_gp', 'ukb_cancer', 'ncrascr']:
 					qa = input('Do you want to CREATE/RECREATE the temp tables (TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL)? (y/n):').lower() 
 					while qa not in ['y', 'n', 'yes', 'no']:
 						qa = input('I did not understand that. Do you want to CREATE/RECREATE the temp tables (TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL? (y/n):').lower()
