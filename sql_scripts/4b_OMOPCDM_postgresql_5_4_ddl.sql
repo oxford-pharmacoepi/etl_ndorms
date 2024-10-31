@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DRUG_EXPOSURE (
 			visit_detail_id bigint NULL,
 			drug_source_value varchar(250) NULL,
 			drug_source_concept_id integer NULL,
-			route_source_value varchar(50) NULL,
+			route_source_value varchar(100) NULL,
 			dose_unit_source_value varchar(50) NULL )
 			TABLESPACE pg_default;
 
@@ -187,7 +187,7 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.MEASUREMENT (
 			measurement_source_concept_id integer NULL,
 			unit_source_value varchar(60) NULL,
 			unit_source_concept_id integer NULL,
-			value_source_value varchar(50) NULL,
+			value_source_value varchar(200) NULL,
 			measurement_event_id bigint NULL,
 			meas_event_field_concept_id integer NULL )
 			TABLESPACE pg_default;
@@ -201,7 +201,7 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.OBSERVATION (
 			observation_datetime TIMESTAMP NULL,
 			observation_type_concept_id integer NOT NULL,
 			value_as_number NUMERIC NULL,
-			value_as_string varchar(350) NULL,
+			value_as_string varchar(800) NULL,
 			value_as_concept_id integer NULL,
 			qualifier_concept_id integer NULL,
 			unit_concept_id integer NULL,
@@ -497,7 +497,7 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem_source
     range_low double precision,
     refills integer,
     route_concept_id integer,
-    route_source_value character varying(50) COLLATE pg_catalog."default",
+    route_source_value character varying(100) COLLATE pg_catalog."default",
     sig character varying(255) COLLATE pg_catalog."default",
     stop_reason character varying(20) COLLATE pg_catalog."default",
     unique_device_id character varying(50) COLLATE pg_catalog."default",
@@ -507,7 +507,7 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem_source
     value_as_concept_id integer,
     value_as_number double precision,
     value_as_string character varying(800) COLLATE pg_catalog."default",
-    value_source_value character varying(50) COLLATE pg_catalog."default",
+    value_source_value character varying(200) COLLATE pg_catalog."default",
     anatomic_site_concept_id integer,
     disease_status_concept_id integer,
     specimen_source_id character varying(50) COLLATE pg_catalog."default",
@@ -551,7 +551,7 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem
     range_low double precision,
     refills integer,
     route_concept_id integer,
-    route_source_value character varying(50) COLLATE pg_catalog."default",
+    route_source_value character varying(100) COLLATE pg_catalog."default",
     sig character varying(255) COLLATE pg_catalog."default",
     stop_reason character varying(20) COLLATE pg_catalog."default",
     unique_device_id character varying(50) COLLATE pg_catalog."default",
@@ -561,7 +561,7 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem
     value_as_concept_id integer,
     value_as_number double precision,
     value_as_string character varying(800) COLLATE pg_catalog."default",
-    value_source_value character varying(50) COLLATE pg_catalog."default",
+    value_source_value character varying(200) COLLATE pg_catalog."default",
     anatomic_site_concept_id integer,
     disease_status_concept_id integer,
     specimen_source_id character varying(50) COLLATE pg_catalog."default",

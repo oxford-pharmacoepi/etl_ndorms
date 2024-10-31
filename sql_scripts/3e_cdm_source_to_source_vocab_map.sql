@@ -2,9 +2,9 @@ drop table if exists {VOCABULARY_SCHEMA}.source_to_source_vocab_map CASCADE;
 
 CREATE TABLE IF NOT EXISTS {VOCABULARY_SCHEMA}.source_to_source_vocab_map
 (
-    source_code varchar(255),
+    source_code varchar(500),
     source_concept_id integer,
-    source_code_description varchar(255),
+    source_code_description varchar(500),
     source_vocabulary_id varchar(30),
     source_domain_id varchar(20),
     source_concept_class_id varchar(20),
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS {VOCABULARY_SCHEMA}.source_to_source_vocab_map
     source_valid_end_date date,
     source_invalid_reason varchar(1),
     target_concept_id integer,
-    target_concept_name varchar(255),
+    target_concept_name varchar(500),
     target_vocabulary_id varchar(30),
     target_domain_id varchar(20),
     target_concept_class_id varchar(20),

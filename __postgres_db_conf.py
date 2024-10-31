@@ -35,7 +35,7 @@ db_conf = dict({
 	'tbl_hesae': ['hesae_patient', 'hesae_attendance', 'hesae_diagnosis', 'hesae_investigation', 'hesae_treatment', 'hesae_hrg', 'hesae_pathway'],
 	'tbl_ons': ['linkage_coverage','ons_death'],
 	'tbl_ncras': ['tumour', 'treatment'],
-	'tbl_ukb_gp_lookup': ['lookup626'],
+	'tbl_ukb_gp_lookup': ['lookup626', 'gold_product' , 'gold_daysupply_decodes', 'gold_daysupply_modes'],
 	'tbl_ukb_cancer_lookup': ['lookup1970'],
 	'tbl_ukb': ['baseline', 'death', 'death_cause'],
 	'tbl_ukb_cancer': ['baseline', 'death', 'cancer'],
