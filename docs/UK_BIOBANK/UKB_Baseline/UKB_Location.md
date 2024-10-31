@@ -1,6 +1,6 @@
 ---
 layout: default
-title: UKB Location
+title: Location
 nav_order: 3
 parent: UKB BASELINE
 has_children: true

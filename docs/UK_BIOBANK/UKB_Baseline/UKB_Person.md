@@ -1,6 +1,6 @@
 ---
 layout: default
-title: UKB Person
+title: Person
 nav_order: 1
 parent: UKB BASELINE
 has_children: true
