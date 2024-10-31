@@ -1,6 +1,6 @@
 ---
 layout: default
-title: UKB Death
+title: Death
 nav_order: 2
 parent: UKB BASELINE
 has_children: true
