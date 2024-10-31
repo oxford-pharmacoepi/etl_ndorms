@@ -11,4 +11,4 @@ permalink: /docs/UK_BIOBANK/UKB_GP/
 
 These materials are meant to serve as documentation and reference for how the UK Biobank data was converted to the OMOP Common Data Model (CDM).
 
-**Coming soon...**
+![](images/ukb_gp_to_cdm.png)
