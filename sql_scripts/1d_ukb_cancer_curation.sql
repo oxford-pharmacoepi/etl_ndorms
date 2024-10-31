@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.cancer2 (
 	p40021			varchar(4)			--Data-Coding 262: Cancer information source
 )TABLESPACE pg_default;
 
+ALTER TABLE {SOURCE_SCHEMA}.cancer2 SET (autovacuum_enabled = False);
+
 With cte as(
 select 
 	eid,
@@ -109,16 +111,17 @@ DELETE FROM {SOURCE_SCHEMA}.cancer2 as t1
 using {SOURCE_NOK_SCHEMA}.cancer2 as t2
 WHERE t1.id = t2.id;
 
+VACUUM (ANALYZE) {SOURCE_SCHEMA}.cancer2;
+ALTER TABLE {SOURCE_SCHEMA}.cancer2 SET (autovacuum_enabled = True);
+
 --------------------------------
 -- baseline
 --------------------------------
 INSERT INTO {SOURCE_NOK_SCHEMA}.baseline
-(
-	select t1.*
-	from {SOURCE_SCHEMA}.baseline as t1
-	left join {SOURCE_SCHEMA}.cancer2 as t2 on t1.eid = t2.eid
-	where t2.eid is null
-);
+select t1.*
+from {SOURCE_SCHEMA}.baseline as t1
+left join {SOURCE_SCHEMA}.cancer2 as t2 on t1.eid = t2.eid
+where t2.eid is null;
 
 alter table {SOURCE_NOK_SCHEMA}.baseline add constraint pk_baseline_nok primary key (eid) USING INDEX TABLESPACE pg_default;
 
@@ -130,11 +133,9 @@ WHERE t1.eid = t2.eid;
 -- death
 --------------------------------
 INSERT INTO {SOURCE_NOK_SCHEMA}.death
-(
-	select t1.*
-	from {SOURCE_SCHEMA}.death as t1
-	join {SOURCE_NOK_SCHEMA}.baseline as t2 on t1.eid = t2.eid		--Eliminate death with no gp records
-); 
+select t1.*
+from {SOURCE_SCHEMA}.death as t1
+join {SOURCE_NOK_SCHEMA}.baseline as t2 on t1.eid = t2.eid; 
 
 alter table {SOURCE_NOK_SCHEMA}.death add constraint pk_death primary key (eid, ins_index) USING INDEX TABLESPACE pg_default;
 
@@ -142,7 +143,6 @@ DELETE FROM {SOURCE_SCHEMA}.death as t1
 using {SOURCE_NOK_SCHEMA}.death as t2
 WHERE t1.eid = t2.eid
 and t1.ins_index = t2.ins_index;
-
 
 -- create index in cancer2
 create index idx_cancer2_1 on {SOURCE_SCHEMA}.cancer2(eid) TABLESPACE pg_default;
