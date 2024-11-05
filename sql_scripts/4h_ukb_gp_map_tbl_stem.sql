@@ -208,7 +208,7 @@ left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t1.source_va
 where t1.stem_source_table = 'gp_scripts';
 
 ALTER TABLE {CHUNK_SCHEMA}.stem_{CHUNK_ID} ADD CONSTRAINT pk_stem_{CHUNK_ID} PRIMARY KEY (id);
-create index idx_stem_{CHUNK_ID}_1 on {CHUNK_SCHEMA}.stem_{CHUNK_ID} (domain_id, visit_occurrence_id);
+create index idx_stem_{CHUNK_ID}_1 on {CHUNK_SCHEMA}.stem_{CHUNK_ID} (domain_id);
 create index idx_stem_{CHUNK_ID}_2 on {CHUNK_SCHEMA}.stem_{CHUNK_ID} (unit_source_value);
 create index idx_stem_{CHUNK_ID}_3 on {CHUNK_SCHEMA}.stem_{CHUNK_ID} (source_value);
 
@@ -223,14 +223,13 @@ With _measurement AS(
 	select 	id, 
 			CASE 
 				WHEN domain_id = 'Condition' THEN 1147127
-				WHEN domain_id = 'Procedure' THEN 1147810	
-				-- WHEN domain_id = 'Observation' THEN 1147762
-				ELSE 1147762
+				WHEN domain_id = 'Procedure' THEN 1147082
+				WHEN domain_id = 'Observation' THEN 1147165
 			END as event_field_concept_id,
 			stem_source_table, 
 			stem_source_id 
 	from {CHUNK_SCHEMA}.stem_{CHUNK_ID}
-	where domain_id <> 'Measurement' 
+	where domain_id in ('Condition', 'Observation', 'Procedure')
 ), cte as(
 	select  
 		t1.id, 
@@ -254,13 +253,13 @@ With _observation AS(
 	select 	id,
 			CASE 
 				WHEN domain_id = 'Condition' THEN 1147127
-				--WHEN domain_id = 'Observation' THEN 1147762
-				WHEN domain_id = 'Procedure' THEN 1147810
+				WHEN domain_id = 'Observation' THEN 1147165 
+				WHEN domain_id = 'Procedure' THEN 1147082
 				WHEN domain_id = 'Measurement' THEN 1147138
-				ELSE 1147762
 			END as event_field_concept_id,
 			stem_source_table, stem_source_id 
 	from {CHUNK_SCHEMA}.stem_{CHUNK_ID} 
+	where domain_id in ('Condition', 'Observation', 'Procedure', 'Measurement')
 ), cte as(
 	select  
 		t1.id, 

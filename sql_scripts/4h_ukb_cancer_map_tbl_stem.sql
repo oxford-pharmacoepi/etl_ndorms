@@ -155,13 +155,12 @@ With _measurement AS(
 			source_value,
 			CASE 
 				WHEN domain_id = 'Condition' THEN 1147127
-				--WHEN domain_id = 'Observation' THEN 1147762
-				WHEN domain_id = 'Procedure' THEN 1147810		
-				ELSE 1147762
+				WHEN domain_id = 'Observation' THEN 1147165
+				WHEN domain_id = 'Procedure' THEN 1147082	
 			END as event_field_concept_id, 
 			stem_source_id 
 	from {CHUNK_SCHEMA}.stem_{CHUNK_ID}
-	where domain_id <> 'Measurement' 
+	where domain_id in ('Condition', 'Observation', 'Procedure')
 ), cte as(
 	select  
 		t1.id, 
