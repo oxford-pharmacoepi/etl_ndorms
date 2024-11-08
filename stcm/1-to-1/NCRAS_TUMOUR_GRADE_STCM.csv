@@ -1,0 +1,5 @@
+source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
+G1,0,NCRAS_TUMOUR_GRADE_STCM,Well differentiated,36768162,Cancer Modifier,2020-09-23,2099-12-31,
+G2,0,NCRAS_TUMOUR_GRADE_STCM,Moderately differentiated,36770626,Cancer Modifier,2020-09-23,2099-12-31,
+G3,0,NCRAS_TUMOUR_GRADE_STCM,Poorly differentiated,36769666,Cancer Modifier,2020-09-23,2099-12-31,
+G4,0,NCRAS_TUMOUR_GRADE_STCM,Undifferentiated / anaplastic,36769737,Cancer Modifier,2020-09-23,2099-12-31,
