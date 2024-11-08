@@ -1,0 +1,6 @@
+source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
+1,0,NCRAS_TUMOUR_GLEASON_SEC_STCM,Gleason Secondary Pattern Grade 1,1635517,Cancer Modifier,2022-05-09,2099-12-31,
+2,0,NCRAS_TUMOUR_GLEASON_SEC_STCM,Gleason Secondary Pattern Grade 2,1635385,Cancer Modifier,2022-05-09,2099-12-31,
+3,0,NCRAS_TUMOUR_GLEASON_SEC_STCM,Gleason Secondary Pattern Grade 3,1634808,Cancer Modifier,2022-05-09,2099-12-31,
+4,0,NCRAS_TUMOUR_GLEASON_SEC_STCM,Gleason Secondary Pattern Grade 4,1633367,Cancer Modifier,2022-05-09,2099-12-31,
+5,0,NCRAS_TUMOUR_GLEASON_SEC_STCM,Gleason Secondary Pattern Grade 5,1634739,Cancer Modifier,2022-05-09,2099-12-31,

@@ -27,3 +27,5 @@ drop table if exists {TARGET_SCHEMA}.PROVIDER CASCADE;
 drop table if exists {TARGET_SCHEMA}.CARE_SITE CASCADE;
 drop table if exists {TARGET_SCHEMA}.LOCATION CASCADE;
 drop table if exists {TARGET_SCHEMA}.CDM_SOURCE CASCADE;
+drop table if exists {TARGET_SCHEMA}.EPISODE CASCADE;
+drop table if exists {TARGET_SCHEMA}.EPISODE_EVENT CASCADE;
