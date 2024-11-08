@@ -67,8 +67,8 @@ select distinct
 	t1.stem_source_id
 from {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} as t1
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t1.source_concept_id = t2.source_concept_id
-AND ((t1.stem_source_table = 'Tumour' AND t2.source_vocabulary_id = 'ICDO3')
-OR (t1.stem_source_table = 'Treatment' AND t2.source_vocabulary_id in ('OPCS4', 'RxNorm', 'RxNorm Extension')))
+--AND ((t1.stem_source_table = 'Tumour' AND t2.source_vocabulary_id = 'ICDO3')											--source_concept_id is PK.
+--OR (t1.stem_source_table = 'Treatment' AND t2.source_vocabulary_id in ('OPCS4', 'RxNorm', 'RxNorm Extension')))
 where t1.source_concept_id <> 0;
 
 
