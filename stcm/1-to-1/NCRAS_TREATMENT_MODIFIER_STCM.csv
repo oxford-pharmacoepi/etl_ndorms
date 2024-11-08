@@ -1,0 +1,5 @@
+source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
+lesionsize,0,NCRAS_TREATMENT_MODIFIER_STCM,"The size in mm of the diameter of a lesion, largest if more than one, if the histology of a site proves to be invasive.",4245121,SNOMED,2003-07-31,2099-12-31,
+number_of_tumours,0,NCRAS_TREATMENT_MODIFIER_STCM,Number of tumours affected by this event,36770490,Cancer Modifier,2020-09-23,2099-12-31,
+within_six_months_flag,0,NCRAS_TREATMENT_MODIFIER_STCM,Whether treatment was within six months of date of diagnosis,4215565,SNOMED,2003-01-31,2099-12-31,
+six_months_after_flag,0,NCRAS_TREATMENT_MODIFIER_STCM,Whether treatment was after six months from date of diagnosis,4215565,SNOMED,2003-01-31,2099-12-31,
