@@ -1,0 +1,8 @@
+source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
+0,0,NCRAS_TUMOUR_BASIS_DIAG_STCM,Death certificate,32815,Type Concept,2020-08-20,2099-12-31,
+1,0,NCRAS_TUMOUR_BASIS_DIAG_STCM,Clinical: Diagnosis made before death without (2-7),32828,Type Concept,2020-08-20,2099-12-31,
+2,0,NCRAS_TUMOUR_BASIS_DIAG_STCM,Clinical investigation: Includes all diagnostic techniques without a tissue diagnosis,32828,Type Concept,2020-08-20,2099-12-31,
+4,0,NCRAS_TUMOUR_BASIS_DIAG_STCM,Specific tumour markers: Includes biochemical and/or immunological markers which are site specific,32828,Type Concept,2020-08-20,2099-12-31,
+5,0,NCRAS_TUMOUR_BASIS_DIAG_STCM,"Cytology: Examination of cells whether from a primary or secondary site, including fluids aspirated using endoscopes or needles. Also including microscopic examination of peripheral blood films and trephine bone marrow aspirates",32835,Type Concept,2020-08-20,2099-12-31,
+6,0,NCRAS_TUMOUR_BASIS_DIAG_STCM,Histology of a metastases: Includes autopsy specimens,32835,Type Concept,2020-08-20,2099-12-31,
+7,0,NCRAS_TUMOUR_BASIS_DIAG_STCM,Histology of a primary tumour: Includes all cutting and bone marrow biopsies. Also includes autopsy specimens of a primary tumour,32835,Type Concept,2020-08-20,2099-12-31,
