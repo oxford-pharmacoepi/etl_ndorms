@@ -13,6 +13,7 @@ cte1 as (
 		t2.e_cr_id, 
 		t2.diagnosisdatebest as start_date, 
 		t2.morph_icd10_o2 || '/' || t2.behaviour_icd10_o2 || '-' || site_icd10_o2 || '.9' as source_code
+		,t2.basisofdiagnosis, t2.dco
 		from cte0 as t1
 		inner join {SOURCE_SCHEMA}.tumour as t2 on t1.person_id = t2.e_patid
 ),
@@ -21,7 +22,11 @@ cte2 as (
 		t1.e_cr_id, 
 		t1.start_date, 
 		t1.source_code as source_value,
-		COALESCE(t2.source_concept_id, 0) as source_concept_id
+		COALESCE(t2.source_concept_id, 0) as source_concept_id,
+		CASE 
+			WHEN t1.basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(t1.dco) = 'Y' THEN 0
+			ELSE t1.basisofdiagnosis 
+		END as type_source_value
 		from cte1 as t1
 		left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t1.source_code = t2.source_code 
 		and t2.source_vocabulary_id = 'ICDO3'
@@ -42,7 +47,7 @@ select NULL as domain_id,
 	NULL as concept_id,
 	t1.source_value,
 	t1.source_concept_id,
-	32879 as type_concept_id,	--Registry
+	COALESCE(t3.target_concept_id, 32879) as type_concept_id,
 	t1.start_date,
 	t1.start_date as end_date,
 	'00:00:00'::time start_time,
@@ -80,6 +85,7 @@ select NULL as domain_id,
 	t1.e_cr_id as stem_source_id
 from cte2 as t1
 inner join {SOURCE_SCHEMA}.temp_visit_detail as t2 on t1.e_cr_id = t2.visit_detail_source_id
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t3 on t1.type_source_value = t3.source_code::numeric and t3.source_vocabulary_id = 'NCRAS_TUMOUR_BASIS_DIAG_STCM'
 WHERE t2.source_table = 'Tumour';
 
 
@@ -257,12 +263,16 @@ WITH cte0 as (
 	WHERE t1.diagnosisdatebest >= t2.observation_period_start_date and t1.diagnosisdatebest <= t2.observation_period_end_date
 ), cte2 as(
 	select
-		e_patid,		
+		e_patid,	
+		CASE 
+			WHEN basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE basisofdiagnosis 
+		END as type_source_value,
 		diagnosisdatebest as start_date,
 		'tumoursize' as source_value,
 		tumoursize as value_as_number,
-		'mm' as unit_source_value,  	
-		e_cr_id as stem_source_id
+		'mm' as unit_source_value,  		
+		e_cr_id
 	from cte1
 	where tumoursize is not null
 
@@ -270,11 +280,15 @@ WITH cte0 as (
 
 	select 
 		e_patid,
+		CASE 
+			WHEN basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE basisofdiagnosis 
+		END as type_source_value,
 		diagnosisdatebest as start_date,
 		'nodesexcised' as source_value,
 		nodesexcised as value_as_number,
 		null as unit_source_value,
-		e_cr_id as stem_source_id
+		e_cr_id
 	from cte1
 	where nodesexcised is not null
 
@@ -282,11 +296,15 @@ WITH cte0 as (
 
 	select 
 		e_patid,
+		CASE 
+			WHEN basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE basisofdiagnosis 
+		END as type_source_value,
 		diagnosisdatebest as start_date,
 		'nodesinvolved' as source_value,
 		nodesinvolved as value_as_number,
 		null as unit_source_value,
-		e_cr_id as stem_source_id
+		e_cr_id
 	from cte1
 	where nodesinvolved is not null
 
@@ -294,11 +312,15 @@ WITH cte0 as (
 
 	select 
 		e_patid,
+		CASE 
+			WHEN basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE basisofdiagnosis 
+		END as type_source_value,
 		diagnosisdatebest as start_date,
 		'tumourcount' as source_value,
 		tumourcount as value_as_number,
 		null as unit_source_value,
-		e_cr_id as stem_source_id
+		e_cr_id
 	from cte1
 	where tumourcount is not null
 
@@ -306,11 +328,15 @@ WITH cte0 as (
 
 	select 
 		e_patid,
+		CASE 
+			WHEN basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE basisofdiagnosis 
+		END as type_source_value,
 		diagnosisdatebest as start_date,
 		'bigtumourcount' as source_value,
 		bigtumourcount as value_as_number,
 		null as unit_source_value,
-		e_cr_id as stem_source_id
+		e_cr_id
 	from cte1
 	where bigtumourcount is not null
 
@@ -318,11 +344,15 @@ WITH cte0 as (
 
 	select 
 		e_patid,
+		CASE 
+			WHEN basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE basisofdiagnosis 
+		END as type_source_value,
 		diagnosisdatebest as start_date,
 		'chrl_tot_27_03' as source_value,
 		chrl_tot_27_03 as value_as_number,
 		null as unit_source_value,
-		e_cr_id as stem_source_id
+		e_cr_id
 	from cte1
 	where chrl_tot_27_03 is not null
 
@@ -330,11 +360,15 @@ WITH cte0 as (
 
 	select 
 		e_patid,
+		CASE 
+			WHEN basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE basisofdiagnosis 
+		END as type_source_value,
 		diagnosisdatebest as start_date,
 		'chrl_tot_78_06' as source_value,
 		chrl_tot_78_06 as value_as_number,
 		null as unit_source_value,
-		e_cr_id as stem_source_id
+		e_cr_id
 	from cte1
 	where chrl_tot_78_06 is not null
 
@@ -342,16 +376,22 @@ WITH cte0 as (
 
 	select 
 		e_patid,
+		CASE 
+			WHEN basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE basisofdiagnosis 
+		END as type_source_value,
 		diagnosisdatebest as start_date,
 		'gleason_combined' as source_value,
 		gleason_combined as value_as_number,
 		null as unit_source_value,
-		e_cr_id as stem_source_id
+		e_cr_id
 	from cte1
 	where gleason_combined is not null
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
+	visit_occurrence_id,
+	visit_detail_id,
 	source_value,
 	source_concept_id, 
 	type_concept_id, 
@@ -360,24 +400,30 @@ insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	start_time, 
 	value_as_number,
 	unit_source_value,
+	value_source_value,
 	stem_source_table,
 	stem_source_id
 )
-select  										-- ***no duplication
+select distinct								
 	t1.e_patid as person_id,
+	tt.visit_occurrence_id,
+	tt.visit_detail_id,
 	t1.source_value,
 	COALESCE(t2.source_concept_id, 0) as source_concept_id,
-	32879 as type_concept_id,
+	COALESCE(t3.target_concept_id, 32879) as type_concept_id,
 	t1.start_date as start_date,
 	t1.start_date as end_date,
 	'00:00:00'::time start_time,
 	t1.value_as_number,
 	t1.unit_source_value,
-	'Tumour-Modifier' stem_source_table,
-	t1.stem_source_id
+	t1.source_value as value_source_value,
+	'Tumour-Modifier' as stem_source_table,
+	t1.e_cr_id as stem_source_id
 from cte2 as t1
+join {SOURCE_SCHEMA}.temp_visit_detail as tt on t1.e_cr_id = tt.visit_detail_source_id and tt.source_table = 'Tumour'
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_code = t1.source_value and t2.source_vocabulary_id = 'NCRAS_TUMOUR_MODIFIER_STCM' 
-and t2.target_domain_id = 'Measurement';  -- for Athena changes target domain during STCM update
+and t2.target_domain_id = 'Measurement'  -- for Athena changes target domain during STCM update
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t3 on t1.type_source_value = t3.source_code::numeric and t3.source_vocabulary_id = 'NCRAS_TUMOUR_BASIS_DIAG_STCM';
 
 
 -- GRADE 
@@ -385,9 +431,26 @@ WITH cte0 as (
 	select person_id
 	from {CHUNK_SCHEMA}.chunk_person
 	where chunk_id = {CHUNK_ID}
+), cte1 as(
+	select 
+		t1.e_patid,
+		t1.grade,
+		CASE 
+			WHEN basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE basisofdiagnosis 
+		END as type_source_value,
+		t1.diagnosisdatebest,
+		t1.e_cr_id
+	from {SOURCE_SCHEMA}.tumour as t1
+	join cte0 on cte0.person_id = t1.e_patid
+	join {TARGET_SCHEMA}.observation_period as t2 on t1.e_patid = t2.person_id
+	where t1.grade is not null 
+	and t1.diagnosisdatebest >= t2.observation_period_start_date and t1.diagnosisdatebest <= t2.observation_period_end_date
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
+	visit_occurrence_id,
+	visit_detail_id,
 	source_value,
 	source_concept_id, 
 	type_concept_id, 
@@ -398,25 +461,23 @@ insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	stem_source_table,
 	stem_source_id
 )
-select 
+select distinct
 	t1.e_patid as person_id,
+	tt.visit_occurrence_id,
+	tt.visit_detail_id,
 	t1.grade as source_value,
 	COALESCE(t2.source_concept_id, 0) as source_concept_id,
-	32879 as type_concept_id,	--Registry
+	COALESCE(t3.target_concept_id, 32879) as type_concept_id,
 	t1.diagnosisdatebest as start_date,
 	t1.diagnosisdatebest as end_date,
 	'00:00:00'::time start_time,
 	'grade' as value_source_value,
 	'Tumour-Grade' stem_source_table,
 	t1.e_cr_id as stem_source_id
-from {SOURCE_SCHEMA}.tumour as t1
-join cte0 on cte0.person_id = t1.e_patid
-join {TARGET_SCHEMA}.observation_period as t3 on t1.e_patid = t3.person_id
-left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_code = t1.grade and t2.source_vocabulary_id = 'NCRAS_TUMOUR_GRADE_STCM' 
-and t2.target_domain_id = 'Measurement'  -- for Athena changes target domain during STCM update
-where t1.grade is not null 
-and t1.diagnosisdatebest >= t3.observation_period_start_date and t1.diagnosisdatebest <= t3.observation_period_end_date;
-
+from cte1 as t1
+join {SOURCE_SCHEMA}.temp_visit_detail as tt on t1.e_cr_id = tt.visit_detail_source_id and tt.source_table = 'Tumour'
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_code = t1.grade and t2.source_vocabulary_id = 'NCRAS_TUMOUR_GRADE_STCM' and t2.target_domain_id = 'Measurement'  -- for Athena changes target domain during STCM update
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t3 on t1.type_source_value = t3.source_code::numeric and t3.source_vocabulary_id = 'NCRAS_TUMOUR_BASIS_DIAG_STCM';
 
 -- stage_best, stage_img, stage_path
 WITH cte0 as (
@@ -427,6 +488,10 @@ WITH cte0 as (
 	select 
 		t1.e_cr_id,
 		t1.e_patid,
+		CASE 
+			WHEN t1.basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE t1.basisofdiagnosis 
+		END as type_source_value,
 		t1.diagnosisdatebest,
 		CASE
 			WHEN t1.stage_best_system in ('6th', 'UICC 6') THEN '6TH_'
@@ -435,7 +500,7 @@ WITH cte0 as (
 			ELSE ''
 		END as stage_system,
 		t1.stage_best as source_value,
-		'Best registry stage at diagnosis of the tumour' as value_source_value
+		'stage_best' as value_source_value
 	from {SOURCE_SCHEMA}.tumour as t1
 	join cte0 as t2 on t1.e_patid = t2.person_id
 	where t1.stage_best is not null 
@@ -445,6 +510,10 @@ WITH cte0 as (
 	select 
 		t1.e_cr_id,
 		t1.e_patid,
+		CASE 
+			WHEN t1.basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE t1.basisofdiagnosis 
+		END as type_source_value,
 		t1.diagnosisdatebest,
 		CASE
 			WHEN t1.stage_img_system in (6, 21) THEN '6TH_'
@@ -453,7 +522,7 @@ WITH cte0 as (
 			ELSE ''
 		END as stage_system,
 		t1.stage_img as source_value,
-		'Stage at diagnosis (derived from imaging)' as value_source_value
+		'stage_img' as value_source_value
 	from {SOURCE_SCHEMA}.tumour as t1
 	join cte0 as t2 on t1.e_patid = t2.person_id
 	where t1.stage_img is not null 
@@ -463,6 +532,10 @@ WITH cte0 as (
 	select 
 		t1.e_cr_id,
 		t1.e_patid,
+		CASE 
+			WHEN t1.basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE t1.basisofdiagnosis 
+		END as type_source_value,
 		t1.diagnosisdatebest,
 		CASE
 			WHEN t1.stage_path_system in (6, 21) THEN '6TH_'
@@ -471,13 +544,15 @@ WITH cte0 as (
 			ELSE ''
 		END as stage_system,
 		t1.stage_path as source_value,
-		'Pathological stage at diagnoses' as value_source_value
+		'stage_path' as value_source_value
 	from {SOURCE_SCHEMA}.tumour as t1
 	join cte0 as t2 on t1.e_patid = t2.person_id
 	where t1.stage_path is not null 
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
+	visit_occurrence_id,
+	visit_detail_id,
 	source_value,
 	source_concept_id, 
 	type_concept_id, 
@@ -488,11 +563,13 @@ insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	stem_source_table,
 	stem_source_id
 )
-select 
+select distinct
 	t1.e_patid as person_id,
+	tt.visit_occurrence_id,
+	tt.visit_detail_id,
 	COALESCE(t2.source_code, t3.source_code, t1.source_value) as source_value,
 	COALESCE(t2.source_concept_id, t3.source_concept_id, 0) as source_concept_id,
-	32879 as type_concept_id,	--Registry
+	COALESCE(t4.target_concept_id, 32879) as type_concept_id,
 	t1.diagnosisdatebest as start_date,
 	t1.diagnosisdatebest as end_date,
 	'00:00:00'::time start_time,
@@ -500,10 +577,12 @@ select
 	'Tumour-Stage' as stem_source_table,
 	t1.e_cr_id as stem_source_id
 from cte1 as t1
-join {TARGET_SCHEMA}.observation_period as t4 on t1.e_patid = t4.person_id
+join {TARGET_SCHEMA}.observation_period as t5 on t1.e_patid = t5.person_id
+join {SOURCE_SCHEMA}.temp_visit_detail as tt on t1.e_cr_id = tt.visit_detail_source_id and tt.source_table = 'Tumour'
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_vocabulary_id = 'Cancer Modifier' and UPPER(t2.source_code) = UPPER(t1.stage_system || 'AJCC/UICC-STAGE-'|| t1.source_value) and t2.target_domain_id = 'Measurement' -- for Athena changes target domain during STCM update
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t3 on t3.source_vocabulary_id = 'Cancer Modifier' and UPPER(t3.source_code) = UPPER(t1.stage_system || 'AJCC/UICC-STAGE-'|| LEFT(t1.source_value, 1)) and t3.target_domain_id = 'Measurement' 
-where t1.diagnosisdatebest >= t4.observation_period_start_date and t1.diagnosisdatebest <= t4.observation_period_end_date;
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t1.type_source_value = t4.source_code::numeric and t4.source_vocabulary_id = 'NCRAS_TUMOUR_BASIS_DIAG_STCM'
+where t1.diagnosisdatebest >= t5.observation_period_start_date and t1.diagnosisdatebest <= t5.observation_period_end_date;
 
 -- t_best, n_best, m_best
 WITH cte0 as (
@@ -514,6 +593,10 @@ WITH cte0 as (
 	select 
 		t1.e_cr_id,
 		t1.e_patid,
+		CASE 
+			WHEN t1.basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE t1.basisofdiagnosis 
+		END as type_source_value,
 		t1.diagnosisdatebest,
 		CASE
 			WHEN t1.stage_best_system in ('6th', 'UICC 6') THEN '6TH_'
@@ -536,6 +619,10 @@ WITH cte0 as (
 	select 
 		t1.e_cr_id,
 		t1.e_patid,
+		CASE 
+			WHEN t1.basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE t1.basisofdiagnosis 
+		END as type_source_value,
 		t1.diagnosisdatebest,
 		CASE
 			WHEN t1.stage_best_system in ('6th', 'UICC 6') THEN '6TH_'
@@ -558,6 +645,10 @@ WITH cte0 as (
 	select 
 		t1.e_cr_id,
 		t1.e_patid,
+		CASE 
+			WHEN t1.basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE t1.basisofdiagnosis 
+		END as type_source_value,
 		t1.diagnosisdatebest,
 		CASE
 			WHEN t1.stage_best_system in ('6th', 'UICC 6') THEN '6TH_'
@@ -577,6 +668,8 @@ WITH cte0 as (
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
+	visit_occurrence_id,
+	visit_detail_id,
 	source_value,
 	source_concept_id, 
 	type_concept_id, 
@@ -589,9 +682,11 @@ insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 )
 select 
 	t1.e_patid as person_id,
+	tt.visit_occurrence_id,
+	tt.visit_detail_id,
 	COALESCE(t2.source_code, t1.source_value) as source_value,
 	COALESCE(t2.source_concept_id, 0) as source_concept_id,
-	32879 as type_concept_id,	--Registry
+	COALESCE(t4.target_concept_id, 32879) as type_concept_id,
 	t1.diagnosisdatebest as start_date,
 	t1.diagnosisdatebest as end_date,
 	'00:00:00'::time start_time,
@@ -600,9 +695,10 @@ select
 	t1.e_cr_id as stem_source_id
 from cte1 as t1
 join {TARGET_SCHEMA}.observation_period as t3 on t1.e_patid = t3.person_id
+join {SOURCE_SCHEMA}.temp_visit_detail as tt on t1.e_cr_id = tt.visit_detail_source_id and tt.source_table = 'Tumour'
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on UPPER(t2.source_code) = UPPER(t1.stage_system || 'AJCC/UICC-'|| t1.tnm_code) 
-and t2.source_vocabulary_id = 'Cancer Modifier' 
-and t2.target_domain_id = 'Measurement' -- for Athena changes target domain during STCM update
+and t2.source_vocabulary_id = 'Cancer Modifier' and t2.target_domain_id = 'Measurement' -- for Athena changes target domain during STCM update
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t1.type_source_value = t4.source_code::numeric and t4.source_vocabulary_id = 'NCRAS_TUMOUR_BASIS_DIAG_STCM'
 where t1.diagnosisdatebest >= t3.observation_period_start_date and t1.diagnosisdatebest <= t3.observation_period_end_date;
 
 
@@ -615,6 +711,10 @@ WITH cte0 as (
 	select 
 		t1.e_cr_id,
 		t1.e_patid,
+		CASE 
+			WHEN t1.basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE t1.basisofdiagnosis 
+		END as type_source_value,
 		t1.diagnosisdatebest,
 		CASE
 			WHEN t1.stage_img_system in (6, 21) THEN '6TH_'
@@ -637,6 +737,10 @@ WITH cte0 as (
 	select 
 		t1.e_cr_id,
 		t1.e_patid,
+		CASE 
+			WHEN t1.basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE t1.basisofdiagnosis 
+		END as type_source_value,
 		t1.diagnosisdatebest,
 		CASE
 			WHEN t1.stage_img_system in (6, 21) THEN '6TH_'
@@ -659,6 +763,10 @@ WITH cte0 as (
 	select 
 		t1.e_cr_id,
 		t1.e_patid,
+		CASE 
+			WHEN t1.basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE t1.basisofdiagnosis 
+		END as type_source_value,
 		t1.diagnosisdatebest,
 		CASE
 			WHEN t1.stage_img_system in (6, 21) THEN '6TH_'
@@ -678,6 +786,8 @@ WITH cte0 as (
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
+	visit_occurrence_id,
+	visit_detail_id,
 	source_value,
 	source_concept_id, 
 	type_concept_id, 
@@ -690,9 +800,11 @@ insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 )
 select 
 	t1.e_patid as person_id,
+	tt.visit_occurrence_id,
+	tt.visit_detail_id,
 	COALESCE(t2.source_code, t1.source_value) as source_value,
 	COALESCE(t2.source_concept_id, 0) as source_concept_id,
-	32879 as type_concept_id,	--Registry
+	COALESCE(t4.target_concept_id, 32879) as type_concept_id,
 	t1.diagnosisdatebest as start_date,
 	t1.diagnosisdatebest as end_date,
 	'00:00:00'::time start_time,
@@ -701,9 +813,10 @@ select
 	t1.e_cr_id as stem_source_id
 from cte1 as t1
 join {TARGET_SCHEMA}.observation_period as t3 on t1.e_patid = t3.person_id
+join {SOURCE_SCHEMA}.temp_visit_detail as tt on t1.e_cr_id = tt.visit_detail_source_id and tt.source_table = 'Tumour'
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on UPPER(t2.source_code) = UPPER(t1.stage_system || 'AJCC/UICC-'|| t1.tnm_code) 
-and t2.source_vocabulary_id = 'Cancer Modifier' 
-and t2.target_domain_id = 'Measurement' -- for Athena changes target domain during STCM update
+and t2.source_vocabulary_id = 'Cancer Modifier' and t2.target_domain_id = 'Measurement' -- for Athena changes target domain during STCM update
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t1.type_source_value = t4.source_code::numeric and t4.source_vocabulary_id = 'NCRAS_TUMOUR_BASIS_DIAG_STCM'
 where t1.diagnosisdatebest >= t3.observation_period_start_date and t1.diagnosisdatebest <= t3.observation_period_end_date;
 
 
@@ -716,6 +829,10 @@ WITH cte0 as (
 	select 
 		t1.e_cr_id,
 		t1.e_patid,
+		CASE 
+			WHEN t1.basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE t1.basisofdiagnosis 
+		END as type_source_value,
 		t1.diagnosisdatebest,
 		CASE
 			WHEN t1.stage_path_system in (6, 21) THEN '6TH_'
@@ -738,6 +855,10 @@ WITH cte0 as (
 	select 
 		t1.e_cr_id,
 		t1.e_patid,
+		CASE 
+			WHEN t1.basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE t1.basisofdiagnosis 
+		END as type_source_value,
 		t1.diagnosisdatebest,
 		CASE
 			WHEN t1.stage_path_system in (6, 21) THEN '6TH_'
@@ -760,6 +881,10 @@ WITH cte0 as (
 	select 
 		t1.e_cr_id,
 		t1.e_patid,
+		CASE 
+			WHEN t1.basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+			ELSE t1.basisofdiagnosis 
+		END as type_source_value,
 		t1.diagnosisdatebest,
 		CASE
 			WHEN t1.stage_path_system in (6, 21) THEN '6TH_'
@@ -779,6 +904,8 @@ WITH cte0 as (
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
+	visit_occurrence_id,
+	visit_detail_id,
 	source_value,
 	source_concept_id, 
 	type_concept_id, 
@@ -791,9 +918,11 @@ insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 )
 select 
 	t1.e_patid as person_id,
+	tt.visit_occurrence_id,
+	tt.visit_detail_id,
 	COALESCE(t2.source_code, t1.source_value) as source_value,
 	COALESCE(t2.source_concept_id, 0) as source_concept_id,
-	32879 as type_concept_id,	--Registry
+	COALESCE(t4.target_concept_id, 32879) as type_concept_id,
 	t1.diagnosisdatebest as start_date,
 	t1.diagnosisdatebest as end_date,
 	'00:00:00'::time start_time,
@@ -802,9 +931,11 @@ select
 	t1.e_cr_id as stem_source_id
 from cte1 as t1
 join {TARGET_SCHEMA}.observation_period as t3 on t1.e_patid = t3.person_id
+join {SOURCE_SCHEMA}.temp_visit_detail as tt on t1.e_cr_id = tt.visit_detail_source_id and tt.source_table = 'Tumour'
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on UPPER(t2.source_code) = UPPER(t1.stage_system || 'AJCC/UICC-'|| t1.tnm_code) 
 and t2.source_vocabulary_id = 'Cancer Modifier' 
 and t2.target_domain_id = 'Measurement' -- for Athena changes target domain during STCM update
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t1.type_source_value = t4.source_code::numeric and t4.source_vocabulary_id = 'NCRAS_TUMOUR_BASIS_DIAG_STCM'
 where t1.diagnosisdatebest >= t3.observation_period_start_date and t1.diagnosisdatebest <= t3.observation_period_end_date;
 
 -- gleason_primary 
@@ -812,9 +943,26 @@ WITH cte0 as (
 	select person_id
 	from {CHUNK_SCHEMA}.chunk_person
 	where chunk_id = {CHUNK_ID}
+), cte1 as(
+	select 
+		t1.e_patid,
+		CASE 
+				WHEN t1.basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+				ELSE t1.basisofdiagnosis 
+		END as type_source_value,
+		t1.diagnosisdatebest,
+		t1.gleason_primary,
+		t1.e_cr_id
+	from {SOURCE_SCHEMA}.tumour as t1
+	join cte0 as t2 on t1.e_patid = t2.person_id
+	join {TARGET_SCHEMA}.observation_period as t3 on t1.e_patid = t3.person_id
+	where t1.gleason_primary >= 1 and t1.gleason_primary <= 5
+	and t1.diagnosisdatebest >= t3.observation_period_start_date and t1.diagnosisdatebest <= t3.observation_period_end_date
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
+	visit_occurrence_id,
+	visit_detail_id,
 	source_value,
 	source_concept_id, 
 	type_concept_id, 
@@ -828,9 +976,11 @@ insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 )
 select 
 	t1.e_patid as person_id,
+	tt.visit_occurrence_id,
+	tt.visit_detail_id,
 	t1.gleason_primary::text as source_value,
-	COALESCE(t4.source_concept_id, 0) as source_concept_id,
-	32879 as type_concept_id,	--Registry	
+	COALESCE(t2.source_concept_id, 0) as source_concept_id,
+	COALESCE(t3.target_concept_id, 32879) as type_concept_id,
 	t1.diagnosisdatebest as start_date,
 	t1.diagnosisdatebest as end_date,
 	'00:00:00'::time start_time,
@@ -838,13 +988,11 @@ select
 	'gleason_primary' as value_source_value,
 	'Tumour-Gleason Primary' as stem_source_table,
 	t1.e_cr_id as stem_source_id
-from {SOURCE_SCHEMA}.tumour as t1
-join cte0 as t2 on t1.e_patid = t2.person_id
-join {TARGET_SCHEMA}.observation_period as t3 on t1.e_patid = t3.person_id
-left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t4.source_code = t1.gleason_primary::text and t4.source_vocabulary_id = 'NCRAS_TUMOUR_GLEASON_PRI_STCM' 
-and t4.target_domain_id = 'Measurement' -- for Athena changes target domain during STCM update
-where t1.gleason_primary >= 1 and t1.gleason_primary <= 5
-and t1.diagnosisdatebest >= t3.observation_period_start_date and t1.diagnosisdatebest <= t3.observation_period_end_date;
+from cte1 as t1
+join {SOURCE_SCHEMA}.temp_visit_detail as tt on t1.e_cr_id = tt.visit_detail_source_id and tt.source_table = 'Tumour'
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_code = t1.gleason_primary::text and t2.source_vocabulary_id = 'NCRAS_TUMOUR_GLEASON_PRI_STCM' 
+and t2.target_domain_id = 'Measurement' -- for Athena changes target domain during STCM update
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t3 on t1.type_source_value = t3.source_code::numeric and t3.source_vocabulary_id = 'NCRAS_TUMOUR_BASIS_DIAG_STCM';
 
 	
 -- gleason_secondary 
@@ -852,9 +1000,26 @@ WITH cte0 as (
 	select person_id
 	from {CHUNK_SCHEMA}.chunk_person
 	where chunk_id = {CHUNK_ID}
+), cte1 as(
+	select 
+		t1.e_patid,
+		CASE 
+				WHEN t1.basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+				ELSE t1.basisofdiagnosis 
+		END as type_source_value,
+		t1.diagnosisdatebest,
+		t1.gleason_secondary,
+		t1.e_cr_id
+	from {SOURCE_SCHEMA}.tumour as t1
+	join cte0 as t2 on t1.e_patid = t2.person_id
+	join {TARGET_SCHEMA}.observation_period as t3 on t1.e_patid = t3.person_id
+	where t1.gleason_secondary >= 1 and t1.gleason_secondary <= 5
+	and t1.diagnosisdatebest >= t3.observation_period_start_date and t1.diagnosisdatebest <= t3.observation_period_end_date
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
+	visit_occurrence_id,
+	visit_detail_id,
 	source_value,
 	source_concept_id, 
 	type_concept_id, 
@@ -868,9 +1033,11 @@ insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 )
 select 
 	t1.e_patid as person_id,
+	tt.visit_occurrence_id,
+	tt.visit_detail_id,
 	t1.gleason_secondary::text as source_value,
-	COALESCE(t4.source_concept_id, 0) as source_concept_id,
-	32879 as type_concept_id,	--Registry	
+	COALESCE(t2.source_concept_id, 0) as source_concept_id,
+	COALESCE(t3.target_concept_id, 32879) as type_concept_id,
 	t1.diagnosisdatebest as start_date,
 	t1.diagnosisdatebest as end_date,
 	'00:00:00'::time start_time,
@@ -878,22 +1045,38 @@ select
 	'gleason_secondary' as value_source_value,
 	'Tumour-Gleason Secondary' as stem_source_table,
 	t1.e_cr_id as stem_source_id
-from {SOURCE_SCHEMA}.tumour as t1
-join cte0 as t2 on t1.e_patid = t2.person_id
-join {TARGET_SCHEMA}.observation_period as t3 on t1.e_patid = t3.person_id
-left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t4.source_code = t1.gleason_secondary::text and t4.source_vocabulary_id = 'NCRAS_TUMOUR_GLEASON_SEC_STCM' 
-and t4.target_domain_id = 'Measurement' -- for Athena changes target domain during STCM update
-where t1.gleason_secondary >= 1 and t1.gleason_secondary <= 5
-and t1.diagnosisdatebest >= t3.observation_period_start_date and t1.diagnosisdatebest <= t3.observation_period_end_date;
+from cte1 as t1
+join {SOURCE_SCHEMA}.temp_visit_detail as tt on t1.e_cr_id = tt.visit_detail_source_id and tt.source_table = 'Tumour'
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_code = t1.gleason_secondary::text and t2.source_vocabulary_id = 'NCRAS_TUMOUR_GLEASON_SEC_STCM' 
+and t2.target_domain_id = 'Measurement' -- for Athena changes target domain during STCM update
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t3 on t1.type_source_value = t3.source_code::numeric and t3.source_vocabulary_id = 'NCRAS_TUMOUR_BASIS_DIAG_STCM';
+
 
 -- gleason_tertiary
 WITH cte0 as (
 	select person_id
 	from {CHUNK_SCHEMA}.chunk_person
 	where chunk_id = {CHUNK_ID}
+), cte1 as(
+	select 
+		t1.e_patid,
+		CASE 
+				WHEN t1.basisofdiagnosis NOT in (0,1,2,4,5,6,7) and upper(dco) = 'Y' THEN 0
+				ELSE t1.basisofdiagnosis 
+		END as type_source_value,
+		t1.diagnosisdatebest,
+		t1.gleason_tertiary,
+		t1.e_cr_id
+	from {SOURCE_SCHEMA}.tumour as t1
+	join cte0 as t2 on t1.e_patid = t2.person_id
+	join {TARGET_SCHEMA}.observation_period as t3 on t1.e_patid = t3.person_id
+	where t1.gleason_tertiary >= 1 and t1.gleason_tertiary <= 5  
+	and t1.diagnosisdatebest >= t3.observation_period_start_date and t1.diagnosisdatebest <= t3.observation_period_end_date
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
+	visit_occurrence_id,
+	visit_detail_id,
 	source_value,
 	source_concept_id, 
 	type_concept_id, 
@@ -907,9 +1090,11 @@ insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 )
 select 
 	t1.e_patid as person_id,
+	tt.visit_occurrence_id,
+	tt.visit_detail_id,
 	t1.gleason_tertiary::text as source_value,
-	COALESCE(t4.source_concept_id, 0) as source_concept_id,
-	32879 as type_concept_id,	--Registry	
+	COALESCE(t2.source_concept_id, 0) as source_concept_id,
+	COALESCE(t3.target_concept_id, 32879) as type_concept_id,
 	t1.diagnosisdatebest as start_date,
 	t1.diagnosisdatebest as end_date,
 	'00:00:00'::time start_time,
@@ -917,13 +1102,12 @@ select
 	'gleason_tertiary' as value_source_value,
 	'Tumour-Gleason Tertiary' as stem_source_table,
 	t1.e_cr_id as stem_source_id
-from {SOURCE_SCHEMA}.tumour as t1
-join cte0 as t2 on t1.e_patid = t2.person_id
-join {TARGET_SCHEMA}.observation_period as t3 on t1.e_patid = t3.person_id
-left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t4.source_code = t1.gleason_tertiary::text and t4.source_vocabulary_id = 'NCRAS_TUMOUR_GLEASON_TER_STCM' 
-and t4.target_domain_id = 'Measurement' -- for Athena changes target domain during STCM update
-where t1.gleason_tertiary >= 1 and t1.gleason_tertiary <= 5  
-and t1.diagnosisdatebest >= t3.observation_period_start_date and t1.diagnosisdatebest <= t3.observation_period_end_date;
+from cte1 as t1
+join {SOURCE_SCHEMA}.temp_visit_detail as tt on t1.e_cr_id = tt.visit_detail_source_id and tt.source_table = 'Tumour'
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_code = t1.gleason_tertiary::text and t2.source_vocabulary_id = 'NCRAS_TUMOUR_GLEASON_TER_STCM' 
+and t2.target_domain_id = 'Measurement' -- for Athena changes target domain during STCM update
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t3 on t1.type_source_value = t3.source_code::numeric and t3.source_vocabulary_id = 'NCRAS_TUMOUR_BASIS_DIAG_STCM';
+
 
 ------------------------------------------------------------------
 -- Treatment Modifiers 'Treatment-[modifier]' as stem_source_table
@@ -963,6 +1147,8 @@ WITH cte0 as (
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id,  
+	visit_occurrence_id,
+	visit_detail_id,
 	source_value,
 	source_concept_id, 
 	type_concept_id, 
@@ -971,11 +1157,14 @@ insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	start_time, 
 	value_as_number,
 	unit_source_value,
+	value_source_value,
 	stem_source_table,
 	stem_source_id
 )
 select
 	t1.e_patid as person_id,
+	tt.visit_occurrence_id,
+	tt.visit_detail_id,
 	t1.source_value,
 	COALESCE(t2.source_concept_id, 0) as source_concept_id,
 	32879 as type_concept_id,
@@ -984,9 +1173,11 @@ select
 	'00:00:00'::time start_time,
 	t1.value_as_number,
 	t1.unit_source_value,
+	t1.source_value as value_source_value,
 	'Treatment-Modifier' as stem_source_table,
 	t1.treatment_id as stem_source_id
 from cte2 as t1
+join {SOURCE_SCHEMA}.temp_visit_detail as tt on t1.treatment_id = tt.visit_detail_source_id and tt.source_table = 'Treatment'
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_code = t1.source_value::text and t2.source_vocabulary_id = 'NCRAS_TREATMENT_MODIFIER_STCM' 
 and t2.target_domain_id = 'Measurement'; -- for Athena changes target domain during STCM update
 
@@ -1032,9 +1223,12 @@ WITH cte0 as (
 		4172704 as qualifier_concept_id,
 		treatment_id
 	from cte1
+	
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id,  
+	visit_occurrence_id,
+	visit_detail_id,
 	source_value,
 	source_concept_id, 
 	type_concept_id, 
@@ -1046,11 +1240,14 @@ insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	unit_source_value,
 	qualifier_source_value,
 	qualifier_concept_id,
+	value_source_value,
 	stem_source_table,
 	stem_source_id
 )
 select  
 	t1.e_patid as person_id,
+	tt.visit_occurrence_id,
+	tt.visit_detail_id,
 	t1.source_value,
 	COALESCE(t2.source_concept_id, 0) as source_concept_id,
 	32879 as type_concept_id,
@@ -1062,9 +1259,11 @@ select
 	'month' as unit_source_value,
 	t1.qualifier_source_value,
 	t1.qualifier_concept_id,
+	t1.source_value as value_source_value,
 	'Treatment-Modifier' as stem_source_table,
 	treatment_id as stem_source_id
 from cte2 as t1
+join {SOURCE_SCHEMA}.temp_visit_detail as tt on t1.treatment_id = tt.visit_detail_source_id and tt.source_table = 'Treatment'
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_code = t1.source_value 
 and t2.source_vocabulary_id = 'NCRAS_TREATMENT_MODIFIER_STCM';
 
