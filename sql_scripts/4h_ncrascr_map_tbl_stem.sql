@@ -773,6 +773,7 @@ insert into {CHUNK_SCHEMA}.stem_{CHUNK_ID} (
 	id, 
 	source_concept_id,
 	concept_id, 
+	source_value,
 	type_concept_id, 
 	start_date, 
 	end_date, 
@@ -788,17 +789,18 @@ select
 	nextval('{CHUNK_SCHEMA}.stem_id_seq') as id,	--episode_id
 	t2.id as source_concept_id, 					--episode_parent_id,
 	32531 as concept_id, 							--episode_concept_id: Treatment Regimen Episode					
+	t1.eventdesc as source_value,					--episode_source_value
 	32879 as type_concept_id, 						--episode_type_concept_id
 	t1.start_date, 									--episode_start_date
 	NULL::date as end_date,							--episode_end_date
 	'00:00:00'::time as start_time,
 	ROW_NUMBER () OVER (PARTITION BY t1.person_id ORDER BY t1.person_id, t1.treatment_id, t1.start_date) as value_as_number, --episode_number,
-	t1.value_as_concept_id,							--episode_object_concept_id
+	t1.value_as_concept_id,							--episode_object_concept_id	
 	t1.stem_source_table,
 	t1.treatment_id as stem_source_id
 from cte0 as t1
 left join {CHUNK_SCHEMA}.stem_{CHUNK_ID} as t2 on t1.person_id = t2.person_id and t1.e_cr_id = t2.stem_source_id::numeric
-where t2.concept_id = 32533  						-- link Treatment Regimen Episode	to Disease Episode
+where t2.concept_id = 32533  						-- link Treatment Regimen Episode to Disease Episode
 and t1.value_as_concept_id is not null
 and t1.target_domain_id in ('Regimen', 'Procedure');
 

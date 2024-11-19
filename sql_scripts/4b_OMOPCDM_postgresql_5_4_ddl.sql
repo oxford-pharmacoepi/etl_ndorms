@@ -212,7 +212,7 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.OBSERVATION (
 			observation_source_concept_id integer NULL,
 			unit_source_value varchar(100) NULL,
 			qualifier_source_value varchar(50) NULL,
-			value_source_value varchar(50) NULL,
+			value_source_value varchar(100) NULL,
 			observation_event_id integer NULL,
 			obs_event_field_concept_id integer NULL )
 			TABLESPACE pg_default;
