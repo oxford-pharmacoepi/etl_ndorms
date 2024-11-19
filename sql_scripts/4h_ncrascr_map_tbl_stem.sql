@@ -794,7 +794,7 @@ select
 	t1.start_date, 									--episode_start_date
 	NULL::date as end_date,							--episode_end_date
 	'00:00:00'::time as start_time,
-	ROW_NUMBER () OVER (PARTITION BY t1.person_id ORDER BY t1.person_id, t1.treatment_id, t1.start_date) as value_as_number, --episode_number,
+	ROW_NUMBER () OVER (PARTITION BY t1.person_id ORDER BY t1.person_id, t1.start_date, t1.treatment_id) as value_as_number, --episode_number,
 	t1.value_as_concept_id,							--episode_object_concept_id	
 	t1.stem_source_table,
 	t1.treatment_id as stem_source_id
