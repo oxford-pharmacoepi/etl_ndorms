@@ -422,7 +422,6 @@ select distinct
 from cte2 as t1
 join {SOURCE_SCHEMA}.temp_visit_detail as tt on t1.e_cr_id = tt.visit_detail_source_id and tt.source_table = 'Tumour'
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_code = t1.source_value and t2.source_vocabulary_id = 'NCRAS_TUMOUR_MODIFIER_STCM' 
-and t2.target_domain_id = 'Measurement'  -- for Athena changes target domain during STCM update
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t3 on t1.type_source_value = t3.source_code::numeric and t3.source_vocabulary_id = 'NCRAS_TUMOUR_BASIS_DIAG_STCM';
 
 
@@ -1178,8 +1177,8 @@ select
 	t1.treatment_id as stem_source_id
 from cte2 as t1
 join {SOURCE_SCHEMA}.temp_visit_detail as tt on t1.treatment_id = tt.visit_detail_source_id and tt.source_table = 'Treatment'
-left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_code = t1.source_value::text and t2.source_vocabulary_id = 'NCRAS_TREATMENT_MODIFIER_STCM' 
-and t2.target_domain_id = 'Measurement'; -- for Athena changes target domain during STCM update
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_code = t1.source_value::text and t2.source_vocabulary_id = 'NCRAS_TREATMENT_MODIFIER_STCM';
+
 
 ------------------------------
 -- within_six_months_flag 
@@ -1259,7 +1258,7 @@ select
 	'month' as unit_source_value,
 	t1.qualifier_source_value,
 	t1.qualifier_concept_id,
-	t1.source_value as value_source_value,
+	t2.source_code_description as value_source_value,
 	'Treatment-Modifier' as stem_source_table,
 	treatment_id as stem_source_id
 from cte2 as t1

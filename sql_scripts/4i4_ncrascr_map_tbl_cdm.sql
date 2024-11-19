@@ -133,7 +133,9 @@ SELECT
 		CASE
 			WHEN t1.unit_source_value is not null THEN COALESCE(t2.source_concept_id, 0)
 		END as unit_source_concept_id,
-		t1.value_source_value,
+		CASE 
+			WHEN t1.value_source_value <> t1.source_value THEN t1.value_source_value
+		END AS value_source_value,
 		t1.measurement_event_id as measurement_event_id,
 		t1.meas_event_field_concept_id as meas_event_field_concept_id
 from {CHUNK_SCHEMA}.stem_{CHUNK_ID} as t1
@@ -180,8 +182,10 @@ SELECT
 		value_as_number as episode_number,
 		value_as_concept_id as episode_object_concept_id,
 		type_concept_id as episode_type_concept_id,
-		NULL as episode_source_value,
-		NULL::integer as episode_source_concept_id
+		source_value as episode_source_value,
+		CASE 
+			WHEN source_value is not null THEN 0
+		END as episode_source_concept_id
 from {CHUNK_SCHEMA}.stem_{CHUNK_ID}
 where domain_id = 'Episode';
 
@@ -270,7 +274,9 @@ SELECT
 		t1.source_concept_id as observation_source_concept_id,
 		t1.unit_source_value,
 		t1.qualifier_source_value,
-		t1.value_source_value,
+		CASE 
+			WHEN t1.value_source_value <> t1.source_value THEN t1.value_source_value
+		END as value_source_value,
 		t1.observation_event_id,
 		t1.obs_event_field_concept_id
 from {CHUNK_SCHEMA}.stem_{CHUNK_ID} as t1

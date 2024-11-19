@@ -1,9 +1,9 @@
 source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
 tumoursize,0,NCRAS_TUMOUR_MODIFIER_STCM,"Diameter of a tumour in mm, largest if more than one",4154259,SNOMED,2002-07-31,2099-12-31,
-nodesexcised,0,NCRAS_TUMOUR_MODIFIER_STCM,The number of local and regional nodes reported as being positive,36770490,Cancer Modifier,2020-09-23,2099-12-31,
-nodesinvolved,0,NCRAS_TUMOUR_MODIFIER_STCM,The number of local and regional nodes examined,40484595,SNOMED,2010-01-31,2099-12-31,
-tumourcount,0,NCRAS_TUMOUR_MODIFIER_STCM,Count of every tumour associated with this e_cr_patid,4228659,SNOMED,2004-01-31,2099-12-31,
-bigtumourcount,0,NCRAS_TUMOUR_MODIFIER_STCM,Count of every tumour associated with this e_cr_patid in range C00-97 excluding C44,4228659,SNOMED,2004-01-31,2099-12-31,
+nodesexcised,0,NCRAS_TUMOUR_MODIFIER_STCM,The number of local and regional nodes reported as being positive,40479359,SNOMED,2010-01-31,2099-12-31,
+nodesinvolved,0,NCRAS_TUMOUR_MODIFIER_STCM,The number of local and regional nodes examined,4156565,SNOMED,2002-07-31,2099-12-31,
+tumourcount,0,NCRAS_TUMOUR_MODIFIER_STCM,Count of every tumour associated with this e_cr_patid,4078513,SNOMED,2002-01-31,2099-12-31,
+bigtumourcount,0,NCRAS_TUMOUR_MODIFIER_STCM,Count of every tumour associated with this e_cr_patid in range C00-97 excluding C44,4078513,SNOMED,2002-01-31,2099-12-31,
 chrl_tot_27_03,0,NCRAS_TUMOUR_MODIFIER_STCM,Charlson co-morbidity score over 2 years,42538860,SNOMED,2018-01-31,2099-12-31,
 chrl_tot_78_06,0,NCRAS_TUMOUR_MODIFIER_STCM,Charlson co-morbidity score over 6 years,42538860,SNOMED,2018-01-31,2099-12-31,
 gleason_combined,0,NCRAS_TUMOUR_MODIFIER_STCM,Gleason combined,619648,SNOMED,2021-07-31,2099-12-31,
