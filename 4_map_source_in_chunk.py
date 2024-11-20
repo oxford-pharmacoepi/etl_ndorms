@@ -118,6 +118,13 @@ def main():
 						tbl_list_count = [target_schema_to_link + "." + tbl for tbl in db_conf['tbl_cdm']]
 						ret = mapping_util.get_table_max_ids_parallel(db_conf, tbl_list_count, tbl_max_ids)
 						if ret == True:
+							query1 = 'with cte as (SELECT MAX(max_id) as max_id FROM ' + tbl_max_ids + ' WHERE tbl_name in \
+									(\'condition_occurrence\', \'device_exposure\', \'drug_exposure\', \'measurement\', \
+									\'observation\', \'procedure_occurrence\')) \
+									INSERT INTO ' + tbl_max_ids + ' (tbl_name, max_id) \
+									SELECT \'max_of_all\', max_id \
+									FROM cte';
+							cursor1.execute(query1)
 							query1 = 'ALTER TABLE ' + tbl_max_ids + ' ADD CONSTRAINT pk_max_ids PRIMARY KEY (tbl_name);'
 							cursor1.execute(query1)
 							msg = 'Finished calculating max_ids in ' + target_schema_to_link.upper() + ' data in ' + mapping_util.calc_time(time.time() - time1) + '\n'
