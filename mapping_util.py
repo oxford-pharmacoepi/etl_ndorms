@@ -377,7 +377,7 @@ def get_table_max_ids(db_conf, tbl_name, tbl_result, cnx=None):
 		else: 
 			query1 = 'INSERT INTO ' + tbl_result + ' (tbl_name, max_id) \
 			VALUES (\'' + tbl_name_short + '\', \
-			(select MAX(col1) from (select col1 from ' + tbl_name + ' as t1(col1)) as max_id))'
+			(select coalesce(MAX(col1),0) from (select col1 from ' + tbl_name + ' as t1(col1)) as max_id))'
 			cursor1.execute(query1)
 		print(f'{tbl_name} max_id calculated')
 		cursor1.close()
@@ -509,6 +509,7 @@ def execute_multiple_queries(db_conf, filename, chunk_id = None, cnx = None, com
 					database=db_conf['database']
 				)
 				cnx.autocommit = commit
+#			print(cnx.info.dsn_parameters)
 			cursor1 = cnx.cursor()
 			queries = parse_queries_file(db_conf, filename, chunk_id)
 			for query in queries:
