@@ -120,7 +120,7 @@ def main():
 						if ret == True:
 							query1 = 'with cte as (SELECT MAX(max_id) as max_id FROM ' + tbl_max_ids + ' WHERE tbl_name in \
 									(\'condition_occurrence\', \'device_exposure\', \'drug_exposure\', \'measurement\', \
-									\'observation\', \'procedure_occurrence\')) \
+									\'observation\', \'procedure_occurrence\', \'visit_detail\', \'visit_occurrence\')) \
 									INSERT INTO ' + tbl_max_ids + ' (tbl_name, max_id) \
 									SELECT \'max_of_all\', max_id \
 									FROM cte';
