@@ -3,13 +3,9 @@
 --------------------------------
 drop table if exists {TARGET_SCHEMA}.visit_occurrence CASCADE;
 
-with cte0 AS (
-	SELECT max_id as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
-	WHERE lower(tbl_name) = 'visit_occurrence'
-),
-cte1 as (
-	SELECT distinct cte0.start_id + visit_occurrence_id as visit_occurrence_id, person_id, visit_detail_start_date
-	from cte0, {SOURCE_SCHEMA}.temp_visit_detail as t1
+with cte1 as (
+	SELECT distinct visit_occurrence_id, person_id, visit_detail_start_date
+	from {SOURCE_SCHEMA}.temp_visit_detail as t1
 )
 SELECT 
 	t1.visit_occurrence_id,
@@ -44,12 +40,8 @@ CREATE INDEX idx_visit_concept_id ON {TARGET_SCHEMA}.visit_occurrence (visit_con
 --------------------------------
 drop table if exists {TARGET_SCHEMA}.visit_detail CASCADE;
 
-with cte0 AS (
-	SELECT max_id as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
-	WHERE lower(tbl_name) = 'visit_detail'
-)
 select 
-	cte0.start_id + t1.visit_detail_id as visit_detail_id, 
+	t1.visit_detail_id, 
 	t1.person_id as person_id, 
 	38004268::integer as visit_detail_concept_id,	--Ambulatory Health Care Facilities, Clinic / Center, Oncology
 	t1.visit_detail_start_date as visit_detail_start_date,
@@ -69,7 +61,7 @@ select
 	null::bigint as parent_visit_detail_id,
 	t1.visit_occurrence_id as visit_occurrence_id
 into {TARGET_SCHEMA}.visit_detail
-from cte0, {SOURCE_SCHEMA}.temp_visit_detail as t1
+from {SOURCE_SCHEMA}.temp_visit_detail as t1
 left join {SOURCE_SCHEMA}.temp_visit_detail as t2 on t2.visit_detail_id - 1 = t1.visit_detail_id 
 and t2.person_id = t1.person_id;
 

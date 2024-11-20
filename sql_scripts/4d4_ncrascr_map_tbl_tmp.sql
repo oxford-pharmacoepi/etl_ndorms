@@ -14,7 +14,11 @@ CREATE TABLE {SOURCE_SCHEMA}.temp_visit_detail
 	source_table varchar(20) NULL
 );
 
-WITH cte3 as (
+with cte0 AS (
+	SELECT max_id as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
+	WHERE lower(tbl_name) = 'max_of_all'
+),
+cte3 as (
 	select 
 		e_patid 			as person_id,
 		e_cr_id 			as visit_detail_source_id,
@@ -43,14 +47,14 @@ cte5 as (
 cte6 as (
 	select person_id, visit_detail_start_date,
 	row_number() over (order by person_id, visit_detail_start_date) as visit_occurrence_id
-	from cte5
+	from cte0, cte5
 	group by person_id, visit_detail_start_date
 )
 INSERT INTO {SOURCE_SCHEMA}.temp_visit_detail
 SELECT 
-row_number() over (order by t1.person_id, t1.visit_detail_start_date, t1.visit_detail_source_id) as visit_detail_id, 
-t2.visit_occurrence_id, t1.*
-FROM cte5 as t1
+row_number() over (order by t1.person_id, t1.visit_detail_start_date, t1.visit_detail_source_id) + cte0.start_id as visit_detail_id, 
+t2.visit_occurrence_id + cte0.start_id as visit_occurrence_id, t1.*
+FROM cte0, cte5 as t1
 inner join cte6 as t2 on t1.person_id = t2.person_id and t1.visit_detail_start_date = t2.visit_detail_start_date;
 
 
