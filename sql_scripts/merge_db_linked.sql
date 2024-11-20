@@ -14,18 +14,30 @@ DECLARE
 	query1 TEXT;
 	results INTEGER;
 BEGIN
-	schema1 := 'public_aurum';
-	schema2 := 'public_hesapc';
-	schema3 := 'public_aurum_hesapc';
+--	schema1 := 'public_aurum'; -- primary source
+--	schema2 := 'public_hesapc';-- linked source
+--	schema3 := 'public_aurum_hesapc';
 
---	schema1 := 'public_gold';
---	schema2 := 'public_hesapc';
---	schema3 := 'public_gold_hesapc';
+	schema1 := 'public_gold_hesapc';
+	schema2 := 'public_ncrascr';
+	schema3 := 'public';
 	tbl_to_delete := '_patid_deleted';
 ------------------------------------------------------
 -- 1. Vocabularies needs to be built BEFORE running the following code
+--If not possible to build the vocabularies because the content is wrong, copy them
+--    FOR query1 IN 
+--		SELECT format('CREATE TABLE IF NOT EXISTS %I.%I (LIKE %I.%I EXCLUDING CONSTRAINTS) TABLESPACE pg_default;', schema2, tablename, schema1, tablename)
+--		FROM pg_tables 
+--		WHERE schemaname = schema1
+--		AND tablename IN ('CONCEPT', 'CONCEPT_ANCESTOR', 'CONCEPT_CLASS', 'CONCEPT_RELATIONSHIP', 'CONCEPT_SYNONYM', 'DOMAIN',
+--							'DRUG_STRENGTH', 'FACT_RELATIONSHIP', 'METADATA', 'RELATIONSHIP', 'SOURCE_TO_CONCEPT_MAP', 
+--							'SOURCE_TO_SOURCE_VOCAB_MAP', 'VOCABULARY')
+--LOOP
+--		RAISE NOTICE 'appliying %', query1;
+--		EXECUTE query1;
+--   END LOOP;
 ------------------------------------------------------
--- 2. Create all tables in schema3 without constraints as they are in the main data source (schema1).
+-- 2. Create all tables in schema3 without constraints as they are in schema1
 -- Vocabulary tables will not be affected as already created
 ------------------------------------------------------
     FOR query1 IN 
@@ -39,7 +51,7 @@ BEGIN
 		EXECUTE query1;
     END LOOP;
 ------------------------------------------------------
--- 3. Insert content to schema3 from primary source (schema1) of all CDM tables non-patient related
+-- 3. Insert content to schema3 from schema1 of all CDM tables non-patient related
 ------------------------------------------------------
    FOR query1 IN 
 		SELECT format('INSERT INTO %I.%I SELECT * FROM %I.%I;', schema3, tablename, schema1, tablename)
@@ -50,15 +62,16 @@ BEGIN
 		EXECUTE query1;
     END LOOP;
 ------------------------------------------------------
--- 4. Insert content to schema3 from primary source (schema1) of all CDM tables patient related and exclude those records belonging to `tbl_to_delete`
+-- 4. Insert content to schema3 from schema1 of all CDM tables patient related and exclude those records belonging to `tbl_to_delete`
 ------------------------------------------------------
+--EPISODE_EVENT NEEDS TO BE ADDED IN A SEPARATE QUERY
     FOR query1 IN 
 		SELECT format('INSERT INTO %I.%I 
 			SELECT t1.* FROM %I.%I AS t1
 			LEFT JOIN %I.%I AS t2 on t1.person_id = t2.patid
 			WHERE t2.patid is null;', schema3, tablename, schema1, tablename, schema1, tbl_to_delete)
 		FROM pg_tables WHERE schemaname = schema1
-		AND tablename IN ('condition_era', 'condition_occurrence', 'death', 'device_exposure', 'drug_era', 'drug_exposure', 'measurement', 'observation', 'observation_period', 'person', 'procedure_occurrence', 'visit_detail', 'visit_occurrence')
+		AND tablename IN ('condition_era', 'condition_occurrence', 'death', 'device_exposure', 'drug_era', 'drug_exposure', 'episode', 'measurement', 'observation', 'observation_period', 'person', 'procedure_occurrence', 'specimen', 'visit_detail', 'visit_occurrence')
    LOOP
 		RAISE NOTICE 'appliying %', query1;
 		EXECUTE query1;
@@ -69,7 +82,7 @@ BEGIN
 	query1 = format('CREATE UNIQUE INDEX IF NOT EXISTS idx_person_id ON %I.person (person_id ASC) TABLESPACE pg_default;',schema3);
 	EXECUTE query1;
 ------------------------------------------------------
--- 6. Update schema3.PERSON table with race information taken from the linked source (source2) if not already present
+-- 6. Update schema3.PERSON table with race information taken from schema2 if not already present
 ------------------------------------------------------
 	query1 = format('UPDATE %I.person AS t1
 					SET race_concept_id = t2.race_concept_id,
@@ -80,7 +93,7 @@ BEGIN
 	RAISE NOTICE 'appliying %', query1;
 	EXECUTE query1;
 ------------------------------------------------------
--- 7. Insert content from linked source (schema2) of all CDM tables patient related (escluding DEATH, OBSERVATION_PERIOD, PERSON) 
+-- 7. Insert content from schema2 of all CDM tables patient related (escluding DEATH, OBSERVATION_PERIOD, PERSON) 
 --    and exclude those records belonging to `tbl_to_delete`
 ------------------------------------------------------
     FOR query1 IN 
@@ -89,25 +102,36 @@ BEGIN
 			LEFT JOIN %I.%I AS t2 on t1.person_id = t2.patid
 			WHERE t2.patid is null;', schema3, tablename, schema2, tablename, schema1, tbl_to_delete)
 		FROM pg_tables WHERE schemaname = schema1
-		AND tablename IN ('condition_era', 'condition_occurrence', 'device_exposure', 'drug_era', 'drug_exposure', 'measurement', 'observation', 'procedure_occurrence', 'visit_detail', 'visit_occurrence')
+		AND tablename IN ('condition_era', 'condition_occurrence', 'device_exposure', 'drug_era', 'drug_exposure', 'episode', 'measurement', 'observation', 'procedure_occurrence', 'specimen', 'visit_detail', 'visit_occurrence')
     LOOP
 		RAISE NOTICE 'appliying %', query1;
 		EXECUTE query1;
     END LOOP;
 ------------------------------------------------------
--- 8. Insert content to source3.PROVIDER from source2.PROVIDER
+-- 8. Insert content to schema3 from schema2.PROVIDER
 ------------------------------------------------------
 	query1 = format('INSERT INTO %I.provider SELECT * FROM %I.provider;', schema3, schema2);
 	RAISE NOTICE 'appliying %', query1;
 	EXECUTE query1;
 ------------------------------------------------------
--- 9. Insert content to source3._PATID_DELETED from source1._PATID_DELETED (always present)
+-- 9. Insert content to schema3 from schema2.EPISODE_EVENT
+------------------------------------------------------
+	query1 = format('INSERT INTO %I.episode_event 
+					SELECT t1.* FROM %I.episode_event as t1
+					INNER JOIN %I.episode AS t2 on t1.episode_id = t2.episode_id
+					LEFT JOIN %I.%I AS t3 on t2.person_id = t3.patid
+					WHERE t3.patid is null;', schema3, schema2, schema2, schema1, tbl_to_delete);
+	RAISE NOTICE 'appliying %', query1;
+	EXECUTE query1;
+
+------------------------------------------------------
+-- 10. Insert content to schema3._PATID_DELETED from schema1._PATID_DELETED (always present)
 ------------------------------------------------------
 	query1 = format('INSERT INTO %I.%I SELECT * FROM %I.%I;', schema3, tbl_to_delete, schema1, tbl_to_delete);
 	RAISE NOTICE 'appliying %', query1;
 	EXECUTE query1;
 ------------------------------------------------------
--- 10. Update source3.OBSERVATION_PERIOD to consider all merged data sources (schema1, schema2)
+-- 11. Update schema3.OBSERVATION_PERIOD to consider all merged data sources (schema1, schema2)
 -- We leave the OBSERVATION_PERIOD records from Primary Care (GOLD/AURUM) unchanged (period_type_concept_id=32880)
 -- We insert/update an OBSERVATION_PERIOD record per patient with the "summary" of all observation_periods (period_type_concept_id=32882)
 ------------------------------------------------------
@@ -148,7 +172,7 @@ BEGIN
 			EXECUTE query1;
 	END IF;
 ------------------------------------------------------
--- 11. Update schema3.CDM_SOURCE
+-- 12. Update schema3.CDM_SOURCE
 ------------------------------------------------------
 	query1 = format('UPDATE %I.cdm_source 
 					SET source_description = CONCAT(upper(source_description), '' + '', upper(substring(''%I'', ''[^_]*$'')));', schema3, schema3);
