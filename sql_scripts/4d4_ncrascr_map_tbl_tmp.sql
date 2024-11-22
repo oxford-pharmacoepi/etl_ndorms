@@ -15,7 +15,7 @@ CREATE TABLE {SOURCE_SCHEMA}.temp_visit_detail
 );
 
 with cte0 AS (
-	SELECT max_id as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
+	SELECT max_id + 1 as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
 	WHERE lower(tbl_name) = 'max_of_all'
 ),
 cte3 as (
