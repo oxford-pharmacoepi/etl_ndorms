@@ -27,7 +27,7 @@ SELECT
 	t2.visit_occurrence_id as preceding_visit_occurrence_id
 INTO {TARGET_SCHEMA}.visit_occurrence
 from cte1 as t1
-left join cte1 as t2 on (t2.visit_occurrence_id - 1) = t1.visit_occurrence_id 
+left join cte1 as t2 on (t1.visit_occurrence_id - 1) = t2.visit_occurrence_id 
 and t1.person_id = t2.person_id;
 
 alter table {TARGET_SCHEMA}.visit_occurrence add constraint xpk_visit_occurrence primary key (visit_occurrence_id) USING INDEX TABLESPACE pg_default;
@@ -62,7 +62,7 @@ select
 	t1.visit_occurrence_id as visit_occurrence_id
 into {TARGET_SCHEMA}.visit_detail
 from {SOURCE_SCHEMA}.temp_visit_detail as t1
-left join {SOURCE_SCHEMA}.temp_visit_detail as t2 on t2.visit_detail_id - 1 = t1.visit_detail_id 
+left join {SOURCE_SCHEMA}.temp_visit_detail as t2 on t1.visit_detail_id - 1 = t2.visit_detail_id 
 and t2.person_id = t1.person_id;
 
 	
