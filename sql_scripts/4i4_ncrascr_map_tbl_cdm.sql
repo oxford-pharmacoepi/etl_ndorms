@@ -177,7 +177,7 @@ with cte0 AS (
 		CASE 
 			WHEN t1.value_source_value <> t1.source_value THEN t1.value_source_value
 		END AS value_source_value,
-		t1.measurement_event_id as measurement_event_id,
+		cte0.start_id + t1.measurement_event_id as measurement_event_id,
 		t1.meas_event_field_concept_id as meas_event_field_concept_id
 	from cte0, {CHUNK_SCHEMA}.stem_{CHUNK_ID} t1
 	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_vocabulary_id = 'UCUM' 
@@ -350,7 +350,7 @@ with cte0 AS (
 		CASE 
 			WHEN t1.value_source_value <> t1.source_value THEN t1.value_source_value
 		END as value_source_value,
-		t1.observation_event_id,
+		cte0.start_id + t1.observation_event_id as observation_event_id,
 		t1.obs_event_field_concept_id
 	from cte0, {CHUNK_SCHEMA}.stem_{CHUNK_ID} as t1
 	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_vocabulary_id = 'UCUM' 
