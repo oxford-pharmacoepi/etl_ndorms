@@ -14,7 +14,7 @@ with cte1 as (
 		s.end_date as condition_end_date,
 		s.end_date::TIMESTAMP as condition_end_datetime,
 		s.type_concept_id as condition_type_concept_id,
-		0 as condition_status_concept_id,
+		NULL::bigint as condition_status_concept_id,
 		s.stop_reason,
 		s.provider_id,
 		s.visit_occurrence_id,

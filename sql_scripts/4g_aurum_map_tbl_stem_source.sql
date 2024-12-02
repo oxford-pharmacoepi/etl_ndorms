@@ -42,7 +42,7 @@ insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (domain_id, person_id, visit_o
 					 modifier_concept_id, stem_source_table, stem_source_id)
 select NULL as domain_id,
 	t2.person_id, 
-	vd.visit_occurrence_id,
+	v.visit_occurrence_id,
 	v.visit_detail_id,
 	t2.provider_id,
 	NULL as concept_id,
@@ -86,7 +86,7 @@ select NULL as domain_id,
 	t2.obsid as stem_source_id
 from t2
 inner join {SOURCE_SCHEMA}.temp_visit_detail v on t2.obsid = v.visit_detail_source_id
-inner join {TARGET_SCHEMA}.visit_detail vd on v.visit_detail_id = vd.visit_detail_id
+--inner join {TARGET_SCHEMA}.visit_detail vd on v.visit_detail_id = vd.visit_detail_id
 WHERE v.source_table = 'Observation';
 
 
@@ -104,10 +104,10 @@ WITH cte1 as (
 	),
 	t2 as (
 		select t1.*,
-		vd.visit_occurrence_id, v.visit_detail_id
+		v.visit_occurrence_id, v.visit_detail_id
 		from t1
-		left join {SOURCE_SCHEMA}.temp_visit_detail v on t1.consid = v.visit_detail_source_id
-		left join {TARGET_SCHEMA}.visit_detail vd on v.visit_detail_id = vd.visit_detail_id
+		inner join {SOURCE_SCHEMA}.temp_visit_detail v on t1.consid = v.visit_detail_source_id
+--		left join {TARGET_SCHEMA}.visit_detail vd on v.visit_detail_id = vd.visit_detail_id
 		where v.source_table = 'Consultation'
 	)
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (domain_id, person_id, visit_occurrence_id, visit_detail_id, provider_id, concept_id, source_value,
@@ -179,16 +179,28 @@ WITH cte2 as (
 		where chunk_id = {CHUNK_ID}
 	),
 	t1 as (
-		select d.patid, d.staffid, d.issuedate, d.duration, d.quantity, d.issueid, d.prodcodeid, d.quantunitid, d.probobsid
+		select d.patid, d.staffid, d.issuedate, d.duration, d.quantity, d.issueid, 
+				d.prodcodeid, d.quantunitid, d.probobsid
 		from cte2
 		inner join {SOURCE_SCHEMA}.drugissue d on cte2.person_id = d.patid 
 	),
 	t2 as (
-		select t1.*, v.visit_detail_id, v.visit_detail_source_id, v.source_table 
+		select t1.*, v.visit_detail_id, v.visit_occurrence_id
 		from t1
-		left join {SOURCE_SCHEMA}.temp_visit_detail v on t1.probobsid = v.visit_detail_source_id
+		inner join {SOURCE_SCHEMA}.temp_visit_detail v on t1.issueid = v.visit_detail_source_id
+		and v.source_table = 'DrugIssue'
+	),
+	t3 as (
+		select t1.*, v.visit_detail_id, v.visit_occurrence_id
+		from t1
+		inner join {SOURCE_SCHEMA}.temp_visit_detail v on t1.probobsid = v.visit_detail_source_id
 		and v.source_table = 'Observation'
-	)		
+	),
+	t4 as (
+		select * from t2
+		UNION
+		select * from t3
+	)
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (domain_id, person_id, visit_occurrence_id, visit_detail_id, provider_id, concept_id, source_value,
 										 source_concept_id, type_concept_id, start_date, end_date, start_time, days_supply, dose_unit_concept_id,
 										 dose_unit_source_value, effective_drug_dose, lot_number, modifier_source_value, operator_concept_id, qualifier_concept_id,
@@ -197,21 +209,21 @@ insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (domain_id, person_id, visit_o
 										 value_as_string, value_source_value, anatomic_site_concept_id, disease_status_concept_id, specimen_source_id,
 										 anatomic_site_source_value, disease_status_source_value, modifier_concept_id, stem_source_table, stem_source_id)
 select 	NULL,
-		t2.patid,
-		vd.visit_occurrence_id, -- not sure why this makes some chunks to hang. Showing the full vd record as below works. ???
-		t2.visit_detail_id,
-		t2.staffid as provider_id,
+		t4.patid,
+		t4.visit_occurrence_id, -- not sure why this makes some chunks to hang. Showing the full vd record as below works. ???
+		t4.visit_detail_id,
+		t4.staffid as provider_id,
 		NULL::int,
 		dc.dmdid as source_value,
 		t.dmd_source_concept_id as source_concept_id,
 		32838,
-		t2.issuedate,
-		case when t2.duration is null then t2.issuedate
-			when t2.duration <= 0 then t2.issuedate
-			else t2.issuedate + (t2.duration-1) * INTERVAL '1 day'
+		t4.issuedate,
+		case when t4.duration is null then t4.issuedate
+			when t4.duration <= 0 then t4.issuedate
+			else t4.issuedate + (t4.duration-1) * INTERVAL '1 day'
 		end as end_date,
 		'00:00:00'::time,
-		case when t2.duration < 0 then null else t2.duration end,
+		case when t4.duration < 0 then null else t4.duration end,
 		0,
 		q.description,
 		NULL,
@@ -220,7 +232,7 @@ select 	NULL,
 		0,
 		0,
 		NULL,
-		t2.quantity,
+		t4.quantity,
 		NULL::double precision,
 		NULL::double precision,
 		NULL::double precision,
@@ -242,12 +254,12 @@ select 	NULL,
 		NULL,
 		0,
 		'DrugIssue',
-		t2.issueid
-from t2
-left join {SOURCE_SCHEMA}.productdictionary dc on t2.prodcodeid = dc.prodcodeid
-left join {SOURCE_SCHEMA}.quantunit q	on t2.quantunitid = q.quantunitid
-left join {SOURCE_SCHEMA}.temp_drug_concept_map t on t2.prodcodeid = t.prodcodeid
-left join {TARGET_SCHEMA}.visit_detail vd on t2.visit_detail_id = vd.visit_detail_id -- not sure why this makes some chunks to hang. Showing the full vd record as above works. ???
+		t4.issueid
+from t4
+left join {SOURCE_SCHEMA}.productdictionary dc on t4.prodcodeid = dc.prodcodeid
+left join {SOURCE_SCHEMA}.quantunit q	on t4.quantunitid = q.quantunitid
+left join {SOURCE_SCHEMA}.temp_drug_concept_map t on t4.prodcodeid = t.prodcodeid
+--left join {TARGET_SCHEMA}.visit_detail vd on t2.visit_detail_id = vd.visit_detail_id -- not sure why this makes some chunks to hang. Showing the full vd record as above works. ???
 --and d.issuedate is not null -- it is always not null
 ;
 
@@ -263,10 +275,11 @@ WITH cte3 as (
 		inner join {SOURCE_SCHEMA}.referral r on  cte3.person_id = r.patid
 	),
 	t2 as (
-		select t1.*, v.visit_detail_id, v.visit_detail_source_id, v.source_table, vd.visit_occurrence_id, vd.visit_detail_start_date, vd.visit_detail_end_date
+		select t1.*, v.visit_detail_id, v.visit_detail_source_id, v.source_table, 
+		v.visit_occurrence_id, v.visit_detail_start_date, v.visit_detail_end_date
 		from t1
-		left join {SOURCE_SCHEMA}.temp_visit_detail v on t1.obsid = v.visit_detail_source_id
-		inner join {TARGET_SCHEMA}.visit_detail vd on v.visit_detail_id = vd.visit_detail_id
+		inner join {SOURCE_SCHEMA}.temp_visit_detail v on t1.obsid = v.visit_detail_source_id
+--		inner join {TARGET_SCHEMA}.visit_detail vd on v.visit_detail_id = vd.visit_detail_id
 		where v.source_table = 'Observation'
 	)
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (domain_id, person_id, visit_occurrence_id, visit_detail_id, provider_id, concept_id, source_value,

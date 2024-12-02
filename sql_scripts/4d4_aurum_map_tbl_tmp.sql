@@ -49,6 +49,7 @@ drop table if exists {SOURCE_SCHEMA}.temp_visit_detail CASCADE;
 CREATE TABLE {SOURCE_SCHEMA}.temp_visit_detail 
 (
 	visit_detail_id bigint NOT NULL,
+	visit_occurrence_id bigint NOT NULL,
 	visit_detail_source_id bigint NOT NULL,
 	person_id bigint NOT NULL,
 	visit_detail_start_date date NOT NULL,
@@ -91,16 +92,41 @@ cte4 as (
 	where c.consdate is not null
 ),
 cte5 as (
+	select issueid	as visit_detail_source_id,
+		patid		as person_id,
+		issuedate	as visit_detail_start_date,
+		issuedate	as visit_detail_end_date,
+		staffid	as provider_id,
+		pracid	as care_site_id,
+		NULL::bigint	as parent_visit_detail_id,
+		'DrugIssue' as source_table
+	from {SOURCE_SCHEMA}.drugissue
+	where probobsid is null
+),
+cte6 as (
 	select * 
 	from cte3
 	UNION
 	select * 
 	from cte4
+	UNION
+	select * 
+	from cte5
+),
+cte7 as (
+	select person_id, visit_detail_start_date,
+	row_number() over (order by person_id, visit_detail_start_date) as visit_occurrence_id
+	from cte6
+	group by person_id, visit_detail_start_date
 )
 INSERT INTO {SOURCE_SCHEMA}.temp_visit_detail
-SELECT row_number() over (order by visit_detail_source_id) as visit_detail_id, *
-FROM cte5;
-
+SELECT row_number() over (order by t1.person_id, t1.visit_detail_start_date, t1.visit_detail_source_id) as visit_detail_id, 
+t2.visit_occurrence_id, t1.*
+FROM cte6 as t1
+inner join cte7 as t2 on t1.person_id = t2.person_id and t1.visit_detail_start_date = t2.visit_detail_start_date;
+--INSERT INTO {SOURCE_SCHEMA}.temp_visit_detail
+--SELECT row_number() over (order by visit_detail_source_id) as visit_detail_id, *
+--FROM cte6;
 
 alter table {SOURCE_SCHEMA}.temp_visit_detail add constraint pk_temp_visit_d primary key (visit_detail_id); --added 31/10/2022
 create index idx_temp_visit_det1 on {SOURCE_SCHEMA}.temp_visit_detail (visit_detail_source_id, source_table); --modified 27/10/2022
