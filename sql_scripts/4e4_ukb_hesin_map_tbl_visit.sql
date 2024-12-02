@@ -49,8 +49,8 @@ cte5 AS (
 	FROM {SOURCE_SCHEMA}.hesin AS t1
 	INNER JOIN cte4 as t2 ON t1.eid = t2.eid AND t1.spell_index = t2.spell_index
 	INNER JOIN cte3 as t3 ON t1.eid = t3.person_id AND t1.ins_index = t3.ins_index
-	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t4 on t4.source_code = CONCAT('265-',t1.admisorc_uni) and t4.target_domain_id = 'visit' and t4.source_vocabulary_id = 'UKB_ADMISORC_STCM'
-	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t5 on t5.source_code = CONCAT('267-',t1.disdest_uni) and t5.target_domain_id = 'visit' and t5.source_vocabulary_id = 'UKB_DISDEST_STCM'
+	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t4 on t4.source_code = CONCAT('265-',t1.admisorc_uni) and t4.target_domain_id = 'Visit' and t4.source_vocabulary_id = 'UKB_ADMISORC_STCM'
+	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t5 on t5.source_code = CONCAT('267-',t1.disdest_uni) and t5.target_domain_id = 'Visit' and t5.source_vocabulary_id = 'UKB_DISDEST_STCM'
 	WHERE t1.spell_seq = 0
 ),
 cte6 AS (
@@ -162,19 +162,13 @@ with cte0 AS (
 	FROM {TARGET_SCHEMA}.observation_period
 ),
 cte1 AS (
-	SELECT t2.eid,t2.spell_index, MIN(t2.epistart) AS date_min, MAX(t2.epiend) AS date_max 
-	FROM cte0 as t1
-	INNER JOIN {SOURCE_SCHEMA}.hesin AS t2 ON t2.eid = t1.person_id
-	GROUP BY t2.eid,t2.spell_index
-),
-cte2 AS (
 	SELECT
 	t1.eid AS person_id,
 	9201 AS visit_detail_concept_id,
-	COALESCE(t2.date_min::date,t1.admidate::date, t1.disdate::date) AS visit_detail_start_date,
-	COALESCE(t2.date_min::timestamp,t1.admidate::timestamp, t1.disdate::timestamp) AS visit_detail_start_datetime,
-	COALESCE(t2.date_max::date,t2.date_min::date,t1.disdate::date) AS visit_detail_end_date,
-	COALESCE(t2.date_max::timestamp,t2.date_min::timestamp,t1.disdate::timestamp) AS visit_detail_end_datetime,
+	COALESCE(t1.epistart::date,t1.admidate::date, t1.disdate::date) AS visit_detail_start_date,
+	COALESCE(t1.epistart::timestamp,t1.admidate::timestamp, t1.disdate::timestamp) AS visit_detail_start_datetime,
+	COALESCE(t1.epiend::date,t1.epistart::date, t1.disdate::date) AS visit_detail_end_date,
+	COALESCE(t1.epiend::timestamp,t1.epistart::timestamp,t1.disdate::timestamp) AS visit_detail_end_datetime,
 	32818 AS visit_detail_type_concept_id,
 	NULL::int AS provider_id,
 	NULL::int AS care_site_id,
@@ -191,11 +185,10 @@ cte2 AS (
 	t1.spell_seq AS spell_seq
 	FROM cte0 as t0 
 	INNER JOIN {SOURCE_SCHEMA}.hesin AS t1 ON t1.eid = t0.person_id
-	INNER JOIN cte1 as t2 ON t1.eid = t2.eid AND t1.spell_index = t2.spell_index
-	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t4 on t4.source_code = CONCAT('265-',t1.admisorc_uni) and t4.target_domain_id = 'visit' and t4.source_vocabulary_id = 'UKB_ADMISORC_STCM'
-	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t5 on t5.source_code = CONCAT('267-',t1.disdest_uni) and t5.target_domain_id = 'visit' and t5.source_vocabulary_id = 'UKB_DISDEST_STCM'
+	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t4 on t4.source_code = CONCAT('265-',t1.admisorc_uni) and t4.target_domain_id = 'Visit' and t4.source_vocabulary_id = 'UKB_ADMISORC_STCM'
+	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t5 on t5.source_code = CONCAT('267-',t1.disdest_uni) and t5.target_domain_id = 'Visit' and t5.source_vocabulary_id = 'UKB_DISDEST_STCM'
 ),
-cte3 AS (
+cte2 AS (
 	SELECT person_id, visit_detail_source_value,
 	CASE WHEN visit_detail_start_date <= visit_detail_end_date 
 		THEN visit_detail_start_date ELSE visit_detail_end_date 
@@ -209,9 +202,9 @@ cte3 AS (
 	CASE WHEN visit_detail_start_date <= visit_detail_end_date 
 		THEN visit_detail_end_date ELSE visit_detail_start_date 
 	END AS visit_detail_end_datetime
-	FROM cte2
+	FROM cte1
 ),
-cte4 AS (
+cte3 AS (
 	SELECT 
 	t1.person_id,
 	t1.visit_detail_concept_id,
@@ -233,20 +226,20 @@ cte4 AS (
 	t1.visit_occurrence_id,
 	t1.spell_index,
 	t1.spell_seq
-	FROM cte2 AS t1
-	INNER JOIN cte3 AS t2 ON t1.person_id = t2.person_id AND t1.visit_detail_source_value = t2.visit_detail_source_value
+	FROM cte1 AS t1
+	INNER JOIN cte2 AS t2 ON t1.person_id = t2.person_id AND t1.visit_detail_source_value = t2.visit_detail_source_value
 ),
 --------------------------------
 -- VISIT_DETAIL FROM hesin_psych
 --------------------------------
-cte5 AS (
+cte4 AS (
 	SELECT
 	t1.eid AS person_id,
 	9201 AS visit_detail_concept_id,
-	COALESCE(t2.detndate::date,t1.admidate::date, t1.disdate::date) AS visit_detail_start_date,
-	COALESCE(t2.detndate::timestamp,t1.admidate::timestamp, t1.disdate::timestamp) AS visit_detail_start_datetime,
-	COALESCE(t1.epiend,t1.disdate,t1.admidate) AS visit_detail_end_date,
-	COALESCE(t1.epiend,t1.disdate,t1.admidate) AS visit_detail_end_datetime,
+	COALESCE(t1.epistart::date,t1.admidate::date, t1.disdate::date) AS visit_detail_start_date,
+	COALESCE(t1.epistart::timestamp,t1.admidate::timestamp, t1.disdate::timestamp) AS visit_detail_start_datetime,
+	COALESCE(t1.epiend::date,t1.epistart::date, t1.disdate::date) AS visit_detail_end_date,
+	COALESCE(t1.epiend::timestamp,t1.epistart::timestamp,t1.disdate::timestamp) AS visit_detail_end_datetime,
 	32818 AS visit_detail_type_concept_id,
 	NULL::int AS provider_id,
 	NULL::int AS care_site_id,
@@ -264,20 +257,20 @@ cte5 AS (
 	FROM cte0 as t0 
 	INNER JOIN {SOURCE_SCHEMA}.hesin as t1 on t1.eid = t0.person_id 
 	INNER JOIN {SOURCE_SCHEMA}.hesin_psych AS t2 ON t1.eid = t2.eid AND t1.ins_index = t2.ins_index
-	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t4 on t4.source_code = CONCAT('265-',t1.admisorc_uni) and t4.target_domain_id = 'visit' and t4.source_vocabulary_id = 'UKB_ADMISORC_STCM'
-	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t5 on t5.source_code = CONCAT('267-',t1.disdest_uni) and t5.target_domain_id = 'visit' and t5.source_vocabulary_id = 'UKB_DISDEST_STCM'
+	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t4 on t4.source_code = CONCAT('265-',t1.admisorc_uni) and t4.target_domain_id = 'Visit' and t4.source_vocabulary_id = 'UKB_ADMISORC_STCM'
+	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t5 on t5.source_code = CONCAT('267-',t1.disdest_uni) and t5.target_domain_id = 'Visit' and t5.source_vocabulary_id = 'UKB_DISDEST_STCM'
 ),
-cte6 AS (
+cte5 AS (
 --------------------------------
 -- VISIT_DETAIL FROM hesin_critical
 --------------------------------
 	SELECT 
 	t1.eid AS person_id,
 	9201 AS visit_detail_concept_id,
-	COALESCE(t2.ccstartdate,t1.epistart,t1.admidate) AS visit_detail_start_date,
-	COALESCE(t2.ccstartdate,t1.epistart,t1.admidate) AS visit_detail_start_datetime,
-	COALESCE(t2.ccdisdate,t1.epiend,t1.disdate) AS visit_detail_end_date,
-	COALESCE(t2.ccdisdate,t1.epiend,t1.disdate) AS visit_detail_end_datetime,
+	COALESCE(t1.epistart::date,t1.admidate::date, t1.disdate::date) AS visit_detail_start_date,
+	COALESCE(t1.epistart::timestamp,t1.admidate::timestamp, t1.disdate::timestamp) AS visit_detail_start_datetime,
+	COALESCE(t1.epiend::date,t1.epistart::date, t1.disdate::date) AS visit_detail_end_date,
+	COALESCE(t1.epiend::timestamp,t1.epistart::timestamp,t1.disdate::timestamp) AS visit_detail_end_datetime,
 	32818 AS visit_detail_type_concept_id,
 	NULL::int AS provider_id,
 	NULL::int AS care_site_id,
@@ -295,17 +288,17 @@ cte6 AS (
 	FROM cte0 as t0 
 	INNER JOIN {SOURCE_SCHEMA}.hesin as t1 on t1.eid = t0.person_id
 	INNER JOIN {SOURCE_SCHEMA}.hesin_critical AS t2 ON t1.eid = t2.eid AND t1.ins_index = t2.ins_index 
-	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t4 on t4.source_code = CONCAT('265-',t1.admisorc_uni) and t4.target_domain_id = 'visit' and t4.source_vocabulary_id = 'UKB_ADMISORC_STCM'
-	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t5 on t5.source_code = CONCAT('267-',t1.disdest_uni) and t5.target_domain_id = 'visit' and t5.source_vocabulary_id = 'UKB_DISDEST_STCM'
+	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t4 on t4.source_code = CONCAT('265-',t1.admisorc_uni) and t4.target_domain_id = 'Visit' and t4.source_vocabulary_id = 'UKB_ADMISORC_STCM'
+	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t5 on t5.source_code = CONCAT('267-',t1.disdest_uni) and t5.target_domain_id = 'Visit' and t5.source_vocabulary_id = 'UKB_DISDEST_STCM'
 ),
-cte7 AS (
+cte6 AS (
+	SELECT * FROM cte3
+	UNION
 	SELECT * FROM cte4
 	UNION
 	SELECT * FROM cte5
-	UNION
-	SELECT * FROM cte6
 ),
-cte8 AS (
+cte7 AS (
 	SELECT 
 	NEXTVAL('{TARGET_SCHEMA}.sequence_vd') AS visit_detail_id, 
 	t1.person_id,	
@@ -326,17 +319,17 @@ cte8 AS (
 	t1.preceding_visit_detail_id, 
 	t1.parent_visit_detail_id,
 	t2.visit_occurrence_id
-	FROM cte7 as t1
+	FROM cte6 as t1
 	INNER JOIN {TARGET_SCHEMA}.visit_occurrence AS t2 ON t2.visit_source_value::bigint = t1.spell_index and t2.person_id = t1.person_id
 	INNER JOIN cte0 as t3 ON t1.person_id = t3.person_id
 	WHERE t1.visit_detail_start_date >= t3.observation_period_start_date
 	AND t1.visit_detail_start_date <= t3.observation_period_end_date
-	ORDER BY t1.person_id, t1.visit_detail_start_date, t1.visit_detail_source_value
+	ORDER BY t1.person_id, t1.spell_index,t1.spell_seq
 ),
-cte9 AS (
+cte8 AS (
 	SELECT t1.person_id, t1.visit_detail_id, MAX(t2.visit_detail_id) AS preceding_visit_detail_id 
-	FROM cte8 AS t1
-	INNER JOIN cte8 AS t2 ON t1.person_id = t2.person_id
+	FROM cte7 AS t1
+	INNER JOIN cte7 AS t2 ON t1.person_id = t2.person_id
 	WHERE t1.visit_detail_id > t2.visit_detail_id
 	GROUP BY t1.person_id, t1.visit_detail_id
 )
@@ -381,8 +374,8 @@ SELECT
 	t2.preceding_visit_detail_id,
 	t1.parent_visit_detail_id,
 	t1.visit_occurrence_id
-FROM cte8 as t1
-LEFT JOIN cte9 AS t2 ON t1.visit_detail_id = t2.visit_detail_id;
+FROM cte7 as t1
+LEFT JOIN cte8 AS t2 ON t1.visit_detail_id = t2.visit_detail_id;
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_vd;
 
