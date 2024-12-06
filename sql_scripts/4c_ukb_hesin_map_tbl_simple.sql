@@ -15,7 +15,7 @@ SELECT
 	country_source_value,
 	latitude,
 	longitude
-FROM {target_schema_to_link}.location;
+FROM public_ukb.location;
 --------------------------------
 -- PERSON
 --------------------------------
@@ -148,7 +148,7 @@ FROM cte2;
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_pro;
 --The following is used in the mapping
-CREATE UNIQUE INDEX idx_provider_source ON {TARGET_SCHEMA}.provider (specialty_source_value ASC);
+CREATE UNIQUE INDEX idx_provider_source ON {TARGET_SCHEMA}.provider (specialty_source_value ASC) TABLESPACE pg_default;
 --------------------------------
 -- DEATH
 --------------------------------
@@ -169,11 +169,12 @@ select
 	t1.cause_concept_id, 
 	t1.cause_source_value, 
 	t1.cause_source_concept_id
-From {target_schema_to_link}.death as t1
+From public_ukb.death as t1
 inner join {TARGET_SCHEMA}.person as t2 on t1.person_id = t2.person_id;
 
-ALTER TABLE {TARGET_SCHEMA}.death ADD CONSTRAINT xpk_death PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default;
-
+ALTER TABLE {TARGET_SCHEMA}.death ADD CONSTRAINT xpk_death PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default ;
+CREATE INDEX idx_death_person_id_1 ON {TARGET_SCHEMA}.death (person_id ASC) TABLESPACE pg_default;
+CLUSTER {TARGET_SCHEMA}.death USING idx_death_person_id_1;
 
 --------------------------------
 -- OBSERVATION_PERIOD --
