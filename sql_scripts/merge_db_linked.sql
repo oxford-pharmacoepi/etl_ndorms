@@ -14,28 +14,43 @@ DECLARE
 	query1 TEXT;
 	results INTEGER;
 BEGIN
---	schema1 := 'public_aurum'; -- primary source
---	schema2 := 'public_hesapc';-- linked source
---	schema3 := 'public_aurum_hesapc';
-
-	schema1 := 'public_gold_hesapc';
-	schema2 := 'public_ncrascr';
+	schema1 := 'public_aurum_hesapc'; -- primary source
+	schema2 := 'public_ncrascr';-- linked source
 	schema3 := 'public';
+
+--	schema1 := 'public_gold_hesapc';
+--	schema2 := 'public_ncrascr';
+--	schema3 := 'public';
 	tbl_to_delete := '_patid_deleted';
 ------------------------------------------------------
--- 1. Vocabularies needs to be built BEFORE running the following code
---If not possible to build the vocabularies because the content is wrong, copy them
+-- 1A. Vocabularies needs to be built BEFORE running the following code
+------------------------------------------------------
+-- If not possible to build the vocabularies because the content is wrong, copy them
 --    FOR query1 IN 
 --		SELECT format('CREATE TABLE IF NOT EXISTS %I.%I (LIKE %I.%I EXCLUDING CONSTRAINTS) TABLESPACE pg_default;', schema2, tablename, schema1, tablename)
 --		FROM pg_tables 
 --		WHERE schemaname = schema1
---		AND tablename IN ('CONCEPT', 'CONCEPT_ANCESTOR', 'CONCEPT_CLASS', 'CONCEPT_RELATIONSHIP', 'CONCEPT_SYNONYM', 'DOMAIN',
+--		AND upper(tablename) IN ('CONCEPT', 'CONCEPT_ANCESTOR', 'CONCEPT_CLASS', 'CONCEPT_RELATIONSHIP', 'CONCEPT_SYNONYM', 'DOMAIN',
 --							'DRUG_STRENGTH', 'FACT_RELATIONSHIP', 'METADATA', 'RELATIONSHIP', 'SOURCE_TO_CONCEPT_MAP', 
---							'SOURCE_TO_SOURCE_VOCAB_MAP', 'VOCABULARY')
---LOOP
+--							'SOURCE_TO_SOURCE_VOCAB_MAP', 'SOURCE_TO_STANDARD_VOCAB_MAP', 'VOCABULARY')
+--	LOOP
 --		RAISE NOTICE 'appliying %', query1;
 --		EXECUTE query1;
 --   END LOOP;
+------------------------------------------------------
+-- 1B. Vocabularies needs to be built BEFORE running the following code
+------------------------------------------------------
+-- If not possible to build the vocabularies because the content is wrong, copy them
+--   FOR query1 IN 
+--		SELECT format('INSERT INTO %I.%I SELECT * FROM %I.%I;', schema2, tablename, schema1, tablename)
+--		FROM pg_tables WHERE schemaname = schema1
+--		AND upper(tablename) IN ('CONCEPT', 'CONCEPT_ANCESTOR', 'CONCEPT_CLASS', 'CONCEPT_RELATIONSHIP', 'CONCEPT_SYNONYM', 'DOMAIN',
+--							'DRUG_STRENGTH', 'FACT_RELATIONSHIP', 'METADATA', 'RELATIONSHIP', 'SOURCE_TO_CONCEPT_MAP', 
+--							'SOURCE_TO_SOURCE_VOCAB_MAP', 'SOURCE_TO_STANDARD_VOCAB_MAP', 'VOCABULARY')
+--    LOOP
+--		RAISE NOTICE 'appliying %', query1;
+--		EXECUTE query1;
+--    END LOOP;
 ------------------------------------------------------
 -- 2. Create all tables in schema3 without constraints as they are in schema1
 -- Vocabulary tables will not be affected as already created
@@ -101,7 +116,7 @@ BEGIN
 			SELECT t1.* FROM %I.%I AS t1
 			LEFT JOIN %I.%I AS t2 on t1.person_id = t2.patid
 			WHERE t2.patid is null;', schema3, tablename, schema2, tablename, schema1, tbl_to_delete)
-		FROM pg_tables WHERE schemaname = schema1
+		FROM pg_tables WHERE schemaname = schema2
 		AND tablename IN ('condition_era', 'condition_occurrence', 'device_exposure', 'drug_era', 'drug_exposure', 'episode', 'measurement', 'observation', 'procedure_occurrence', 'specimen', 'visit_detail', 'visit_occurrence')
     LOOP
 		RAISE NOTICE 'appliying %', query1;
@@ -161,14 +176,21 @@ BEGIN
 			query1 = format('DROP SEQUENCE IF EXISTS %I.sequence_op;',schema3);
 			EXECUTE query1;
 		ELSE 
-			query1 = format('UPDATE %I.observation_period AS t1
+			query1 = format('WITH cte AS (
+					SELECT t1.observation_period_id,
+					LEAST(t1.observation_period_start_date, t2.observation_period_start_date) as observation_period_start_date,
+					GREATEST(t1.observation_period_end_date, t2.observation_period_end_date) as observation_period_end_date
+					FROM %I.observation_period AS t1
+					INNER JOIN %I.observation_period AS t2 ON t1.person_id = t2.person_id
+					AND t1.period_type_concept_id = 32882
+					AND t2.period_type_concept_id = 32880
+				)
+				UPDATE %I.observation_period AS t1
 				SET 
-				observation_period_start_date = LEAST(t1.observation_period_start_date, t2.observation_period_start_date),
-				observation_period_end_date = GREATEST(t1.observation_period_end_date, t2.observation_period_end_date)
-				FROM %I.observation_period AS t2 
-				WHERE t1.person_id = t2.person_id
-				AND t1.period_type_concept_id = 32882
-				AND t2.period_type_concept_id = 32880;', schema3, schema2);
+				observation_period_start_date = t2.observation_period_start_date,
+				observation_period_end_date = t2.observation_period_end_date
+				FROM cte as t2
+				WHERE t1.observation_period_id = t2.observation_period_id;', schema3, schema2, schema3);
 			EXECUTE query1;
 	END IF;
 ------------------------------------------------------
