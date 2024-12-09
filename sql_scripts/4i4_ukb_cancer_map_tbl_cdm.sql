@@ -159,6 +159,57 @@ from {CHUNK_SCHEMA}.stem_{CHUNK_ID}
 where domain_id = 'Specimen';
 
 --------------------------------
+--insert into episode from stem
+--------------------------------
+insert into {TARGET_SCHEMA}.episode 
+SELECT 	
+		id as episode_id,
+		person_id,
+		concept_id as episode_concept_id,
+		start_date as episode_start_date,
+		start_date as episode_start_datetime,
+		end_date as episode_end_date,
+		end_date as episode_end_datetime,
+		source_concept_id as episode_parent_id,
+		value_as_number as episode_number,
+		value_as_concept_id as episode_object_concept_id,
+		type_concept_id as episode_type_concept_id,
+		NULL as episode_source_value,
+		NULL::integer as episode_source_concept_id
+from {CHUNK_SCHEMA}.stem_{CHUNK_ID}
+where domain_id = 'Episode';
+
+-----------------------------------------
+-- EPISODE_EVENT
+-----------------------------------------
+-- Disease Episode
+With cte0 as(
+	select 
+		id as episode_id,
+		person_id,
+		stem_source_id
+	from {CHUNK_SCHEMA}.stem_{CHUNK_ID}
+	where concept_id = 32533  -- Disease Episode
+)
+insert into {TARGET_SCHEMA}.episode_event
+select 
+	t2.episode_id,
+	t1.id as event_id, 
+	CASE 
+		WHEN t1.domain_id = 'Condition' THEN 1147127
+		WHEN t1.domain_id = 'Measurement' THEN 1147138
+		WHEN t1.domain_id = 'Observation' THEN 1147165
+		WHEN t1.domain_id = 'Procedure' THEN 1147082	
+		WHEN t1.domain_id = 'Drug' THEN 1147094		
+		WHEN t1.domain_id = 'Specimen' THEN 1147049
+		WHEN t1.domain_id = 'Device' THEN 1147115
+		ELSE 1147165
+	END as event_field_concept_id
+from {CHUNK_SCHEMA}.stem_{CHUNK_ID} as t1
+join cte0 as t2 on t1.stem_source_id = t2.stem_source_id
+where t1.domain_id <> 'Episode';
+
+--------------------------------
 --insert into observation from stem.
 --------------------------------
 insert into {TARGET_SCHEMA}.observation 
@@ -185,7 +236,7 @@ SELECT
 		observation_event_id,
 		obs_event_field_concept_id
 from {CHUNK_SCHEMA}.stem_{CHUNK_ID} as t1
-where domain_id not in ('Condition', 'Procedure', 'Drug', 'Measurement', 'Device', 'Specimen');
+where domain_id not in ('Condition', 'Procedure', 'Drug', 'Measurement', 'Device', 'Specimen', 'Episode');
 
 -----------------------------------------
 -- UPDATE CHUNK
