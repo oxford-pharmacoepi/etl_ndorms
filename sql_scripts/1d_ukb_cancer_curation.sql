@@ -7,12 +7,12 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.cancer2 (
 	id 				BIGSERIAL 	NOT NULL,
 	eid				bigint 		not null,	
 	p40005			date,
-	p40006			varchar(5),
-	p40008			NUMERIC,
+	p40006			varchar(5),			--Type of cancer: ICD10
+	--p40008			NUMERIC,		--Age at cancer diagnosis
 	p40009			integer,			--Reported occurrences of cancer
-	p40011			varchar(4),			--Histology of cancer tumour
+	p40011			integer,			--Histology of cancer tumour
 	p40012			integer,			--Behaviour of cancer tumour
-	p40013			varchar(6),
+	p40013			varchar(6),			--Type of cancer: ICD9
 	p40019			integer,			--Cancer record format
 	p40021			varchar(4)			--Data-Coding 262: Cancer information source
 )TABLESPACE pg_default;
@@ -32,11 +32,11 @@ select
 				 p40006_i10::TEXT,p40006_i11::TEXT, p40006_i12::TEXT, p40006_i13::TEXT, p40006_i14::TEXT,
 				 p40006_i15::TEXT,p40006_i16::TEXT, p40006_i17::TEXT, p40006_i18::TEXT, p40006_i19::TEXT,
 				 p40006_i20::TEXT,p40006_i21::TEXT]) as p40006,
-	unnest(array[p40008_i0::TEXT, p40008_i1::TEXT, p40008_i2::TEXT, p40008_i3::TEXT, p40008_i4::TEXT,
-				 p40008_i5::TEXT, p40008_i6::TEXT, p40008_i7::TEXT, p40008_i8::TEXT, p40008_i9::TEXT,
-				 p40008_i10::TEXT,p40008_i11::TEXT,p40008_i12::TEXT, p40008_i13::TEXT, p40008_i14::TEXT,
-				 p40008_i15::TEXT,p40008_i16::TEXT,p40008_i17::TEXT, p40008_i18::TEXT, p40008_i19::TEXT,
-				 p40008_i20::TEXT,p40008_i21::TEXT]) as p40008,
+	--unnest(array[p40008_i0::TEXT, p40008_i1::TEXT, p40008_i2::TEXT, p40008_i3::TEXT, p40008_i4::TEXT,
+	--			 p40008_i5::TEXT, p40008_i6::TEXT, p40008_i7::TEXT, p40008_i8::TEXT, p40008_i9::TEXT,
+	--			 p40008_i10::TEXT,p40008_i11::TEXT,p40008_i12::TEXT, p40008_i13::TEXT, p40008_i14::TEXT,
+	--			 p40008_i15::TEXT,p40008_i16::TEXT,p40008_i17::TEXT, p40008_i18::TEXT, p40008_i19::TEXT,
+	--			 p40008_i20::TEXT,p40008_i21::TEXT]) as p40008,
 	p40009_i0 as p40009,
 	unnest(array[p40011_i0::TEXT, p40011_i1::TEXT, p40011_i2::TEXT, p40011_i3::TEXT, p40011_i4::TEXT,
 				 p40011_i5::TEXT, p40011_i6::TEXT, p40011_i7::TEXT, p40011_i8::TEXT, p40011_i9::TEXT,
@@ -63,14 +63,14 @@ select
 				 p40021_i20::TEXT, p40021_i21::TEXT]) as p40021
 from {SOURCE_SCHEMA}.cancer
 )
-insert into {SOURCE_SCHEMA}.cancer2(eid, p40005, p40006, p40008, p40009, p40011, p40012, p40013, p40019, p40021)
+insert into {SOURCE_SCHEMA}.cancer2(eid, p40005, p40006, p40009, p40011, p40012, p40013, p40019, p40021)
 select 
 	eid, 
 	p40005::date, 
 	p40006,
-	p40008::numeric,
+	--p40008::numeric,
 	p40009,
-	LEFT(p40011, 4),
+	LEFT(p40011, 4)::numeric,
 	p40012::numeric,
 	p40013,
 	p40019::numeric,
@@ -96,6 +96,21 @@ CREATE TABLE {SOURCE_NOK_SCHEMA}.death (LIKE {SOURCE_SCHEMA}.death) TABLESPACE p
 --------------------------------
 -- cancer2
 --------------------------------
+With cte as(
+	select 
+		min(id) as min_id, 
+		eid, 
+		p40005, 
+		p40006, 
+		p40009, 
+		p40011, 
+		p40012, 
+		p40013, 
+		p40019, 
+		p40021
+	from {SOURCE_SCHEMA}.cancer2
+	group by eid, p40005, p40006, p40009, p40011, p40012, p40013, p40019, p40021   --167936
+)
 INSERT INTO {SOURCE_NOK_SCHEMA}.cancer2(
 	select * from {SOURCE_SCHEMA}.cancer2
 	where p40005 is NULL
@@ -103,6 +118,20 @@ INSERT INTO {SOURCE_NOK_SCHEMA}.cancer2(
 	and p40011 is NULL 			-- Histology of cancer tumour is null
 	and p40012 is NULL 
 	and p40013 is NULL 			-- Type of cancer: ICD9
+
+	UNION
+
+	select * from {SOURCE_SCHEMA}.cancer2
+	where p40011 is null 
+	and p40012 is null 
+	and p40006 is null 
+	and p40013 is null
+
+	UNION
+
+	select t1.* from {SOURCE_SCHEMA}.cancer2 as t1			-- eliminate duplication
+	left join cte as t2 on t1.id = t2.min_id
+	where t2.min_id is null
 );
 
 alter table {SOURCE_NOK_SCHEMA}.cancer2 add constraint pk_cancer2_nok primary key (id) USING INDEX TABLESPACE pg_default;
@@ -110,9 +139,6 @@ alter table {SOURCE_NOK_SCHEMA}.cancer2 add constraint pk_cancer2_nok primary ke
 DELETE FROM {SOURCE_SCHEMA}.cancer2 as t1 
 using {SOURCE_NOK_SCHEMA}.cancer2 as t2
 WHERE t1.id = t2.id;
-
-VACUUM (ANALYZE) {SOURCE_SCHEMA}.cancer2;
-ALTER TABLE {SOURCE_SCHEMA}.cancer2 SET (autovacuum_enabled = True);
 
 --------------------------------
 -- baseline
@@ -150,3 +176,6 @@ create index idx_cancer2_2 on {SOURCE_SCHEMA}.cancer2(p40011, p40012, p40006) TA
 create index idx_cancer2_3 on {SOURCE_SCHEMA}.cancer2(p40011, p40012, p40013) TABLESPACE pg_default;
 create index idx_cancer2_4 on {SOURCE_SCHEMA}.cancer2(p40006) TABLESPACE pg_default;
 create index idx_cancer2_5 on {SOURCE_SCHEMA}.cancer2(p40013) TABLESPACE pg_default;
+
+VACUUM (ANALYZE) {SOURCE_SCHEMA}.cancer2;
+ALTER TABLE {SOURCE_SCHEMA}.cancer2 SET (autovacuum_enabled = True);
