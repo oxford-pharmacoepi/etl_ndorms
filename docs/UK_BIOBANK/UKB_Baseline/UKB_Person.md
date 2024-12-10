@@ -23,7 +23,7 @@ description: "UK Person"
 | birth_datetime | | | |
 | race_concept_id | p21000 | p21000 will be mapped to Race Concept_id by using UK Biobank vocabulary. | [Data-Field 21000](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=21000) |
 | ethnicity_concept_id | | 0 | |
-| location_id | p54_i0 | p54_i0 will be mapped to Geography Concept_id by using UKB_COUNTRY_STCM. | [Data-Field 54-Instance 0](https://biobank.ndph.ox.ac.uk/ukb/instance.cgi?id=2) |
+| location_id | p54_i0 | p54_i0 will be mapped to Geography Concept_id by using UKB_COUNTRY_STCM. | In UK biobank, patient and GP location information is absent. The only available information is the [UK Biobank Assessment Centre (Data-Coding 54)](https://biobank.ndph.ox.ac.uk/ukb/instance.cgi?id=2), which indicates where participants were recruited. |
 | provider_id | | | |
 | care_site_id | | | |
 | person_source_value | eid | | |
