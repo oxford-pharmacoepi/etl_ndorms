@@ -9,7 +9,7 @@ description: "UKB Cancer to STEM"
 
 # CDM Table name: stem_table
 
-The STEM table is a staging area where UKB CANCER source codes like Read codes will first be mapped to concept_ids. The STEM table itself is an amalgamation of the OMOP event tables to facilitate record movement. This means that all fields present across the OMOP event tables are present in the STEM table. After a record is mapped and staged, the domain of the concept_id dictates which OMOP table (Condition_occurrence, Drug_exposure, Procedure_occurrence, Measurement, Observation, Device_exposure) the record will move to. Please see the STEM -> CDM mapping files for a description of which STEM fields move to which STEM tables. 
+The STEM table is a staging area where UKB CANCER source codes like Read codes will first be mapped to concept_ids. The STEM table itself is an amalgamation of the OMOP event tables to facilitate record movement. This means that all fields present across the OMOP event tables are present in the STEM table. After a record is mapped and staged, the domain of the concept_id dictates which OMOP table (Condition_occurrence, Drug_exposure, Procedure_occurrence, Measurement, Observation, Device_exposure, Specimen) the record will move to. Please see the STEM -> CDM mapping files for a description of which STEM fields move to which STEM tables. 
 
 **Fields in the STEM table**
 
@@ -50,12 +50,14 @@ The meas_event_field_concept_id is assigned the concept ID 1147127 to establish 
 | person_id | eid |  |  | 
 | visit_occurrence_id | | from visit_detail  |  | 
 | visit_detail_id | eid<br>[p40005](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40005)<br>[p40021](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40021) | Look up visit_detail_id based on the unique combination of eid, p40005 and p40021.| |
-| concept_id | [p40011](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40011)<br>[p40012](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40012)<br>[p40006](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40006)<br>[p40013](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40013) | source_value([Cancer Diagnosis](https://ohdsi.github.io/OncologyWG/conventions.html#Primary_Diagnosis)) will be mapped to Condition Concept(s) by using ICDO3, ICD10 and ICD9CM and CANCER_ICDO3_STCM<br><br>source_value([Condition/Cancer Modifiers](https://ohdsi.github.io/OncologyWG/conventions.html#Condition_Modifiers)) will be mapped to Measurement Concept(s) or Observation Concept(s) if no suitable Measurement Concept(s) are found by using ICDO3, ICD10 and ICD9CM and CANCER_ICDO3_STCM ||
+| concept_id | [p40011](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40011)<br>[p40012](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40012)<br>[p40006](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40006)<br>[p40013](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40013) | source_value in the form of ****[Histology]/[behavour]-[Topography]**** is mapped to Condition Concept(s) by using ICDO3.<br><br>For those cannot be mapped in the above form:<br>1. source_value in the form of ****[Histology]/[behavour]**** is mapped to Condition Concept(s) by using ICDO3 and CANCER_ICDO3_STCM.<br>2. The topography information in the source_value is then separately mapped by using ICDO3, ICD10 and ICD9CM and CANCER_ICDO3_STCM. ||
 | source_value | [p40011](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40011)<br>[p40012](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40012)<br>[p40006](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40006)<br>[p40013](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40013) | |
 | source_concept_id | source_value | Concept_id represents source_value in Athena |
 | type_concept_id | | [****32879 - Registry****](https://athena.ohdsi.org/search-terms/terms/32879) |
 | start_date | [p40005](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40005) | |
 | end_date | [p40005](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40005) | |
 | start_time | | 00:00:00 |
-| measurement_event_id | |  condition_occurrence_id of the linked [Condition/Cancer Modifiers](https://ohdsi.github.io/OncologyWG/conventions.html#:~:text=Overview%20of%20Condition%20Modifiers&text=What%20we%20are%20calling%20'Condition,using%20the%20Cancer%20Modifier%20vocabulary) record | | 
+| measurement_event_id | |  condition_occurrence_id of the linked additional diagnostic information | | 
 | meas_event_field_concept_id | domain_id | [1147127](https://athena.ohdsi.org/search-terms/terms/1147127) | | 
+
+
