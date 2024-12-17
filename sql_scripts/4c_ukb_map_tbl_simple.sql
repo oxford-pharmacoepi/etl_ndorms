@@ -165,15 +165,21 @@ and (t2.source_vocabulary_id = 'UKB_DEATH_CAUSE_STCM' or t2.source_vocabulary_id
 --------------------------------
 -- OBSERVATION_PERIOD
 --------------------------------
+with cte as(
+	select 
+			distinct 
+			t1.eid, 
+			t1.p53_i0, 
+			COALESCE(t2.date_of_death, to_date(RIGHT(current_database(), 8), 'YYYYMMDD')),
+			32880		-- same as GOLD 
+	from {SOURCE_SCHEMA}.baseline as t1
+	left join {SOURCE_SCHEMA}.death as t2 on t1.eid = t2.eid
+)
 INSERT INTO {TARGET_SCHEMA}.observation_period
 select 
-		ROW_NUMBER () OVER ( ORDER BY t1.person_id) as observation_period_id,
-		t1.eid, 
-		t1.p53_i0, 
-		COALESCE(t2.date_of_death, to_date(RIGHT(current_database(), 8), 'YYYYMMDD')),
-		32880		-- same as GOLD 
-from {SOURCE_SCHEMA}.baseline as t1
-left join {SOURCE_SCHEMA}.death as t2 on t1.eid = t2.eid;
+	ROW_NUMBER () OVER ( ORDER BY eid) as observation_period_id, 
+	* 
+from cte;
 
 ALTER TABLE {TARGET_SCHEMA}.observation_period ADD CONSTRAINT xpk_observation_period PRIMARY KEY (observation_period_id) USING INDEX TABLESPACE pg_default;
 CREATE INDEX IF NOT EXISTS idx_observation_period_id ON {TARGET_SCHEMA}.observation_period (person_id ASC) TABLESPACE pg_default;
