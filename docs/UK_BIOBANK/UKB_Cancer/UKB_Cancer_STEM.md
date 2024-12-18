@@ -53,7 +53,7 @@ The meas_event_field_concept_id is assigned the concept ID 1147127 to establish 
 | concept_id | [p40011](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40011)<br>[p40012](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40012)<br>[p40006](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40006)<br>[p40013](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40013) | source_value in the form of ****[Histology]/[behavour]-[Topography]**** is mapped to Condition Concept(s) by using ICDO3.<br><br>For those cannot be mapped in the above form:<br>1. source_value in the form of ****[Histology]/[behavour]**** is mapped to Condition Concept(s) by using ICDO3 and CANCER_ICDO3_STCM.<br>2. The topography information in the source_value is then separately mapped by using ICDO3, ICD10 and ICD9CM and CANCER_ICDO3_STCM. ||
 | source_value | [p40011](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40011)<br>[p40012](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40012)<br>[p40006](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40006)<br>[p40013](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40013) | |
 | source_concept_id | source_value | Concept_id represents source_value in Athena |
-| type_concept_id | | [****32879 - Registry****](https://athena.ohdsi.org/search-terms/terms/32879) |
+| type_concept_id | | [32879 - Registry](https://athena.ohdsi.org/search-terms/terms/32879) |
 | start_date | [p40005](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40005) | |
 | end_date | [p40005](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40005) | |
 | start_time | | 00:00:00 |

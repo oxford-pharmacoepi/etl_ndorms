@@ -37,7 +37,7 @@ For Details, please refer to the [paper](https://pubmed.ncbi.nlm.nih.gov/3207897
 | person_id | patid | | |
 | death_date | dod | | |
 | death_datetime | dod | | |
-| death_type_concept_id | | [**32815** - Death Certificate](https://athena.ohdsi.org/search-terms/terms/32815) | |
+| death_type_concept_id | | [32815 - Death Certificate](https://athena.ohdsi.org/search-terms/terms/32815) | |
 | cause_concept_id | cause | cause_source_value will be mapped to SNOMED Concept_id by using ONS_DEATH_CAUSE_STCM, ICD10 and ICD9CM | Map cause_source_value by using ONS_DEATH_CAUSE_STCM, ICD10 and ICD9CM in follwoing sequence and conditions. <br><br>1. map the cause_source_value by ONS_DEATH_CAUSE_STCM.<br>2. If it does not match, map by ICD10 and ICD9CM.<br>3. If it does not match, map SUBSTRING(cause_source_value from 0 for 4) by ICD10.<br><br>It does not allow multiple death records for a single person in CDM Death. However,  some ICD10 and ICD9CM codes map to multiple standard concepts in Athena. ONS_DEATH_CAUSE_STCM, an STCM-tailored vocabulary, contains the mapping information between these codes and standard concepts.<br><br>ICD10 and ICD9CM codes with multiple 'Maps to' associations (i.e., maps to multiple standard concepts), ICD10 codes co-exist in ONS_DEATH_CAUSE_STCM, and ICD9CM codes co-exist in ICD10 or/and ONS_DEATH_CAUSE_STCM are disregarded in the mapping.  |
 | cause_source_value | cause | | |
 | cause_source_concept_id | cause | | |

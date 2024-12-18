@@ -19,7 +19,7 @@ In UK biobank, patient and GP location information is absent. The only available
 | city| | | NULL |
 | state| | | NULL |
 | zip| | | NULL |
-| county| | | NULL |
+| county| target_concept_name | | |
 | location_source_value| | | NULL |
 | country_concept_id | | [Data-Coding 54](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=54) will be mapped to Geography Concept_id by using UKB_GP_COUNTRY_STCM |
 | country_source_value | target_concept_name | using the mapped Geography concept name |
