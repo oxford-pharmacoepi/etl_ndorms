@@ -18,7 +18,7 @@ All mapped cancer diagnoses in CDM Condition are additionally mapped to the CDM 
 | Destination Field | Source field | Logic | Comment field | 
 | --- | --- | --- | --- |
 | episode_id | | | Autogenerate| 
-| person_id | STEM.person_id |  |  | |
+| person_id | STEM.person_id |  |  |
 | episode_concept_id |  | [32533 Disease Episode](https://athena.ohdsi.org/search-terms/terms/32533) |  |
 | episode_type_concept_id |  | [32879 Registry](https://athena.ohdsi.org/search-terms/terms/32879) |  |
 | episode_start_date | STEM.start_date |  | |

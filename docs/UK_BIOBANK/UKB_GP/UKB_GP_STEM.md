@@ -51,13 +51,13 @@ The STEM table is a staging area where UKB GP source codes like Read codes will 
 
 ## Reading from ukb_gp.temp_gp_scripts_2 (created by linking ukb_gp.gp_scripts to CDM GOLD lookup tables) 
 Day supply information for prescriptions is essential for constructing the CDM Drug_era. However, in the source data, less than 1% of prescription records include this information. 
-To address this gap, a 'numdays' value as the day supply in CDM Drug_exposure has been assigned by linking the source data with three CDM GOLD lookup tables: ****gold_product****, ****gold_daysupply_decodes****, ****gold_daysupply_modes****. 
+To address this gap, a 'numdays' value as the day supply in CDM Drug_exposure has been assigned by linking the source data with three CDM GOLD lookup tables: **gold_product**, **gold_daysupply_decodes**, **gold_daysupply_modes**. 
 These tables contain dmd code, pharmacy product name, and the most frequent prescriptions based on quantity, and pack size. 
 This approach leverages the common data source between CPRD Gold and the UK Biobank, both of which use Vision® software. 
 
 No suggested day supply is assigned if the source data already contains day supply information or if no corresponding drugs are found in the CDM GOLD lookup tables. For cases where day supply is represented as 'month' in the source data, the day supply is calculated as a multiple of 28, which is the most frequent 'numdays' value.
 
-<span style="color: red;">****Researchers must decide whether to use the suggested day supply or define it independently.****</span> The source quantity information can be found in the 'sig' data field within CDM Drug_exposure.
+<span style="color: red;">**Researchers must decide whether to use the suggested day supply or define it independently.**</span> The source quantity information can be found in the 'sig' data field within CDM Drug_exposure.
 
 
 ![](images/ukb_gp_scripts_to_stem.png)
@@ -72,7 +72,7 @@ No suggested day supply is assigned if the source data already contains day supp
 | concept_id | drug_name<br>read_2 | source_value will be mapped to Athena Standard Concept by using UKB_GP_SCRIPT_DRUG_STCM and UKB_GP_SCRIPT_READ_STCM. | |
 | source_value | drug_name<br>read_2 | use drug_name if concept_id is mapped by drug_name or read_2 if concept_id is mapped by read_2 |
 | source_concept_id | | concept_id represent unit_source_value in Athena or 0 if it doesn't exist in Athena. |
-| type_concept_id | | [****32817 - EHR****](https://athena.ohdsi.org/search-terms/terms/32817) |
+| type_concept_id | | [32817 - EHR](https://athena.ohdsi.org/search-terms/terms/32817) |
 | start_date | issue_date | |
 | end_date | issue_date<br>*day_supply(from quantity) | issue_date + COALESCE(days_supply, 0) |
 | start_time | | 00:00:00 |
@@ -99,7 +99,7 @@ No suggested day supply is assigned if the source data already contains day supp
 | concept_id | read_2<br>read_3 | source_value will be mapped to Athena Standard Concept by using Read vocabulary and UKB_GP_CLINICAL_READ_STCM. | |
 | source_value | read_2<br>read_3 | use read_2 if concept_id is mapped by read_2 or read_3 if concept_id is mapped by read_3 | |
 | source_concept_id | read_2<br>read_3 | concept_id represent source_value in Athena or 0 if it doesn't exist in Athena. |
-| type_concept_id | | [****32817 - EHR****](https://athena.ohdsi.org/search-terms/terms/32817) |
+| type_concept_id | | [32817 - EHR](https://athena.ohdsi.org/search-terms/terms/32817) |
 | start_date | event_dt | |
 | end_date | event_dt | |
 | start_time | | 00:00:00 |

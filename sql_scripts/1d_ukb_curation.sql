@@ -30,7 +30,7 @@ INSERT INTO {SOURCE_NOK_SCHEMA}.death_cause
 	select t1.* 
 	from {SOURCE_SCHEMA}.death_cause as t1 
 	join eid_muti_primary_dcause as t2 on t1.eid = t2.eid
-	where t1.level = 1					--Eliminate mutiple primanry death_cause 
+	where t1.level = 1 and t1.ins_index > 0					--Eliminate mutiple primanry death_cause with ins_index > 0
 );
 
 alter table {SOURCE_NOK_SCHEMA}.death_cause add constraint pk_death_cause_nok primary key (eid, ins_index, arr_index) USING INDEX TABLESPACE pg_default;

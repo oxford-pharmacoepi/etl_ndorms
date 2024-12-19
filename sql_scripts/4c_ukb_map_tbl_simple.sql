@@ -99,45 +99,20 @@ CREATE INDEX idx_gender ON {TARGET_SCHEMA}.person (gender_concept_id ASC) TABLES
 -- DEATH
 --------------------------------
 With ICD10_1 AS(
-	select source_concept_id, source_code
+	select source_code
 	from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map
 	where source_vocabulary_id = 'ICD10' 
 	group by source_concept_id, source_code
 	having count(*)=1 
 ), STCM AS(
-	select source_concept_id, source_code, target_concept_id, source_vocabulary_id
+	select source_concept_id, source_code, target_concept_id
 	from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map 
 	where source_vocabulary_id = 'UKB_DEATH_CAUSE_STCM'	
 ), ICD10 AS(
-	select t1.source_concept_id, t1.target_concept_id, t1.source_vocabulary_id
+	select t1.source_concept_id, t1.source_code, t1.target_concept_id
 	from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t1
-	join ICD10_1 as t2 on t1.source_concept_id = t2.source_concept_id
-	left join STCM as t3 on t3.source_concept_id = t1.source_concept_id
-	where t1.source_vocabulary_id = 'ICD10' and t3.source_concept_id is null
-
-	union
-	
-	select source_concept_id, target_concept_id, source_vocabulary_id
-	from STCM 
-), death_cause_1 AS(
-	select t1.eid, t1.ins_index, t1.cause_icd10, t2.concept_id, t2.concept_id as source_concept_id, t2.concept_code as source_code
-	from {SOURCE_SCHEMA}.death_cause as t1
-	join {VOCABULARY_SCHEMA}.concept as t2 on t1.cause_icd10 = t2.concept_code or t1.cause_icd10 = replace(t2.concept_code, '.', '')
-	where t2.vocabulary_id = 'ICD10'
-), death_cause_2 AS(
-	select t1.eid, t1.ins_index, t1.cause_icd10, t3.concept_id, 0 as source_concept_id, t1.cause_icd10 as source_code
-	from {SOURCE_SCHEMA}.death_cause as t1
-	left join death_cause_1 as t2 on t1.eid = t2.eid and t1.ins_index = t2.ins_index
-	join {VOCABULARY_SCHEMA}.concept as t3 on left(t1.cause_icd10, 3) = t3.concept_code 
-	where t2.eid is null and t3.vocabulary_id = 'ICD10'
-), death_cause AS(
-	select * from death_cause_1
-	union 
-	select * from death_cause_2
-), dead_patient AS(
-	select distinct t1.eid, t1.date_of_death, t2.cause_icd10, t2.source_code, t2.concept_id, t2.source_concept_id
-	from {SOURCE_SCHEMA}.death as t1
-	left join death_cause as t2 on t1.eid = t2.eid and t1.ins_index = t2.ins_index
+	join ICD10_1 as t2 on t1.source_code = t2.source_code
+	where t1.source_vocabulary_id = 'ICD10'
 )
 INSERT INTO {TARGET_SCHEMA}.death(
 	person_id, 
@@ -149,18 +124,24 @@ INSERT INTO {TARGET_SCHEMA}.death(
 	cause_source_concept_id
 )
 select 
-t1.eid,
-t1.date_of_death, 
-t1.date_of_death, 
-32879, --same as cdm_ukb_202003
-CASE 
-	WHEN t1.cause_icd10 is not null THEN COALESCE(t2.target_concept_id, 0) 
-END, 
-t1.source_code, 
-t1.source_concept_id
-from dead_patient as t1
-left join ICD10 as t2 on t1.concept_id = t2.source_concept_id
-and (t2.source_vocabulary_id = 'UKB_DEATH_CAUSE_STCM' or t2.source_vocabulary_id = 'ICD10');
+	t1.eid,
+	t1.date_of_death, 
+	t1.date_of_death, 
+	32879, --same as cdm_ukb_202003
+	CASE 
+		WHEN t2.cause_icd10 is not null THEN COALESCE(t3.target_concept_id, t4.target_concept_id, t5.target_concept_id, t6.target_concept_id, 0) 
+	END as target_concept_id,
+	COALESCE(t3.source_code, t5.source_code, t2.cause_icd10) as source_code,
+	CASE 
+		WHEN t2.cause_icd10 is null then null
+		ELSE COALESCE(t3.source_concept_id, t5.source_concept_id, 0) 
+	END as source_concept_id
+from {SOURCE_SCHEMA}.death as t1
+left join {SOURCE_SCHEMA}.death_cause as t2 on t1.eid= t2.eid and t1.ins_index = t2.ins_index
+left join STCM as t3 on replace(t3.source_code, '.', '') = t2.cause_icd10
+left join STCM as t4 on t4.source_code = left(t2.cause_icd10, 3)
+left join ICD10 as t5 on replace(t5.source_code, '.', '') = t2.cause_icd10
+left join ICD10 as t6 on t6.source_code = left(t2.cause_icd10, 3);
 
 --------------------------------
 -- OBSERVATION_PERIOD
