@@ -39,3 +39,9 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.death_cause (
 	level				int,
 	cause_icd10			VARCHAR(8)
 )TABLESPACE pg_default;
+
+
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}._patid_deleted (
+	patid			bigint 		not null,	
+	reason			VARCHAR(1)
+)TABLESPACE pg_default;
