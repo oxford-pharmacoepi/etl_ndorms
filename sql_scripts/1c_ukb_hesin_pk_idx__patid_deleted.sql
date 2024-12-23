@@ -1,0 +1,1 @@
+alter table {SOURCE_SCHEMA}._patid_deleted add constraint pk_patid_deleted primary key (patid) USING INDEX TABLESPACE pg_default;

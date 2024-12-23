@@ -185,3 +185,8 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hesin_psych (
 	admistat			int,
 	leglstat			int
 )TABLESPACE pg_default;
+
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}._patid_deleted (
+	patid			bigint 		not null,	
+	reason			VARCHAR(1)
+)TABLESPACE pg_default;
