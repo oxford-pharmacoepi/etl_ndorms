@@ -113,6 +113,17 @@ With ICD10_1 AS(
 	from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t1
 	join ICD10_1 as t2 on t1.source_code = t2.source_code
 	where t1.source_vocabulary_id = 'ICD10'
+), cte AS(
+	select distinct 
+		t1.eid,
+		t1.date_of_death, 
+		t2.cause_icd10
+	from {SOURCE_SCHEMA}.death as t1
+	left join {SOURCE_SCHEMA}.death_cause as t2 on t1.eid= t2.eid and t1.ins_index = t2.ins_index
+), _death as(
+	select ROW_NUMBER () OVER ( PARTITION BY eid order by eid, date_of_death, cause_icd10) as tmp_id,
+	*
+	from cte
 )
 INSERT INTO {TARGET_SCHEMA}.death(
 	person_id, 
@@ -129,19 +140,19 @@ select
 	t1.date_of_death, 
 	32879, --same as cdm_ukb_202003
 	CASE 
-		WHEN t2.cause_icd10 is not null THEN COALESCE(t3.target_concept_id, t4.target_concept_id, t5.target_concept_id, t6.target_concept_id, 0) 
+		WHEN t1.cause_icd10 is not null THEN COALESCE(t3.target_concept_id, t4.target_concept_id, t5.target_concept_id, t6.target_concept_id, 0) 
 	END as target_concept_id,
-	COALESCE(t3.source_code, t5.source_code, t2.cause_icd10) as source_code,
+	COALESCE(t3.source_code, t5.source_code, t1.cause_icd10) as source_code,
 	CASE 
-		WHEN t2.cause_icd10 is null then null
+		WHEN t1.cause_icd10 is null then null
 		ELSE COALESCE(t3.source_concept_id, t5.source_concept_id, 0) 
 	END as source_concept_id
-from {SOURCE_SCHEMA}.death as t1
-left join {SOURCE_SCHEMA}.death_cause as t2 on t1.eid= t2.eid and t1.ins_index = t2.ins_index
-left join STCM as t3 on replace(t3.source_code, '.', '') = t2.cause_icd10
-left join STCM as t4 on t4.source_code = left(t2.cause_icd10, 3)
-left join ICD10 as t5 on replace(t5.source_code, '.', '') = t2.cause_icd10
-left join ICD10 as t6 on t6.source_code = left(t2.cause_icd10, 3);
+from _death as t1
+left join STCM as t3 on replace(t3.source_code, '.', '') = t1.cause_icd10
+left join STCM as t4 on t4.source_code = left(t1.cause_icd10, 3)
+left join ICD10 as t5 on replace(t5.source_code, '.', '') = t1.cause_icd10
+left join ICD10 as t6 on t6.source_code = left(t1.cause_icd10, 3)
+where t1.tmp_id = 1;
 
 --------------------------------
 -- OBSERVATION_PERIOD

@@ -46,7 +46,7 @@ The meas_event_field_concept_id is assigned the concept ID 1147127 to establish 
 | Destination Field | Source field | Logic | Comment field | 
 | --- | --- | --- | --- |
 | id | | | Autogenerate| 
-| domain_id | | This should be the domain_id of the standard concept in the concept_id field. If an entity type is mapped to concept_id 0, put the domain_id as Observation. |
+| domain_id | | This should be the domain_id of the standard concept in the concept_id field. If an entity type is mapped to concept_id 0 or concept_id is not in the Condition, Procedure, Drug, Measurement, Specimen, or Device domains, put the domain_id as Observation. |
 | person_id | eid |  |  | 
 | visit_occurrence_id | | from visit_detail  |  | 
 | visit_detail_id | eid<br>[p40005](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40005)<br>[p40021](https://biobank.ndph.ox.ac.uk/ukb/field.cgi?id=40021) | Look up visit_detail_id based on the unique combination of eid, p40005 and p40021.| |

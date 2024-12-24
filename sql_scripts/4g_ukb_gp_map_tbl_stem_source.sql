@@ -1,6 +1,10 @@
 CREATE TABLE {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM_SOURCE);
 
 --insert into stem_source from temp_gp_scripts_2 --duplication exists
+-- a GP can produce identical prescriptions intentionally, 
+-- for example if a person needs to travel and requests extra medications or if the software system imposes restrictions on prescriptions. 
+-- Identical prescription would give patients a longer exposure to the medication
+
 WITH cte0 as (
 	select person_id
 	from {CHUNK_SCHEMA}.chunk_person
@@ -24,14 +28,15 @@ WITH cte0 as (
 		t1.qty,
 		t1.packsize,
 		t1.daysupply,
-		min(t1.id) as id
+		--min(t1.id) as id
+		t1.id						--keep duplication in source date
 	from {SOURCE_SCHEMA}.temp_gp_scripts_2 as t1
 	join cte0 on eid = cte0.person_id
 	join {SOURCE_SCHEMA}.lookup626 as lkup on lkup.code = t1.data_provider
 	join {TARGET_SCHEMA}.observation_period as t2 on t1.eid = t2.person_id
 	join cte1 as t3 on t3.person_id = t1.eid and t3.visit_detail_start_date = t1.issue_date and t3.visit_detail_source_value = concat(lkup.description, '-Drug Prescription')
 	where t1.issue_date >= t2.observation_period_start_date and t1.issue_date <= t2.observation_period_end_date
-	group by t1.eid, t3.visit_occurrence_id, t3.visit_detail_id, t1.data_provider, t1.drug_name, t1.read_2, t1.issue_date, t1.quantity, t1.qty, t1.packsize, t1.daysupply
+	--group by t1.eid, t3.visit_occurrence_id, t3.visit_detail_id, t1.data_provider, t1.drug_name, t1.read_2, t1.issue_date, t1.quantity, t1.qty, t1.packsize, t1.daysupply
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
@@ -50,7 +55,7 @@ insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	stem_source_table,
 	stem_source_id
 )
-select distinct
+select distinct				--remove duplication by 1:n mappings in source_to_standard_vocab_map
 	t1.eid, 	
 	t1.visit_occurrence_id,
 	t1.visit_detail_id,
