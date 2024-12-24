@@ -63,3 +63,8 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.gp_scripts (
 	drug_name			varchar(600),
 	quantity			varchar(250)
 )TABLESPACE pg_default;
+
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}._patid_deleted (
+	patid			bigint 		not null,	
+	reason			VARCHAR(1)
+)TABLESPACE pg_default;

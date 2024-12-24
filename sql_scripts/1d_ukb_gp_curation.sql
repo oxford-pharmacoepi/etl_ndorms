@@ -15,20 +15,28 @@ CREATE TABLE {SOURCE_NOK_SCHEMA}.death (LIKE {SOURCE_SCHEMA}.death) TABLESPACE p
 --------------------------------
 -- gp_clinical
 --------------------------------
+--Remove withdrawal patients
 INSERT INTO {SOURCE_NOK_SCHEMA}.gp_clinical
-select * from {SOURCE_SCHEMA}.gp_clinical
-where read_2 = '.....' or read_3 = '.....' or read_2 = '@A2..';
+(
+	select t1.* from {SOURCE_SCHEMA}.gp_clinical as t1
+	join {SOURCE_SCHEMA}._patid_deleted as t2 on t1.eid = t2.patid	--Remove withdrawal patients
 
--- read_2 = 22A.. value1 = ^
-INSERT INTO {SOURCE_NOK_SCHEMA}.gp_clinical
-select * from {SOURCE_SCHEMA}.gp_clinical
-where read_2 = '22A..'
-and COALESCE(value1, value3) = '^';
+	union
 
--- eventdate = '2037-07-07'
-INSERT INTO {SOURCE_NOK_SCHEMA}.gp_clinical
-select * from {SOURCE_SCHEMA}.gp_clinical
-where event_dt > to_date(RIGHT(current_database(), 8), 'YYYYMMDD');
+	select * from {SOURCE_SCHEMA}.gp_clinical
+	where read_2 = '.....' or read_3 = '.....' or read_2 = '@A2..'
+
+	union
+
+	select * from {SOURCE_SCHEMA}.gp_clinical
+	where read_2 = '22A..'
+	and COALESCE(value1, value3) = '^'		-- read_2 = 22A.. value1 = ^
+
+	union
+
+	select * from {SOURCE_SCHEMA}.gp_clinical
+	where event_dt > to_date(RIGHT(current_database(), 8), 'YYYYMMDD') -- eventdate = '2037-07-07'
+);
 
 alter table {SOURCE_NOK_SCHEMA}.gp_clinical add constraint pk_gp_clinical_nok primary key (id) USING INDEX TABLESPACE pg_default;
 
@@ -40,15 +48,22 @@ WHERE t1.id = t2.id;
 -- gp_scripts
 --------------------------------
 INSERT INTO {SOURCE_NOK_SCHEMA}.gp_scripts
-select * from {SOURCE_SCHEMA}.gp_scripts
-where read_2 is null 
-and drug_name is null
-and (dmd_code is null or dmd_code = '0');
+(
+	select t1.* from {SOURCE_SCHEMA}.gp_scripts as t1
+	join {SOURCE_SCHEMA}._patid_deleted as t2 on t1.eid = t2.patid	--Remove withdrawal patients
 
--- issue_date = '2037-07-07'
-INSERT INTO {SOURCE_NOK_SCHEMA}.gp_scripts
-select * from {SOURCE_SCHEMA}.gp_scripts
-where issue_date > to_date(RIGHT(current_database(), 8), 'YYYYMMDD');
+	union
+	
+	select * from {SOURCE_SCHEMA}.gp_scripts
+	where read_2 is null 
+	and drug_name is null
+	and (dmd_code is null or dmd_code = '0')  --Remove empty drug
+	
+	union
+
+	select * from {SOURCE_SCHEMA}.gp_scripts
+	where issue_date > to_date(RIGHT(current_database(), 8), 'YYYYMMDD') -- issue_date = '2037-07-07'
+);
 
 alter table {SOURCE_NOK_SCHEMA}.gp_scripts add constraint pk_gp_scripts_nok primary key (id) USING INDEX TABLESPACE pg_default;
 
@@ -60,6 +75,15 @@ WHERE t1.id = t2.id;
 --------------------------------
 -- gp_registrations
 --------------------------------
+--Remove withdrawal patients
+select t1.* from {SOURCE_SCHEMA}.gp_registrations as t1
+join {SOURCE_SCHEMA}._patid_deleted as t2 on t1.eid = t2.patid;
+
+DELETE FROM {SOURCE_SCHEMA}.gp_registrations  
+where eid in(
+	select patid from {SOURCE_SCHEMA}._patid_deleted 
+);
+
 -- reg_date = '2037-07-07'
 INSERT INTO {SOURCE_NOK_SCHEMA}.gp_registrations
 select * from {SOURCE_SCHEMA}.gp_registrations
