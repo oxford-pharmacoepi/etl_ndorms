@@ -50,7 +50,9 @@ The STEM table is a staging area where UKB GP source codes like Read codes will 
 
 
 ## Reading from ukb_gp.temp_gp_scripts_2 (created by linking ukb_gp.gp_scripts to CDM GOLD lookup tables) 
-Day supply information for prescriptions is essential for constructing the CDM Drug_era. However, in the source data, less than 1% of prescription records include this information. 
+Duplication in gp_scripts will not be treated as identical prescriptions, as a GP may intentionally issue identical prescriptions. For instance, this could occur if a patient requires extra medication for travel or if the software system imposes prescription limitations. All such instances are accounted for.
+
+Day supply information for prescriptions is essential for constructing the CDM Drug_era. However, in the source data, less than 1% of prescription records(in the quantity data field) include this information. 
 To address this gap, a 'numdays' value as the day supply in CDM Drug_exposure has been assigned by linking the source data with three CDM GOLD lookup tables: **gold_product**, **gold_daysupply_decodes**, **gold_daysupply_modes**. 
 These tables contain dmd code, pharmacy product name, and the most frequent prescriptions based on quantity, and pack size. 
 This approach leverages the common data source between CPRD Gold and the UK Biobank, both of which use Vision® software. 
@@ -74,9 +76,9 @@ No suggested day supply is assigned if the source data already contains day supp
 | source_concept_id | | concept_id represent unit_source_value in Athena or 0 if it doesn't exist in Athena. |
 | type_concept_id | | [32817 - EHR](https://athena.ohdsi.org/search-terms/terms/32817) |
 | start_date | issue_date | |
-| end_date | issue_date<br>*day_supply(from quantity) | issue_date + COALESCE(days_supply, 0) |
+| end_date | issue_date<br>days_supply | issue_date + COALESCE(days_supply, 0) | **The observation_period_end_date does not take days_supply into account, meaning the end_date is not extended beyond the observation period even when days_supply is added.** |
 | start_time | | 00:00:00 |
-| days_supply| quantity | extract day supply information in quantity, given that if it is represented as 'month', *28<br> if day supply information doesn't exists, use numdays provided by CDM GOLD lookup tables. | | 
+| days_supply | quantity | extract day supply information in quantity, given that if it is represented as 'month', *28<br> if day supply information doesn't exists, use numdays provided by CDM GOLD lookup tables. | | 
 | sig | quantity | | for researchers' reference |  
 | quantity | quantity | extract numeric value in quantity | |
 | unit_concept_id | quantity | unit_source_value will be mapped to Athena Standard Concept by using UKB_GP_DEVICE_UNIT_STCM 
@@ -86,6 +88,7 @@ No suggested day supply is assigned if the source data already contains day supp
 | stem_source_id | gp_scripts.id | |
 
 ## Reading from ukb_gp.gp_clinical
+Duplicate entries in gp_clinical will be considered identical and mapped only once.
 
 ![](images/ukb_gp_clinical_to_stem.png)
 
