@@ -206,6 +206,11 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.cancer (
 	p40021_i21		varchar(4)
 )TABLESPACE pg_default;
 
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}._patid_deleted (
+	patid			bigint 		not null,	
+	reason			VARCHAR(1)
+)TABLESPACE pg_default;
+
 --CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.covid19_result_england(
 --	eid					bigint,
 --	specdate			date,

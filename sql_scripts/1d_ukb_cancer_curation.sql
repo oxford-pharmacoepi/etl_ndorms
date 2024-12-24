@@ -1,4 +1,21 @@
 ------------------------------------
+-- curation of cancer
+------------------------------------
+DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.cancer CASCADE;
+
+CREATE TABLE {SOURCE_NOK_SCHEMA}.cancer (LIKE {SOURCE_SCHEMA}.cancer) TABLESPACE pg_default;
+
+INSERT INTO {SOURCE_NOK_SCHEMA}.cancer
+select t1.* from {SOURCE_SCHEMA}.cancer as t1
+join {SOURCE_SCHEMA}._patid_deleted as t2 on t1.eid = t2.patid;	--Remove withdrawal patients
+
+alter table {SOURCE_NOK_SCHEMA}.cancer add constraint pk_cancer_nok primary key (eid) USING INDEX TABLESPACE pg_default;
+
+DELETE FROM {SOURCE_SCHEMA}.cancer as t1 
+using {SOURCE_NOK_SCHEMA}.cancer as t2
+WHERE t1.eid = t2.eid;
+
+------------------------------------
 -- reform the cancer table structure
 ------------------------------------
 DROP TABLE IF EXISTS {SOURCE_SCHEMA}.cancer2 CASCADE;
