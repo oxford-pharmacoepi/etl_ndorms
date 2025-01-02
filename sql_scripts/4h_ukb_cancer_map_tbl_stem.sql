@@ -284,8 +284,8 @@ select distinct
 	NULL::date as end_date,							--episode_end_date
 	'00:00:00'::time as start_time,	
 	concept_id as value_as_concept_id,				--episode_object_concept_id
-	source_value,
-	source_concept_id, 
+	source_value,									--episode_source_value
+	source_concept_id, 								--episode_source_concept_id
 	stem_source_table,
 	stem_source_id
 from {CHUNK_SCHEMA}.stem_{CHUNK_ID} 

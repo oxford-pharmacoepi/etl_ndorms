@@ -170,7 +170,7 @@ SELECT
 		start_date as episode_start_datetime,
 		end_date as episode_end_date,
 		end_date as episode_end_datetime,
-		source_concept_id as episode_parent_id,
+		NULL as episode_parent_id,
 		value_as_number as episode_number,
 		value_as_concept_id as episode_object_concept_id,
 		type_concept_id as episode_type_concept_id,
