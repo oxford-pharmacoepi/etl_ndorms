@@ -76,6 +76,7 @@ WHERE t1.id = t2.id;
 -- gp_registrations
 --------------------------------
 --Remove withdrawal patients
+insert into {SOURCE_NOK_SCHEMA}.gp_registrations
 select t1.* from {SOURCE_SCHEMA}.gp_registrations as t1
 join {SOURCE_SCHEMA}._patid_deleted as t2 on t1.eid = t2.patid;
 
