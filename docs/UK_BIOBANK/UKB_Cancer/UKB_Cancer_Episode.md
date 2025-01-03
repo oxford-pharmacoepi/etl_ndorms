@@ -28,5 +28,5 @@ All mapped cancer diagnoses in CDM Condition are additionally mapped to the CDM 
 | episode_number |  | NULL | |
 | episode_object_concept_id | STEM.concept_id | mapped Condition concepts representing cancer diagnoses | |
 | episode_parent_id |  | NULL |  |
-| episode_source_value |  | NULL |  |
-| episode_source_concept_id |  | NULL |  |
+| episode_source_value | STEM.source_value |  |  |
+| episode_source_concept_id | STEM.source_concept_id |  |  |
