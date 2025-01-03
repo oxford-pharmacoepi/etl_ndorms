@@ -76,7 +76,7 @@ No suggested day supply is assigned if the source data already contains day supp
 | source_concept_id | | concept_id represent unit_source_value in Athena or 0 if it doesn't exist in Athena. |
 | type_concept_id | | [32817 - EHR](https://athena.ohdsi.org/search-terms/terms/32817) |
 | start_date | issue_date | |
-| end_date | issue_date<br>days_supply | issue_date + COALESCE(days_supply, 0) | **The observation_period_end_date does not take days_supply into account, meaning the end_date is not extended beyond the observation period even when days_supply is added.** |
+| end_date | issue_date<br>days_supply | issue_date + COALESCE(days_supply, 0) | **The observation_period_end_date does not take days_supply into account, meaning the end_date may be extend beyond the observation period when days_supply is added.** |
 | start_time | | 00:00:00 |
 | days_supply | quantity | extract day supply information in quantity, given that if it is represented as 'month', *28<br> if day supply information doesn't exists, use numdays provided by CDM GOLD lookup tables. | | 
 | sig | quantity | | for researchers' reference |  
