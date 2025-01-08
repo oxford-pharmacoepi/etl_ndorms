@@ -205,7 +205,7 @@ join cte0 on t1.eid = cte0.person_id
 join {SOURCE_SCHEMA}.lookup626 as lkup on lkup.code = t1.data_provider
 join {TARGET_SCHEMA}.observation_period as t2 on t1.eid = t2.person_id
 join cte1 as t3 on t3.person_id = t1.eid and t3.visit_detail_start_date = t1.event_dt and t3.visit_detail_source_value = concat(lkup.description, '-Clinical')
-left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t1.read_3 = t4.source_code and t4.source_vocabulary_id = 'UKB_GP_CLINICAL_READ_STCM'
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t1.read_2 = t4.source_code and t4.source_vocabulary_id = 'UKB_GP_CLINICAL_READ_STCM'
 left join  {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t5 on concat(t1.read_2, '00') = t5.source_code and t5.source_vocabulary_id = 'Read'
 left join _qualifier as t6 on t6._qualifier = t1.value1 or t6._qualifier = t1.value2 or t6._qualifier = t1.value3
 left join {VOCABULARY_SCHEMA}.concept as t7 on (t7.concept_code = t1.value1 or t7.concept_code = t1.value2 or t7.concept_code = t1.value3) and t7.vocabulary_id = 'Gemscript'  
