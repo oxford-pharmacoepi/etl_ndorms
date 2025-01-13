@@ -33,30 +33,14 @@ cte1 AS (
     INNER JOIN {SOURCE_SCHEMA}.hesin_diag AS t2 ON t1.person_id = t2.eid
     INNER JOIN {SOURCE_SCHEMA}.hesin AS t3 ON t2.eid = t3.eid AND t2.ins_index = t3.ins_index
 ),
-cte_max_visit AS (
-    SELECT 
-        person_id,
-        source_value,
-        visit_source_value,
-        MAX(spell_seq) AS max_spell_seq
-    FROM cte1
-    GROUP BY person_id, source_value, visit_source_value
-),
 cte2 AS (
 SELECT DISTINCT 
     t1.*, 
-    t2.source_concept_id, 
-    max_visit.max_spell_seq
+    CASE WHEN t2.source_concept_id is null then 0 else t2.source_concept_id END AS source_concept_id
 FROM cte1 AS t1
 LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map AS t2 
     ON t2.source_code = t1.source_value
-INNER JOIN cte_max_visit AS max_visit 
-    ON t1.person_id = max_visit.person_id 
-    AND t1.source_value = max_visit.source_value 
-    AND t1.visit_source_value = max_visit.visit_source_value
-WHERE 
-    UPPER(t2.source_vocabulary_id) IN ('ICD9CM', 'ICD10') 
-    AND t1.spell_seq = max_visit.max_spell_seq
+	AND UPPER(t2.source_vocabulary_id) IN ('ICD9CM', 'ICD10') 
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (domain_id, person_id, visit_occurrence_id, visit_detail_id, provider_id, concept_id, source_value,
 					 source_concept_id, type_concept_id, start_date, end_date, start_time, days_supply, dose_unit_concept_id,
@@ -142,10 +126,11 @@ WITH cte0 as (
 		LEFT join {SOURCE_SCHEMA}.hesin as t3 on t2.eid = t3.eid and t2.ins_index = t3.ins_index
 		order by t2.eid, t2.ins_index, COALESCE(t2.opdate,t3.epistart,t3.admidate), level),
 	cte2 as (
-		SELECT DISTINCT t1.*, t2.source_concept_id
+		SELECT DISTINCT t1.*, 
+		CASE WHEN t2.source_concept_id is null then 0 else t2.source_concept_id END AS source_concept_id
 		FROM cte1 as t1
 		left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_code = t1.source_value
-		WHERE upper(t2.source_vocabulary_id) = 'OPCS4'
+		AND upper(t2.source_vocabulary_id) = 'OPCS4'
 
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (domain_id, person_id, visit_occurrence_id, visit_detail_id, provider_id, concept_id, source_value,
