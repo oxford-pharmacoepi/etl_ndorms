@@ -19,76 +19,30 @@ FROM public_ukb.location;
 --------------------------------
 -- PERSON
 --------------------------------
-with cte1 as ( 
-	select distinct(eid) as eid
-	from {SOURCE_SCHEMA}.hesin as t1 
-),
-ukb AS(
-	select 
-		t1.concept_id as source_concept_id, 
-		t1.concept_code as source_code, 
-		COALESCE(t2.target_concept_id, 0) as target_concept_id, 
-		t2.target_domain_id
-	from {VOCABULARY_SCHEMA}.concept as t1
-	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t1.concept_id = t2.source_concept_id and t2.source_vocabulary_id = 'UK Biobank'
-	where t1.vocabulary_id = 'UK Biobank' and (t1.concept_code like '1001-%' or t1.concept_code like '9-%')
-), loc AS(
-	select 	t1.source_code, 
-			t2.location_id
-	from {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t1
-	join {TARGET_SCHEMA}.location as t2 on t2.country_concept_id = t1.target_concept_id
-	where t1.source_vocabulary_id = 'UKB_COUNTRY_STCM'
-)
-INSERT INTO {TARGET_SCHEMA}.person (
-  person_id					,
-  gender_concept_id			,
-  year_of_birth				,
-  month_of_birth			,
-  day_of_birth				,
-  birth_datetime			,
-  race_concept_id			,
-  ethnicity_concept_id		,
-  location_id				,
-  provider_id				,
-  care_site_id				,
-  person_source_value		,
-  gender_source_value		,
-  gender_source_concept_id	,
-  race_source_value			,
-  race_source_concept_id	,
-  ethnicity_source_value	,
-  ethnicity_source_concept_id
-)
-SELECT 
-	t1.eid AS person_id,
-	t3.target_concept_id AS gender_concept_id,
-	t2.p34 AS year_of_birth,
-	t2.p52 AS month_of_birth,
-	NULL::int AS day_of_birth,
-	NULL::timestamp AS birth_datetime,
-	CASE 
-		WHEN t4.target_domain_id <> 'Race' THEN 0
-		ELSE COALESCE(t4.target_concept_id, 0) 
-	END	AS race_concept_id,
-	0 AS ethnicity_concept_id,
-	t5.location_id as location_id,
-	NULL::bigint AS provider_id,
-	NULL::int AS care_site_id,
-	t1.eid::varchar AS person_source_value,
-	CONCAT('9-', t2.p31) AS gender_source_value,
-	t3.source_concept_id AS gender_source_concept_id,
-	CASE
-		WHEN t2.p21000_i0::integer is not null then CONCAT('1001-', t2.p21000_i0::integer)
-	END 
-	AS race_source_value,	
-	t4.source_concept_id AS race_source_concept_id, 
-	NULL AS ethnicity_source_value,
-	NULL::int AS ethnicity_source_concept_id
-FROM cte1 as t1
-INNER JOIN {SOURCE_SCHEMA}.baseline AS t2 ON t1.eid = t2.eid 
-JOIN ukb as t3 on CONCAT('9-', t2.p31) = t3.source_code and t3.target_domain_id = 'Gender'
-LEFT JOIN ukb as t4 on CONCAT('1001-', t2.p21000_i0::integer) = t4.source_code
-LEFT JOIN loc as t5 on t2.p54_i0::text = t5.source_code;
+INSERT INTO {TARGET_SCHEMA}.person
+select 
+	t1.eid,
+	t2.target_concept_id,
+	0,
+	NULL::int,
+	NULL::int,
+	NULL::timestamp,
+	0,
+	0,
+	NULL::bigint,
+	NULL::bigint,
+	NULL::int, 
+	t1.eid,
+	CONCAT('9-', t1.p31),
+	NULL::int,
+	NULL, 
+	NULL::int,
+	NULL, 
+	NULL::int
+from {SOURCE_SCHEMA}.baseline as t1
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on CONCAT('9-', t1.p31) = t2.source_code
+and t2.source_vocabulary_id = 'UK Biobank' and t2.source_code like '9-%'
+inner join {SOURCE_SCHEMA}.hesin as t3 on t1.eid = t3.eid;
 
 ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default;
 CREATE UNIQUE INDEX idx_person_id ON {TARGET_SCHEMA}.person (person_id ASC) TABLESPACE pg_default;
@@ -206,11 +160,13 @@ INSERT INTO {TARGET_SCHEMA}.OBSERVATION_PERIOD
  )
 select
 	nextval('{TARGET_SCHEMA}.observation_period_seq'),
-	eid,  
-	min_date as observation_period_start_date,  
-	max_date as observation_period_end_date,
+	t1.eid,  
+	t1.min_date as observation_period_start_date,  
+	LEAST(t1.max_date,t2.death_date)  as observation_period_end_date,
 	32880
-from cte; 
+from cte as t1
+left join public_ukb.death as t2
+on t1.eid = t2.person_id; 
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.observation_period_seq;
 
