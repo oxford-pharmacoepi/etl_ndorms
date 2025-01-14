@@ -7,13 +7,13 @@ WITH cte0 AS (
     WHERE chunk_id = {CHUNK_ID}
 ),
 cte1 AS (
-    SELECT 
+    SELECT DISTINCT
         t2.eid AS person_id, 
         NULL::bigint AS provider_id, 
         t3.spell_index::varchar AS visit_source_value, 
         t2.ins_index::varchar AS visit_detail_source_value, 
         t3.epistart AS start_date, 
-        t3.epistart AS end_date,
+        t3.epiend AS end_date,
         CASE 
             WHEN LENGTH(COALESCE(t2.diag_icd9, t2.diag_icd10)) = 4 
                 THEN CONCAT(LEFT(COALESCE(t2.diag_icd9, t2.diag_icd10), 3), '.', RIGHT(COALESCE(t2.diag_icd9, t2.diag_icd10), 1)) 
@@ -26,9 +26,9 @@ cte1 AS (
             WHEN t2.level > 1 THEN 32908
             ELSE NULL::int
         END AS disease_status_concept_id,
-        t2.level AS disease_status_source_value,
-        t2.arr_index,
-        t3.spell_seq
+        t2.level AS disease_status_source_value--,
+--        t2.arr_index,
+--        t3.spell_seq
     FROM cte0 AS t1
     INNER JOIN {SOURCE_SCHEMA}.hesin_diag AS t2 ON t1.person_id = t2.eid
     INNER JOIN {SOURCE_SCHEMA}.hesin AS t3 ON t2.eid = t3.eid AND t2.ins_index = t3.ins_index
