@@ -29,7 +29,7 @@ cte4 AS (
 	GROUP BY t2.eid,t2.spell_index
 ),
 cte5 AS (
-	SELECT
+	SELECT DISTINCT
 	t1.eid AS person_id,
 	9201 AS visit_concept_id,
 	COALESCE(t2.date_min,t1.admidate, t1.disdate) AS visit_start_date, 
@@ -51,7 +51,7 @@ cte5 AS (
 	INNER JOIN cte3 as t3 ON t1.eid = t3.person_id AND t1.ins_index = t3.ins_index
 	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t4 on t4.source_code = CONCAT('265-',t1.admisorc_uni) and t4.target_domain_id = 'Visit' and t4.source_vocabulary_id = 'UKB_ADMISORC_STCM'
 	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t5 on t5.source_code = CONCAT('267-',t1.disdest_uni) and t5.target_domain_id = 'Visit' and t5.source_vocabulary_id = 'UKB_DISDEST_STCM'
-	WHERE t1.spell_seq = 0
+--	WHERE t1.spell_seq = 0
 ),
 cte6 AS (
 	SELECT person_id, visit_source_value,
@@ -162,7 +162,7 @@ with cte0 AS (
 	FROM {TARGET_SCHEMA}.observation_period
 ),
 cte1 AS (
-	SELECT
+	SELECT DISTINCT
 	t1.eid AS person_id,
 	9201 AS visit_detail_concept_id,
 	COALESCE(t1.epistart::date,t1.admidate::date, t1.disdate::date) AS visit_detail_start_date,
