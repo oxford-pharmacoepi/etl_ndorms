@@ -33,7 +33,7 @@ description: "visit_detail mapping from hesin_critical & hesin_psych tables"
 | admitted_from_source_value | admisorc_uni | use admisorc_uni to retrieve the source_code_description from source_to_standard_vocab_map by doing a INNER JOIN to source_to_standard_vocab_map as t1 on CONCAT('264-',hesin.admisorc_uni) = t1.source_code AND t1.target_domain_id = 'visit' AND t1.source_vocabulary_id = “UKB_ADMISORC_STCM”.|  |
 | discharged_to_concept_id | disdest_uni| use disdest_uni to retrieve the target_concept_id from source_to_standard_vocab_map by doing a INNER JOIN to source_to_standard_vocab_map as t1 on CONCAT('267-',hesin.disdest_uni) = t1.source_code AND t1.target_domain_id = 'visit' AND t1.source_vocabulary_id = “UKB_DISDEST_STCM”.|  |
 | discharged_to_source_value | disdest_uni | use disdest_uni to retrieve the source_code_description from source_to_standard_vocab_map by doing a INNER JOIN to source_to_standard_vocab_map as t1 on CONCAT('267-',hesin.disdest_uni) = t1.source_code AND t1.target_domain_id = 'visit' AND t1.source_vocabulary_id = “UKB_DISDEST_STCM”.|  |
-| preceding_visit_detail_id| NULL | | check for preceding_visit_detail_id by checking the max(visit_detail_id) for this patient using eid+ins_index |
+| preceding_visit_detail_id| NULL | | check for preceding_visit_detail_id by checking the max(visit_detail_id) for this patient using eid, ins_index |
 | parent_visit_detail_id| NULL | | |
 | visit_occurrence_id| ins_index,eid | |Use ins_index, eid to retrieve visit_occurrence_id from visit_occurrence |
 
@@ -59,7 +59,7 @@ description: "visit_detail mapping from hesin_critical & hesin_psych tables"
 | admitted_from_source_value | hesin.admisorc_uni | use admisorc_uni from HESIN to retrieve the source_code_description from source_to_standard_vocab_map by doing a INNER JOIN to source_to_standard_vocab_map as t1 on CONCAT('264-',hesin.admisorc_uni) = t1.source_code AND t1.target_domain_id = 'visit' AND t1.source_vocabulary_id = “UKB_ADMISORC_STCM”.|  |
 | discharged_to_concept_id | hesin.disdest_uni| use disdest_uni from HESIN to retrieve the target_concept_id from source_to_standard_vocab_map by doing a INNER JOIN to source_to_standard_vocab_map as t1 on CONCAT('267-',hesin.disdest_uni) = t1.source_code AND t1.target_domain_id = 'visit' AND t1.source_vocabulary_id = “UKB_DISDEST_STCM”.|  |
 | discharged_to_source_value | hesin.disdest_uni | use disdest_uni from HESIN  to retrieve the source_code_description from source_to_standard_vocab_map by doing a INNER JOIN to source_to_standard_vocab_map as t1 on CONCAT('267-',hesin.disdest_uni) = t1.source_code AND t1.target_domain_id = 'visit' AND t1.source_vocabulary_id = “UKB_DISDEST_STCM”.|  |
-| preceding_visit_detail_id| | | check for preceding_visit_detail_id by checking the max(visit_detail_id) for this patient using eid+ins_index|
+| preceding_visit_detail_id| | | check for preceding_visit_detail_id by checking the max(visit_detail_id) for this patient using eid, ins_index|
 | parent_visit_detail_id| NULL | | |
 | visit_occurrence_id| ins_index,<br>eid | |Use ins_index, eid to retrieve visit_occurrence_id from visit_occurrence |
 
@@ -87,7 +87,7 @@ description: "visit_detail mapping from hesin_critical & hesin_psych tables"
 | admitted_from_source_value | hesin.admisorc_uni | use admisorc_uni from HESIN to retrieve the source_code_description from source_to_standard_vocab_map by doing a INNER JOIN to source_to_standard_vocab_map as t1 on CONCAT('264-',hesin.admisorc_uni) = t1.source_code AND t1.target_domain_id = 'visit' AND t1.source_vocabulary_id = “UKB_ADMISORC_STCM”.|  |
 | discharged_to_concept_id | hesin.disdest_uni| use disdest_uni from HESIN to retrieve the target_concept_id from source_to_standard_vocab_map by doing a INNER JOIN to source_to_standard_vocab_map as t1 on CONCAT('267-',hesin.disdest_uni) = t1.source_code AND t1.target_domain_id = 'visit' AND t1.source_vocabulary_id = “UKB_DISDEST_STCM”.|  |
 | discharged_to_source_value | hesin.disdest_uni | use disdest_uni from HESIN  to retrieve the source_code_description from source_to_standard_vocab_map by doing a INNER JOIN to source_to_standard_vocab_map as t1 on CONCAT('267-',hesin.disdest_uni) = t1.source_code AND t1.target_domain_id = 'visit' AND t1.source_vocabulary_id = “UKB_DISDEST_STCM”.|  |
-| preceding_visit_detail_id| NULL | | check for preceding_visit_detail_id by checking the max(visit_detail_id) for this patient using eid+ins_index|
+| preceding_visit_detail_id| NULL | | check for preceding_visit_detail_id by checking the max(visit_detail_id) for this patient using eid, ins_index|
 | parent_visit_detail_id| NULL | | |
 | visit_occurrence_id| ins_index,<br>eid | |Use ins_index, eid to retrieve visit_occurrence_id from visit_occurrence |
 
