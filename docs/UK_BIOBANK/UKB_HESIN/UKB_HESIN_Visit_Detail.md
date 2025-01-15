@@ -25,7 +25,7 @@ description: "visit_detail mapping from hesin_critical & hesin_psych tables"
 | visit_detail_end_date | epiend,<br>epistart,<br>disdate| COALESCE(epiend, epistart, disdate)|  |
 | visit_detail_end_datetime | epiend,<br>epistart,<br>disdate| COALESCE(epiend, epistart, disdate) | |
 | visit_detail_type_concept_id| | 32818 = EHR administration record| |
-| provider_id| NULL | | |
+| provider_id |hesin.tretspef,<br>hesin.mainspef | hesin.tretspef, hesin.mainspef will be mapped to Specialty Concept_id by using HES_SPEC_STCM.|  |
 | care_site_id| NULL | | |
 | visit_detail_source_value| ins_index | | |
 | visit_detail_source_concept_id| NULL | | |
@@ -51,7 +51,7 @@ description: "visit_detail mapping from hesin_critical & hesin_psych tables"
 | visit_detail_end_date | hesin.epiend,<br>hesin.epistart,<br>hesin.disdate,<br>detndate| COALESCE(hesin.epiend, hesin.epistart, detndate, disdate)|  |
 | visit_detail_end_datetime | hesin.epiend,<br>hesin.epistart,<br>hesin.disdate,<br>detndate| COALESCE(hesin.epiend, hesin.epistart, detndate, hesin.disdate) | |
 | visit_detail_type_concept_id| | 32818 = EHR administration record | |
-| provider_id| NULL | | |
+| provider_id |hesin.tretspef,<br>hesin.mainspef | hesin.tretspef, hesin.mainspef will be mapped to Specialty Concept_id by using HES_SPEC_STCM.|  |
 | care_site_id| NULL | | |
 | visit_detail_source_value| ins_index  | | |
 | visit_detail_source_concept_id| NULL | | |
@@ -79,7 +79,7 @@ description: "visit_detail mapping from hesin_critical & hesin_psych tables"
 | visit_detail_end_date | hesin.epiend,<br>hesin.epistart,<br>ccdisdate,<br>hesin.disdate| COALESCE(hesin.epiend, hesin.epistart, ccdisdate, hesin.disdate)|  |
 | visit_detail_end_datetime | hesin.epiend,<br>hesin.epistart,<br>ccdisdate,<br>hesin.disdate| COALESCE(hesin.epiend, hesin.epistart, ccdisdate, hesin.disdate) | |
 | visit_detail_type_concept_id| | 32818 = EHR administration record| |
-| provider_id| NULL | | |
+| provider_id |hesin.tretspef,<br>hesin.mainspef | hesin.tretspef, hesin.mainspef will be mapped to Specialty Concept_id by using HES_SPEC_STCM.|  |
 | care_site_id| NULL | | |
 | visit_detail_source_value| ins_index | | |
 | visit_detail_source_concept_id| NULL | | |
