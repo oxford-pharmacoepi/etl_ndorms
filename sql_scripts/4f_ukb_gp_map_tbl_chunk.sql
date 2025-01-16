@@ -39,6 +39,17 @@ CREATE INDEX idx_chunk_completed ON {CHUNK_SCHEMA}.chunk (completed) TABLESPACE 
 DROP SEQUENCE IF EXISTS {CHUNK_SCHEMA}.stem_id_seq;
 CREATE SEQUENCE {CHUNK_SCHEMA}.stem_id_seq as bigint START WITH 1 INCREMENT BY 1 NO MAXVALUE CACHE 1;
 
+WITH cte0 as (
+     SELECT (max_id + 1) as max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'max_of_all'
+), cte1 as(
+	SELECT cte0.max_id
+	FROM cte0
+	UNION ALL
+	SELECT 1 as max_id
+	WHERE NOT EXISTS (SELECT 1 FROM cte0)
+)
+select setval('{CHUNK_SCHEMA}.stem_id_seq', (SELECT max_id from cte1), FALSE); 
+
 --------------------------------
 -- DROP TABLES CREATED BY CHUNKING
 --------------------------------
@@ -51,3 +62,5 @@ truncate table {TARGET_SCHEMA}.device_exposure;
 truncate table {TARGET_SCHEMA}.drug_exposure;
 truncate table {TARGET_SCHEMA}.observation;
 truncate table {TARGET_SCHEMA}.specimen;
+truncate table {TARGET_SCHEMA}.episode;
+truncate table {TARGET_SCHEMA}.episode_event;

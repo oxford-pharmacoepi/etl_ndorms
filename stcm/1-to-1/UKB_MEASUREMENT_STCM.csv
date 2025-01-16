@@ -1,0 +1,2 @@
+source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
+189,35810148,UKB_MEASUREMENT_STCM,Townsend deprivation index at recruitment,715996,OMOP Extension,2022-04-08,2099-12-31,
