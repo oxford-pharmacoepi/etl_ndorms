@@ -263,6 +263,45 @@ insert into {TARGET_SCHEMA}.observation (observation_id, person_id, observation_
 										  observation_source_concept_id, unit_source_value, qualifier_source_value)
 select * from cte7;
 
+
+
+--------------------------------
+--insert into specimen from stem
+--------------------------------
+with cte0 AS (
+	SELECT COALESCE(max_id, 0) as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
+	WHERE lower(tbl_name) = 'specimen'
+), cte8 as (
+	SELECT 
+		cte0.start_id + s.id as specimen_id,
+		s.person_id,
+		s.concept_id as specimen_concept_id,
+		s.type_concept_id as specimen_type_concept_id,
+		case when s.start_date is NULL
+			then v.visit_start_date
+		else s.start_date end as specimen_date,
+		case when s.start_date is NULL
+			then v.visit_start_date
+		else s.start_date end::TIMESTAMP as specimen_datetime,
+		s.quantity,
+		s.unit_concept_id,		
+		NULL as anatomic_site_concept_id,
+		NULL as disease_status_concept_id,
+		s.specimen_source_id,
+		s.source_value as specimen_source_value,
+		s.unit_source_value,
+		NULL as anatomic_site_source_value,
+		NULL as disease_status_source_value
+from cte0, {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
+inner join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id
+where domain_id = 'Specimen'
+)
+insert into {TARGET_SCHEMA}.specimen (specimen_id,person_id,specimen_concept_id,specimen_type_concept_id,specimen_date,
+										specimen_datetime,quantity,unit_concept_id,anatomic_site_concept_id,disease_status_concept_id,
+										specimen_source_id,specimen_source_value,unit_source_value,anatomic_site_source_value,
+										disease_status_source_value)
+
+SELECT * FROM cte8;
 -----------------------------------------
 -- UPDATE CHUNK
 -----------------------------------------
