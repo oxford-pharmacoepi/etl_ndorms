@@ -22,7 +22,7 @@ FROM public_ukb.location;
 INSERT INTO {TARGET_SCHEMA}.person
 select 
 	t1.eid,
-	t2.target_concept_id,
+	0 as target_concept_id,
 	0,
 	NULL::int,
 	NULL::int,
@@ -33,28 +33,29 @@ select
 	NULL::bigint,
 	NULL::int, 
 	t1.eid,
-	CONCAT('9-', t1.p31),
+	NULL,--CONCAT('9-', t1.p31),
 	NULL::int,
 	NULL, 
 	NULL::int,
 	NULL, 
 	NULL::int
 from {SOURCE_SCHEMA}.baseline as t1
-left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on CONCAT('9-', t1.p31) = t2.source_code
-and t2.source_vocabulary_id = 'UK Biobank' and t2.source_code like '9-%'
-inner join {SOURCE_SCHEMA}.hesin as t3 on t1.eid = t3.eid;
+--left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on CONCAT('9-', t1.p31) = t2.source_code
+--and t2.source_vocabulary_id = 'UK Biobank' and t2.source_code like '9-%'
+--inner join {SOURCE_SCHEMA}.hesin as t3 on t1.eid = t3.eid;
 
 ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default;
 CREATE UNIQUE INDEX idx_person_id ON {TARGET_SCHEMA}.person (person_id ASC) TABLESPACE pg_default;
 CLUSTER {TARGET_SCHEMA}.person USING xpk_person;
 CREATE INDEX idx_gender ON {TARGET_SCHEMA}.person (gender_concept_id ASC) TABLESPACE pg_default;
+
 --------------------------------
 -- PROVIDER from hesin
 --------------------------------
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_pro;
 CREATE SEQUENCE {TARGET_SCHEMA}.sequence_pro INCREMENT 1;
 SELECT setval('{TARGET_SCHEMA}.sequence_pro', 
-				(SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'provider'));
+				(SELECT max_id + 1 from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'provider'));
 
 with cte1 AS (
 	select DISTINCT CASE WHEN tretspef <> '&' THEN tretspef ELSE mainspef END as specialty
@@ -123,7 +124,7 @@ select
 	t1.cause_concept_id, 
 	t1.cause_source_value, 
 	t1.cause_source_concept_id
-From public_ukb.death as t1
+from public_ukb.death as t1
 inner join {TARGET_SCHEMA}.person as t2 on t1.person_id = t2.person_id;
 
 ALTER TABLE {TARGET_SCHEMA}.death ADD CONSTRAINT xpk_death PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default ;
