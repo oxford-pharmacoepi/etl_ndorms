@@ -20,8 +20,8 @@ FROM public_ukb.location;
 -- PERSON
 --------------------------------
 INSERT INTO {TARGET_SCHEMA}.person
-select 
-	t1.eid,
+select distinct
+	eid,
 	0 as target_concept_id,
 	0,
 	NULL::int,
@@ -32,17 +32,14 @@ select
 	NULL::bigint,
 	NULL::bigint,
 	NULL::int, 
-	t1.eid,
-	NULL,--CONCAT('9-', t1.p31),
+	eid,
+	NULL,
 	NULL::int,
 	NULL, 
 	NULL::int,
 	NULL, 
 	NULL::int
-from {SOURCE_SCHEMA}.baseline as t1
---left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on CONCAT('9-', t1.p31) = t2.source_code
---and t2.source_vocabulary_id = 'UK Biobank' and t2.source_code like '9-%'
---inner join {SOURCE_SCHEMA}.hesin as t3 on t1.eid = t3.eid;
+from {SOURCE_SCHEMA}.hesin;
 
 ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default;
 CREATE UNIQUE INDEX idx_person_id ON {TARGET_SCHEMA}.person (person_id ASC) TABLESPACE pg_default;
@@ -102,7 +99,7 @@ SELECT
 FROM cte2;
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_pro;
---The following is used in the mapping
+
 CREATE UNIQUE INDEX idx_provider_source ON {TARGET_SCHEMA}.provider (specialty_source_value ASC) TABLESPACE pg_default;
 --------------------------------
 -- DEATH
@@ -138,7 +135,7 @@ DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.observation_period_seq;
 
 CREATE SEQUENCE {TARGET_SCHEMA}.observation_period_seq;
 
-with cte as ( 
+with cte1 as ( 
 	SELECT 
 		eid, 
 		LEAST(MIN(admidate), MIN(epistart),MIN(disdate), MIN(epiend)) AS min_date, 
@@ -161,13 +158,13 @@ INSERT INTO {TARGET_SCHEMA}.OBSERVATION_PERIOD
  )
 select
 	nextval('{TARGET_SCHEMA}.observation_period_seq'),
-	t1.eid,  
-	t1.min_date as observation_period_start_date,  
-	LEAST(t1.max_date,t2.death_date)  as observation_period_end_date,
+	t1.person_id,  
+	t2.min_date as observation_period_start_date,  
+	LEAST(t2.max_date,t3.death_date) as observation_period_end_date,
 	32880
-from cte as t1
-left join public_ukb.death as t2
-on t1.eid = t2.person_id; 
+from {TARGET_SCHEMA}.person as t1
+left join cte1 as t2 on t1.person_id = t2.eid
+left join public_ukb.death as t3 on t2.eid = t3.person_id; 
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.observation_period_seq;
 
