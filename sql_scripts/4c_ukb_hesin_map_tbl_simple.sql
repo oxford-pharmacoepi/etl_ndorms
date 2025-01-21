@@ -124,10 +124,6 @@ select
 from public_ukb.death as t1
 inner join {TARGET_SCHEMA}.person as t2 on t1.person_id = t2.person_id;
 
-ALTER TABLE {TARGET_SCHEMA}.death ADD CONSTRAINT xpk_death PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default ;
-CREATE INDEX idx_death_person_id_1 ON {TARGET_SCHEMA}.death (person_id ASC) TABLESPACE pg_default;
-CLUSTER {TARGET_SCHEMA}.death USING idx_death_person_id_1;
-
 --------------------------------
 -- OBSERVATION_PERIOD --
 --------------------------------
@@ -138,15 +134,14 @@ CREATE SEQUENCE {TARGET_SCHEMA}.observation_period_seq;
 with cte1 as ( 
 	SELECT 
 		eid, 
-		LEAST(MIN(admidate), MIN(epistart),MIN(disdate), MIN(epiend)) AS min_date, 
+		LEAST(MIN(admidate), MIN(epistart), MIN(disdate), MIN(epiend)) AS min_date, 
 		GREATEST(MAX(disdate), MAX(epiend), MAX(admidate), MAX(epistart)) AS max_date
 	FROM 
 		{SOURCE_SCHEMA}.hesin
-	GROUP BY 
-		eid
-	HAVING 
-		(MIN(admidate) IS NOT NULL OR MIN(epistart) IS NOT NULL OR MIN(disdate) IS NOT NULL OR MIN(epiend) IS NOT NULL) AND 
-		(MAX(disdate) IS NOT NULL OR MAX(epiend) IS NOT NULL OR MAX(admidate) IS NOT NULL OR MAX(epistart) IS NOT NULL)	
+	GROUP BY eid
+--	HAVING 
+--		(MIN(admidate) IS NOT NULL OR MIN(epistart) IS NOT NULL OR MIN(disdate) IS NOT NULL OR MIN(epiend) IS NOT NULL) AND 
+--		(MAX(disdate) IS NOT NULL OR MAX(epiend) IS NOT NULL OR MAX(admidate) IS NOT NULL OR MAX(epistart) IS NOT NULL)	
 ) 
 INSERT INTO {TARGET_SCHEMA}.OBSERVATION_PERIOD
  (
@@ -169,5 +164,5 @@ left join public_ukb.death as t3 on t2.eid = t3.person_id;
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.observation_period_seq;
 
 ALTER TABLE {TARGET_SCHEMA}.observation_period ADD CONSTRAINT xpk_observation_period PRIMARY KEY (observation_period_id);
-CREATE INDEX idx_observation_period_id ON {TARGET_SCHEMA}.observation_period (person_id ASC);
+CREATE INDEX idx_observation_period_id ON {TARGET_SCHEMA}.observation_period (person_id ASC) TABLESPACE pg_default;
 CLUSTER {TARGET_SCHEMA}.observation_period USING idx_observation_period_id;
