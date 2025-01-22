@@ -8,12 +8,11 @@ WITH cte0 AS (
 ),
 cte1 AS (
     SELECT DISTINCT
-        t2.eid AS person_id, 
-        NULL::bigint AS provider_id, 
-        t3.spell_index::varchar AS visit_source_value, 
-        t2.ins_index::varchar AS visit_detail_source_value, 
-        t3.epistart AS start_date, 
-        t3.epiend AS end_date,
+        t3.eid AS person_id, 
+        t3.spell_index AS visit_source_value, 
+        t3.ins_index AS visit_detail_source_value, 
+        COALESCE(t3.epistart, t3.admidate) AS start_date, 
+        COALESCE(t3.epiend, t3.disdate, t3.epistart, t3.admidate) AS end_date,
         CASE 
             WHEN LENGTH(COALESCE(t2.diag_icd9, t2.diag_icd10)) = 4 
                 THEN CONCAT(LEFT(COALESCE(t2.diag_icd9, t2.diag_icd10), 3), '.', RIGHT(COALESCE(t2.diag_icd9, t2.diag_icd10), 1)) 
@@ -26,21 +25,18 @@ cte1 AS (
             WHEN t2.level > 1 THEN 32908
             ELSE NULL::int
         END AS disease_status_concept_id,
-        t2.level AS disease_status_source_value--,
---        t2.arr_index,
---        t3.spell_seq
+        t2.level AS disease_status_source_value
     FROM cte0 AS t1
     INNER JOIN {SOURCE_SCHEMA}.hesin_diag AS t2 ON t1.person_id = t2.eid
     INNER JOIN {SOURCE_SCHEMA}.hesin AS t3 ON t2.eid = t3.eid AND t2.ins_index = t3.ins_index
 ),
 cte2 AS (
-SELECT DISTINCT 
+	SELECT DISTINCT 
     t1.*, 
     CASE WHEN t2.source_concept_id is null then 0 else t2.source_concept_id END AS source_concept_id
-FROM cte1 AS t1
-LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map AS t2 
-    ON t2.source_code = t1.source_value
-	AND UPPER(t2.source_vocabulary_id) IN ('ICD9CM', 'ICD10') 
+	FROM cte1 AS t1
+	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map AS t2 
+    ON t2.source_code = t1.source_value AND UPPER(t2.source_vocabulary_id) IN ('ICD9CM', 'ICD10') 
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (domain_id, person_id, visit_occurrence_id, visit_detail_id, provider_id, concept_id, source_value,
 					 source_concept_id, type_concept_id, start_date, end_date, start_time, days_supply, dose_unit_concept_id,
@@ -54,14 +50,14 @@ select
 	NULL as domain_id,
 	t1.person_id, 
 	t2.visit_occurrence_id,
-	t3.visit_detail_id,
-	t1.provider_id,
+	t2.visit_detail_id,
+    NULL::int as provider_id, 
 	NULL::int as concept_id,
 	t1.source_value,
 	t1.source_concept_id,
 	32829 as type_concept_id,
-	t1.start_date,
-	t1.end_date,
+	t2.visit_detail_start_date,
+	t2.visit_detail_end_date,
 	'00:00:00'::time start_time,
 	NULL as days_supply,
 	NULL::int as dose_unit_concept_id,
@@ -96,9 +92,8 @@ select
 	'hesin_diag' stem_source_table,
 	NULL as stem_source_id
 from cte2 as t1
-inner join {TARGET_SCHEMA}.visit_occurrence as t2 on t1.person_id = t2.person_id and t1.visit_source_value = t2.visit_source_value
-inner join {TARGET_SCHEMA}.visit_detail as t3 on t1.person_id = t3.person_id and t1.visit_detail_source_value = t3.visit_detail_source_value
---WHERE t3.visit_detail_concept_id = 9201;	
+inner join {SOURCE_SCHEMA}.temp_visit_detail as t2 on t1.person_id = t2.person_id 
+and t1.visit_source_value = t2.visit_source_value and t1.visit_detail_source_value = t2.visit_detail_source_value;
 
 --insert into stem_source table from hesin_oper
 WITH cte0 as (
@@ -107,10 +102,10 @@ WITH cte0 as (
 		where chunk_id = {CHUNK_ID}
 	),
 	cte1 as (
-		select t2.eid as person_id, 
-		NULL::bigint as provider_id, 
-		t3.spell_index::varchar as visit_source_value, 
-		t2.ins_index::varchar as visit_detail_source_value, 
+		select 
+		t3.eid as person_id, 
+        t3.spell_index AS visit_source_value, 
+        t3.ins_index AS visit_detail_source_value, 
 		COALESCE(t2.opdate,t3.epistart) as start_date, 
 		COALESCE(t2.opdate,t3.epistart) as end_date,
 		CASE 
@@ -123,16 +118,15 @@ WITH cte0 as (
 		t2.level AS modifier_source_value
 		from cte0 as t1
 		INNER join {SOURCE_SCHEMA}.hesin_oper as t2 on t1.person_id = t2.eid
-		LEFT join {SOURCE_SCHEMA}.hesin as t3 on t2.eid = t3.eid and t2.ins_index = t3.ins_index
-		order by t2.eid, t2.ins_index, COALESCE(t2.opdate,t3.epistart,t3.admidate), level),
+		INNER join {SOURCE_SCHEMA}.hesin as t3 on t2.eid = t3.eid and t2.ins_index = t3.ins_index
+	),
 	cte2 as (
 		SELECT DISTINCT t1.*, 
 		CASE WHEN t2.source_concept_id is null then 0 else t2.source_concept_id END AS source_concept_id
 		FROM cte1 as t1
 		left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_code = t1.source_value
 		AND upper(t2.source_vocabulary_id) = 'OPCS4'
-
-)
+	)
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (domain_id, person_id, visit_occurrence_id, visit_detail_id, provider_id, concept_id, source_value,
 					 source_concept_id, type_concept_id, start_date, end_date, start_time, days_supply, dose_unit_concept_id,
 					 dose_unit_source_value, effective_drug_dose, lot_number, modifier_source_value, 
@@ -144,8 +138,8 @@ insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (domain_id, person_id, visit_o
 select NULL as domain_id,
 	t1.person_id, 
 	t2.visit_occurrence_id,
-	t3.visit_detail_id,
-	t1.provider_id,
+	t2.visit_detail_id,
+	NULL::int provider_id, 
 	NULL::int as concept_id,
 	t1.source_value,
 	t1.source_concept_id,
@@ -186,10 +180,9 @@ select NULL as domain_id,
 	'hesin_oper' stem_source_table,
 	NULL as stem_source_id
 from cte2 as t1
-inner join {TARGET_SCHEMA}.visit_occurrence as t2 on t1.person_id = t2.person_id and t1.visit_source_value = t2.visit_source_value
-inner join {TARGET_SCHEMA}.visit_detail as t3 on t1.person_id = t3.person_id and t1.visit_detail_source_value = t3.visit_detail_source_value
+inner join {SOURCE_SCHEMA}.temp_visit_detail as t2 on t1.person_id = t2.person_id 
+and t1.visit_source_value = t2.visit_source_value and t1.visit_detail_source_value = t2.visit_detail_source_value;
 --WHERE t3.visit_detail_concept_id = 9201;
-
 
 create index idx_stem_source_{CHUNK_ID} on {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (source_concept_id) TABLESPACE pg_default;
 
