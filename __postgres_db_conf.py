@@ -5,7 +5,7 @@ db_conf = dict({
 	'data_provider': 'name_of_provider',	#e.g. 'cprd', 'thin', 'ukb'('ukbiobank' for the exisiting mapped one)
 	'database_type': 'type of database',	#e.g. 'gold, 'aurum', 'hesapc', 'ukb'(baseline), 'ukb_gp', 'ukb_hesin'
 	'source_release_date': 'date',			#e.g. '2022-05-01'
-	'cdm_version': '5.3',					#e.g. '5.3', '5.4'
+	'cdm_version': '5.4',					#e.g. '5.3', '5.4'
 	'cdm_etl_reference': 'name of developer',
 	'datestyle': 'ISO,DMY',
 	'source_schema': 'source',
@@ -38,7 +38,7 @@ db_conf = dict({
 	'tbl_ncrascr': ['tumour', 'treatment'],
 	'tbl_ukb_gp_lookup': ['lookup626', 'gold_product' , 'gold_daysupply_decodes', 'gold_daysupply_modes'],
 	'tbl_ukb_cancer_lookup': ['lookup1970'],
-	'tbl_ukb': ['baseline', 'death', 'death_cause'],
+	'tbl_ukb_baseline': ['baseline', 'death', 'death_cause'],
 	'tbl_ukb_cancer': ['baseline', 'death', 'cancer'],
 	'tbl_ukb_gp': ['baseline', 'death', 'gp_clinical', 'gp_registrations', 'gp_scripts'],
 	'tbl_ukb_hesin': ['baseline', 'death', 'hesin', 'hesin_critical', 'hesin_delivery', 'hesin_diag', 'hesin_maternity', 'hesin_oper', 'hesin_psych'],
