@@ -15,7 +15,7 @@ These materials are meant to serve as documentation and reference for how the UK
 
 **UKB HESIN source Data Mapping for CDM v5.4**
 
-![](../images/image1.png)
+![](images/ukb_hesin.png)
 
 **Figure.1**
 

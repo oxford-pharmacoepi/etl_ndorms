@@ -9,14 +9,14 @@ description: "Person mapping from source_ukb_hesin.hesin & public_ukb.death tabl
 
 # CDM Table name: observation_period (CDM v5.4)
 
-## Reading from source_ukb_hesin.hesin, public_ukb.death
+## Reading from hesin, death
 
-![](../images/image3.png)
+![](images/ukb_hesin_to_op.png)
 
 | Destination Field | Source field | Logic | Comment field |
 | --- | --- | :---: | --- |
-| observation_period_id |  | nextval('public.observation_period_seq') AS observation_period_id |  Autogenerate|
+| observation_period_id |  |  |  Autogenerate|
 | person_id | eid | | |
-| observation_period_start_date | admidate,<br>epistart,<br>disdate,<br>epiend | LEAST(MIN(admidate), MIN(epistart),MIN(disdate), MIN(epiend))| |
-| observation_period_end_date |death.date_of_death,<br>disdate,<br>epiend,<br>admidate,<br>epistart | LEAST(death.death_date, GREATEST(MAX(disdate), MAX(epiend), MAX(admidate), MAX(epistart)))| |
+| observation_period_start_date | epistart,<br>admidate| | use the earliest of the two date fields that is not null.|
+| observation_period_end_date |death.date_of_death,<br>epiend,<br>disdate,<br>admidate,<br>epistart |Use admidate, epistart when disdate and epiend are null | use the latest of disdate, epiend, and admidate, then the earliest between that and date_of_death.|
 | period_type_concept_id | | [32880 - Standard algorithm](https://athena.ohdsi.org/search-terms/terms/32880)| |
