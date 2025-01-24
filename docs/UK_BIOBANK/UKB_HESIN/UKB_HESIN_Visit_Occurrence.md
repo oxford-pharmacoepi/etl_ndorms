@@ -25,7 +25,7 @@ description: "VISIT_OCCURRENCE mapping from HESIN table"
 | visit_end_date | epiend | COALESCE( MAX(epiend), disdate, MIN(epistart))|  |
 | visit_end_datetime | epiend | COALESCE(MAX(epiend), disdate, MIN(epistart)) | |
 | visit_type_concept_id |  | 32818 = EHR administration record |  |
-| provider_id |NULL| |  |
+| provider_id |tretspef,<br>mainspef | tretspef, mainspef will be mapped to Specialty Concept_id by using HES_SPEC_STCM.|  |
 | care_site_id | NULL| |  |
 | visit_source_value | spell_index |  | This will allow us to retrieve Visit_occurrence_id. |
 | visit_source_concept_id |NULL  |  |  |

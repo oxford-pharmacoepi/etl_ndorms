@@ -9,50 +9,48 @@ description: "Stem table description"
 
 # CDM Table name: stem_table (CDM v5.4)
 
-## Reading from source_ukb_hesin.hesin_diag
+## Reading from hesin_diag, hesin
 
-![](../images/image9.png)
+![](images/ukb_diag_to_stem.png)
 
 
 | Destination Field | Source field | Logic | Comment field |
 | --- | --- | :---: | --- |
-| id|||Removed for performance reasons|
+| id|||Autogenerate|
 | domain_id | NULL | | | 
 | person_id | eid | | | 
-| visit_occurrence_id |eid,<br>ins_index | | Use eid, ins_index to retrieve visit_occurrence_id |
+| visit_occurrence_id |eid,<br>hesin.spell_index | | Use eid, hesin.spell_index to retrieve visit_occurrence_id |
 | visit_detail_id|eid,<br>ins_index ||Use eid, ins_index to retrieve visit_detail_id |
-| source_value| diag_icd9,<br>diag_icd10 |CONCAT(LEFT(COALESCE(diag_icd9, diag_icd10), 3), '.', RIGHT(COALESCE(diag_icd9, diag_icd10), 1))||
-| source_concept_id | diag_icd9,<br>diag_icd10 | concept_id of either diag_icd9 or diag_icd10 | |
+| source_value| diag_icd9,<br>diag_icd10 |Add dots when necessary | ICD10 codes provided without dots|
+| source_concept_id |  | | |
 | type_concept_id |  | 32829 | |
-| start_date | epistart | | |
-| end_date | epiend | | |
-| start_datetime | epistart |   | |
+| start_date | hesin.epistart,<br>hesin.admidate | If hesin.epistart is null use hesin.admidate| |
+| start_datetime | hesin.epistart,<br>hesin.admidate|   | |
+| end_date | hesin.epiend,<br>hesin.disdate,<br>hesin.epistart,<br>hesin.admidate | | If hesin.epiend is null then use the first not null of (hesin.disdate,hesin.epistart,hesin.admidate)|
+| end_datetime | hesin.epiend,<br>hesin.disdate,<br>hesin.epistart,<br>hesin.admidate | | |
 | concept_id  | NULL |  |  |
-| end_datetime | epiend| | |
 | disease_status_source_value | | | |
 | stem_source_table | | "hesin_diag" | |
  
-## Reading from hesin_oper
+## Reading from hesin_oper, hesin
 
-![](../images/image10.png)
-
+![](images/ukb_oper_to_stem.png)
 
 
 | Destination Field | Source field | Logic | Comment field |
 | --- | --- | :---: | --- |
-| id|||Removed for performance reasons|
+| id|||Autogenerate|
 | domain_id | NULL | | | 
 | person_id | eid | | | 
-| visit_occurrence_id |eid,<br>ins_index | | Use eid, ins_index to retrieve visit_occurrence_id |
+| visit_occurrence_id |eid,<br>spell_index | | Use eid, spell_index to retrieve visit_occurrence_id |
 | visit_detail_id|eid,<br>ins_index ||Use eid, ins_index to retrieve visit_detail_id |
-| source_value| oper4 | CONCAT(LEFT(oper4, 3), '.', RIGHT(oper4, 1))||
-| source_concept_id | oper4 | concept_id of oper4 | |
+| source_value| oper4 | Add dots when necessary| OPCS4 Codes are provided without dots|
+| source_concept_id |  | | |
 | type_concept_id |  | 32829 | |
 | modifier_source_value | level | | |
-| start_date | opdate | | |
-| start_datetime | opdate |   | |
-| end_date | opdate | | |
-| end_datetime | opdate | | |
-| end_datetime | opdate | | |
+| start_date | opdate,<br>hesin.epistart | If opdate is null then use hesin.epistart| |
+| start_datetime | opdate,<br>hesin.epistart |   | |
+| end_date | opdate,<br>hesin.epistart | If opdate is null then use hesin.epistart| |
+| end_datetime | opdate,<br>hesin.epistart  | | |
 | concept_id  | NULL  |  |  |
 | stem_source_table | | "hesin_oper" | |
