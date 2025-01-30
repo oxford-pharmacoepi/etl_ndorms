@@ -15,7 +15,7 @@ SELECT
 	country_source_value,
 	latitude,
 	longitude
-FROM public_ukb.location;
+FROM public_ukb_baseline.location;
 --------------------------------
 -- PERSON
 --------------------------------
@@ -121,7 +121,7 @@ select
 	t1.cause_concept_id, 
 	t1.cause_source_value, 
 	t1.cause_source_concept_id
-from public_ukb.death as t1
+from public_ukb_baseline.death as t1
 inner join {TARGET_SCHEMA}.person as t2 on t1.person_id = t2.person_id;
 
 --------------------------------
@@ -159,7 +159,7 @@ select
 	32880
 from {TARGET_SCHEMA}.person as t1
 left join cte1 as t2 on t1.person_id = t2.eid
-left join public_ukb.death as t3 on t2.eid = t3.person_id; 
+left join public_ukb_baseline.death as t3 on t2.eid = t3.person_id; 
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.observation_period_seq;
 
