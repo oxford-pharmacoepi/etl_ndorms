@@ -12,18 +12,18 @@ SELECT distinct
 	t1.person_id,
 	9201 AS visit_concept_id,
 	t1.visit_start_date,
-	t1.visit_start_date as visit_start_datetime,
+	t1.visit_start_date::timestamp as visit_start_datetime,
 	t1.visit_end_date,
-	t1.visit_end_date as visit_end_datetime,
+	t1.visit_end_date::timestamp as visit_end_datetime,
 	32818 AS visit_type_concept_id,
 	NULL::int AS provider_id,
 	NULL::int AS care_site_id,
 	t1.visit_source_value,
 	NULL::int AS visit_source_concept_id,
-	NULL AS admitted_from_source_value,
 	NULL::int AS admitted_from_concept_id,
-	NULL AS discharged_to_source_value,
+	NULL::varchar(50) AS admitted_from_source_value,
 	NULL::int AS discharged_to_concept_id,
+	NULL::varchar(50) AS discharged_to_source_value,
 	t2.visit_occurrence_id AS preceding_visit_occurrence_id
 INTO {TARGET_SCHEMA}.visit_occurrence
 from cte1 as t1
@@ -42,7 +42,7 @@ CREATE INDEX idx_visit_source_value ON {TARGET_SCHEMA}.visit_occurrence (visit_s
 drop table if exists {TARGET_SCHEMA}.visit_detail CASCADE;
 
 with cte1 AS (
-	select eid as person_id, spell_index as visit_source_value, ins_index as visit_detail_source_value,
+	select eid as person_id, spell_index::varchar(50) as visit_source_value, ins_index::varchar(50) as visit_detail_source_value,
 	CASE WHEN tretspef <> '&' THEN tretspef ELSE CASE WHEN mainspef <> '&' THEN mainspef ELSE Null END END as specialty
 	FROM {SOURCE_SCHEMA}.hesin
 ),	
@@ -58,17 +58,17 @@ SELECT distinct
 	t1.person_id,
 	9201 AS visit_detail_concept_id,
 	t1.visit_detail_start_date,
-	t1.visit_detail_start_date as visit_detail_start_datetime,
+	t1.visit_detail_start_date::timestamp as visit_detail_start_datetime,
 	t1.visit_detail_end_date,
-	t1.visit_detail_end_date AS visit_detail_end_datetime,
+	t1.visit_detail_end_date::timestamp AS visit_detail_end_datetime,
 	32818 AS visit_detail_type_concept_id,
 	t2.provider_id,
 	NULL::int AS care_site_id,
-	t1.visit_detail_source_value,
+	t1.visit_detail_source_value as visit_detail_source_value,
 	NULL::int AS visit_detail_source_concept_id,
-	t4.source_code_description AS admitted_from_source_value,
 	t4.target_concept_id AS admitted_from_concept_id,
-	t5.source_code_description AS discharged_to_source_value,
+	t4.source_code_description::varchar(100) AS admitted_from_source_value,
+	t5.source_code_description::varchar(100) AS discharged_to_source_value,
 	t5.target_concept_id::int AS discharged_to_concept_id,
 	t6.visit_detail_id as preceding_visit_detail_id,
 	NULL::int AS parent_visit_detail_id,
@@ -76,7 +76,7 @@ SELECT distinct
 into {TARGET_SCHEMA}.visit_detail
 FROM {SOURCE_SCHEMA}.temp_visit_detail as t1
 INNER JOIN cte2 as t2 on t1.person_id = t2.person_id and t1.visit_source_value = t2.visit_source_value and t1.visit_detail_source_value = t2.visit_detail_source_value
-INNER JOIN {SOURCE_SCHEMA}.hesin AS t3 ON t3.eid = t1.person_id AND t1.visit_source_value = t3.spell_index and t1.visit_detail_source_value = t3.ins_index
+INNER JOIN {SOURCE_SCHEMA}.hesin AS t3 ON t3.eid = t1.person_id AND t1.visit_source_value = t3.spell_index::varchar(50) and t1.visit_detail_source_value = t3.ins_index::varchar(50)
 LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t4 on t4.source_code = CONCAT('265-',t3.admisorc_uni) and t4.target_domain_id = 'Visit' and t4.source_vocabulary_id = 'UKB_ADMISORC_STCM'
 LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t5 on t5.source_code = CONCAT('267-',t3.disdest_uni) and t5.target_domain_id = 'Visit' and t5.source_vocabulary_id = 'UKB_DISDEST_STCM'
 LEFT JOIN {SOURCE_SCHEMA}.temp_visit_detail as t6 on t1.person_id = t6.person_id and (t1.visit_detail_id - 1) = t6.visit_detail_id;

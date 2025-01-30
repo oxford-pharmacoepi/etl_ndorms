@@ -8,12 +8,12 @@ CREATE TABLE {SOURCE_SCHEMA}.temp_visit_detail
 	visit_detail_id bigint NOT NULL,
 	visit_occurrence_id bigint NOT NULL,
 	person_id bigint NOT NULL,
-	visit_source_value integer NOT NULL,
+	visit_source_value varchar(50) NOT NULL,
 	visit_start_date date NOT NULL,
 	visit_end_date date NOT NULL,
 	visit_detail_start_date date NOT NULL,
 	visit_detail_end_date date NOT NULL,
-	visit_detail_source_value integer NOT NULL
+	visit_detail_source_value varchar(50) NOT NULL
 );
 
 with cte0 AS (
@@ -28,10 +28,10 @@ with cte0 AS (
 cte1 AS ( -- FROM HESIN
 	select 
 		eid as person_id,
-		ins_index as visit_detail_source_value,
+		ins_index::varchar(50) as visit_detail_source_value,
 		COALESCE(epistart, admidate) as visit_detail_start_date,
 		COALESCE(epiend, disdate, epistart, admidate) as visit_detail_end_date,
-		spell_index as visit_source_value
+		spell_index::varchar(50) as visit_source_value
 	from {SOURCE_SCHEMA}.hesin
 ),
 cte2 AS (

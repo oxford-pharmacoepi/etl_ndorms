@@ -9,8 +9,8 @@ WITH cte0 AS (
 cte1 AS (
     SELECT DISTINCT
         t3.eid AS person_id, 
-        t3.spell_index AS visit_source_value, 
-        t3.ins_index AS visit_detail_source_value, 
+        t3.spell_index::varchar(50) AS visit_source_value, 
+        t3.ins_index::varchar(50) AS visit_detail_source_value, 
         COALESCE(t3.epistart, t3.admidate) AS start_date, 
         COALESCE(t3.epiend, t3.disdate, t3.epistart, t3.admidate) AS end_date,
         CASE 
@@ -104,8 +104,8 @@ WITH cte0 as (
 	cte1 as (
 		select 
 		t3.eid as person_id, 
-        t3.spell_index AS visit_source_value, 
-        t3.ins_index AS visit_detail_source_value, 
+        t3.spell_index::varchar(50) AS visit_source_value, 
+        t3.ins_index::varchar(50) AS visit_detail_source_value, 
 		COALESCE(t2.opdate,t3.epistart) as start_date, 
 		COALESCE(t2.opdate,t3.epistart) as end_date,
 		CASE 
