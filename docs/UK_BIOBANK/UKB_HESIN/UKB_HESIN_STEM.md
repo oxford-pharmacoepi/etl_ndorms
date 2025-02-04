@@ -47,7 +47,7 @@ description: "Stem table description"
 | source_value| oper4 | Add dots when necessary| OPCS4 Codes are provided without dots|
 | source_concept_id | oper4 | | |
 | type_concept_id |  | 32829 | |
-| modifier_source_value |  | | |
+| modifier_source_value | level | | |
 | start_date | opdate,<br>hesin.epistart | | If opdate is null then use hesin.epistart|
 | start_datetime | opdate,<br>hesin.epistart |   | |
 | end_date | opdate,<br>hesin.epistart | | If opdate is null then use hesin.epistart |
