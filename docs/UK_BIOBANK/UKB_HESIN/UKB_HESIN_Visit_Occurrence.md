@@ -20,9 +20,9 @@ description: "VISIT_OCCURRENCE mapping from HESIN table"
 | visit_occurrence_id |  |   | Autogenerate | 
 | person_id | eid |  |  |
 | visit_concept_id |  | [9201- Standard algorithm](https://athena.ohdsi.org/search-terms/terms/9201)|  |
-| visit_start_date | epistart,<br>admidate | Use the first not null of  (epistart, admidate)|    |
+| visit_start_date | epistart,<br>admidate | use the minimum of the first not null of (epistart, admidate) within the hospital spell|    |
 | visit_start_datetime | epistart,<br>admidate | |  |
-| visit_end_date | epiend,<br>disdate,<br>epistart,<br>admidate | Use the first not null of  (epiend,disdate,epistart,admidate)|  |
+| visit_end_date | epiend,<br>disdate,<br>epistart,<br>admidate | use the maximum of the first not null of (epiend, disdate, epistart, admidate) within the hospital spell|  |
 | visit_end_datetime | epiend,<br>disdate,<br>epistart,<br>admidate | | |
 | visit_type_concept_id |  |  [32818- Standard algorithm](https://athena.ohdsi.org/search-terms/terms/32818)|  |
 | provider_id |NULL| |  |
@@ -33,4 +33,4 @@ description: "VISIT_OCCURRENCE mapping from HESIN table"
 | admitted_from_source_value | NULL  | |  |
 | discharged_to_concept_id | NULL | |  |
 | discharged_to_source_value | NULL  |  |
-| preceding_visit_occurrence_id |  | Latest visit_occurrence_id before this one, if available |  |
+| preceding_visit_occurrence_id |  | latest visit_occurrence_id before this one, for the patient if available |  |
