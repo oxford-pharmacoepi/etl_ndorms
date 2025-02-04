@@ -7,7 +7,7 @@ description: "Provider mapping from HESIN table"
 
 ---
 
-# CDM Table name: provider (CDM v5.3 / v5.4)
+# CDM Table name: provider (CDM v5.4)
 
 ## Reading from hesin
 
@@ -20,7 +20,7 @@ description: "Provider mapping from HESIN table"
 | provider_name | NULL |  |  |
 | npi | NULL |  |  |
 | dea |NULL  |  |  |
-| specialty_concept_id | tretspef,<br>mainspef | In the absence of a provider_id, we have created a dummy provider_id, each associated with a different specialty, using the first available value from either tretspef or mainspef. ||
+| specialty_concept_id | tretspef,<br>mainspef | In the absence of a provider_id, we have created a dummy provider_id's, each associated with a different specialty, using the first available value from either tretspef or mainspef. ||
 | care_site_id | NULL| | |
 | year_of_birth | NULL |  |  |
 | gender_concept_id | NULL | |  |
