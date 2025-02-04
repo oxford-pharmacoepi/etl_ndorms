@@ -19,12 +19,12 @@ description: "VISIT_OCCURRENCE mapping from HESIN table"
 | --- | --- | :---: | --- |
 | visit_occurrence_id |  |   | Autogenerate | 
 | person_id | eid |  |  |
-| visit_concept_id |  | [9201- Standard algorithm](https://athena.ohdsi.org/search-terms/terms/9201)|  |
+| visit_concept_id |  | [9201- Inpatient visit](https://athena.ohdsi.org/search-terms/terms/9201)|  |
 | visit_start_date | epistart,<br>admidate | use the minimum of the first not null of (epistart, admidate) within the hospital spell|    |
 | visit_start_datetime | epistart,<br>admidate | |  |
 | visit_end_date | epiend,<br>disdate,<br>epistart,<br>admidate | use the maximum of the first not null of (epiend, disdate, epistart, admidate) within the hospital spell|  |
 | visit_end_datetime | epiend,<br>disdate,<br>epistart,<br>admidate | | |
-| visit_type_concept_id |  |  [32818- Standard algorithm](https://athena.ohdsi.org/search-terms/terms/32818)|  |
+| visit_type_concept_id |  |  [32818- EHR administration record](https://athena.ohdsi.org/search-terms/terms/32818)|  |
 | provider_id |NULL| |  |
 | care_site_id | NULL| |  |
 | visit_source_value | spell_index |  | |

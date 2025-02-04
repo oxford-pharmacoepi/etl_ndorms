@@ -21,16 +21,16 @@ description: "Stem table description"
 | person_id | eid | | | 
 | visit_occurrence_id |eid,<br>hesin.spell_index | | Use eid, hesin.spell_index to retrieve visit_occurrence_id |
 | visit_detail_id|eid,<br>ins_index ||Use eid, ins_index to retrieve visit_detail_id |
-| source_value| diag_icd9,<br>diag_icd10 |Add dots when necessary | ICD9 & ICD10 codes provided without dots|
+| source_value| diag_icd9,<br>diag_icd10 |Add dots when necessary | diag_icd9 & diag_icd10 are mutually exclusive they are provided without dots|
 | source_concept_id | diag_icd9,<br>diag_icd10 | | |
-| type_concept_id |  | 32829 | |
-| start_date | hesin.epistart,<br>hesin.admidate | | If hesin.epistart is null use hesin.admidate|
+| type_concept_id |  | [32829 - EHR administration record](https://athena.ohdsi.org/search-terms/terms/32829)| | |
+| start_date | hesin.epistart,<br>hesin.admidate | | use the first not null of (hesin.epistart, hesin.admidate) |
 | start_datetime | hesin.epistart,<br>hesin.admidate|   | |
-| end_date | hesin.epiend,<br>hesin.disdate,<br>hesin.epistart,<br>hesin.admidate | | Use the first not null of (hesin.epiend,hesin.disdate,hesin.epistart,hesin.admidate)|
+| end_date | hesin.epiend,<br>hesin.disdate,<br>hesin.epistart,<br>hesin.admidate | | use the first not null of (hesin.epiend,hesin.disdate,hesin.epistart,hesin.admidate)|
 | end_datetime | hesin.epiend,<br>hesin.disdate,<br>hesin.epistart,<br>hesin.admidate | | |
-| concept_id  | NULL |  |  |
-| disease_status_source_value | | | |
-| stem_source_table | | "hesin_diag" | |
+| concept_id  |  diag_icd9,<br>diag_icd10 | use icd9cm or icd10 vocabulary depending on the presence of diag_icd9 or diag_icd10  |  |
+| disease_status_source_value |level | use  [32902](https://athena.ohdsi.org/search-terms/terms/32902) for primary diagnosis or [32908](https://athena.ohdsi.org/search-terms/terms/32908)  for secondary diagnosis| |
+| stem_source_table | | hesin_diag | |
  
 ## Reading from hesin_oper, hesin
 
@@ -53,4 +53,4 @@ description: "Stem table description"
 | end_date | opdate,<br>hesin.epistart | | If opdate is null then use hesin.epistart |
 | end_datetime | opdate,<br>hesin.epistart  | | |
 | concept_id  | NULL  |  |  |
-| stem_source_table | | "hesin_oper" | |
+| stem_source_table | | hesin_oper | |
