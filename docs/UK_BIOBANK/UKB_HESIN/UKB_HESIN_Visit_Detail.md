@@ -21,7 +21,7 @@ description: "visit_detail mapping from hesin_critical & hesin_psych tables"
 | visit_detail_concept_id| | [9201- Standard algorithm](https://athena.ohdsi.org/search-terms/terms/9201)| | |
 | visit_detail_start_date | epistart,<br>admidate | Use the first not null of (epistart, admidate). |    |
 | visit_detail_start_datetime| epistart,<br>admidate | |  |
-| visit_detail_end_date | epiend,<br>disdate,<br>epistart,<br>admidate| use the first not null of (epiend, disdate, epstart, admidate)|  |
+| visit_detail_end_date | epiend,<br>disdate,<br>epistart,<br>admidate| use the first not null of (epiend, disdate, epistart, admidate)|  |
 | visit_detail_end_datetime | epiend,<br>disdate,<br>epistart,<br>admidate| | |
 | visit_detail_type_concept_id| | [32818- Standard algorithm](https://athena.ohdsi.org/search-terms/terms/32818)| |
 | provider_id |tretspef,<br>mainspef | use the first not null of (tretspef,mainspef) to retrieve the provider_id from the provider table.|  |
