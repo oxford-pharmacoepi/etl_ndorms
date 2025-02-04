@@ -28,9 +28,9 @@ description: "visit_detail mapping from hesin_critical & hesin_psych tables"
 | care_site_id| NULL | | |
 | visit_detail_source_value| ins_index | | |
 | visit_detail_source_concept_id| NULL | | |
-| admitted_from_concept_id | admisorc_uni | Use UKB_ADMISORC_STCM. | Uk bio bank source code starts with (265-) |
+| admitted_from_concept_id | admisorc_uni | use UKB_ADMISORC_STCM | UkBioBank source code starts with "265-" |
 | admitted_from_source_value | admisorc_uni | |  |
-| discharged_to_concept_id | disdest_uni| Use UKB_DISDEST_STCM.|  uk bio bank source code starts with (267-)|
+| discharged_to_concept_id | disdest_uni| use UKB_DISDEST_STCM|  UkBioBank source code starts with "267-"|
 | discharged_to_source_value | disdest_uni | |  |
 | preceding_visit_detail_id| NULL | |  |
 | parent_visit_detail_id| NULL | | |
