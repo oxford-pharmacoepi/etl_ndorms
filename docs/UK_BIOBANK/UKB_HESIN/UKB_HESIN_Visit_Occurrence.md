@@ -20,10 +20,10 @@ description: "VISIT_OCCURRENCE mapping from HESIN table"
 | visit_occurrence_id |  |   | Autogenerate | 
 | person_id | eid |  |  |
 | visit_concept_id |  | [9201- Standard algorithm](https://athena.ohdsi.org/search-terms/terms/9201)|  |
-| visit_start_date | epistart,<br>admidate | use any of these if not null (epistart, admidate)|    |
+| visit_start_date | epistart,<br>admidate | Use the first not null of  (epistart, admidate)|    |
 | visit_start_datetime | epistart,<br>admidate | |  |
-| visit_end_date | epiend,<br>disdate,<br>epistart,<br>admidate | use any of these if not null (epiend,disdate,epistart,admidate)|  |
-| visit_end_datetime | epiend,disdate,epistart,admidate | | |
+| visit_end_date | epiend,<br>disdate,<br>epistart,<br>admidate | Use the first not null of  (epiend,disdate,epistart,admidate)|  |
+| visit_end_datetime | epiend,<br>disdate,<br>epistart,<br>admidate | | |
 | visit_type_concept_id |  |  [32818- Standard algorithm](https://athena.ohdsi.org/search-terms/terms/32818)|  |
 | provider_id |NULL| |  |
 | care_site_id | NULL| |  |
