@@ -32,7 +32,7 @@ description: "visit_detail mapping from hesin_critical & hesin_psych tables"
 | admitted_from_source_value | admisorc_uni | |  |
 | discharged_to_concept_id | disdest_uni| use UKB_DISDEST_STCM|  UK BioBank source value starts with "267-"|
 | discharged_to_source_value | disdest_uni | |  |
-| preceding_visit_detail_id|  | Latest visit_id before this one.  | |
+| preceding_visit_detail_id|  | Latest visit_detail_id before this one, if available  | |
 | parent_visit_detail_id| NULL | | |
 | visit_occurrence_id| eid, spell_index | | |
 
