@@ -42,15 +42,15 @@ description: "Stem table description"
 | id|||Autogenerate|
 | domain_id | NULL | | | 
 | person_id | eid | | | 
-| visit_occurrence_id |eid,<br>hesin.spell_index | | Use eid, hesin.spell_index to retrieve visit_occurrence_id |
-| visit_detail_id|eid,<br>ins_index ||Use eid, ins_index to retrieve visit_detail_id |
-| source_value| oper4 | Add dots when necessary| OPCS4 Codes are provided without dots|
+| visit_occurrence_id |eid,<br>hesin.spell_index | |  |
+| visit_detail_id|eid,<br>ins_index |||
+| source_value| oper4 | add dots when necessary| OPCS4 codes are provided without dots|
 | source_concept_id | oper4 | | |
-| type_concept_id |  | 32829 | |
+| type_concept_id |  | [32829 - EHR administration record](https://athena.ohdsi.org/search-terms/terms/32829)| | |
 | modifier_source_value | level | | |
-| start_date | opdate,<br>hesin.epistart | | If opdate is null then use hesin.epistart|
+| start_date | opdate,<br>hesin.epistart | | use the first not null of (opdate,hesin.epistart)|
 | start_datetime | opdate,<br>hesin.epistart |   | |
-| end_date | opdate,<br>hesin.epistart | | If opdate is null then use hesin.epistart |
+| end_date | opdate,<br>hesin.epistart | | use the first not null of (opdate,hesin.epistart) |
 | end_datetime | opdate,<br>hesin.epistart  | | |
-| concept_id  | NULL  |  |  |
+| concept_id  | oper4  |  | use OPSC4 vocabulary |
 | stem_source_table | | hesin_oper | |
