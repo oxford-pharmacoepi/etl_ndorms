@@ -50,7 +50,7 @@ description: "Stem table description"
 | modifier_source_value |  | | |
 | start_date | opdate,<br>hesin.epistart | | If opdate is null then use hesin.epistart|
 | start_datetime | opdate,<br>hesin.epistart |   | |
-| end_date | opdate,<br>hesin.epiend | | If opdate is null then use hesin.epiend |
-| end_datetime | opdate,<br>hesin.epiend  | | |
+| end_date | opdate,<br>hesin.epistart | | If opdate is null then use hesin.epistart |
+| end_datetime | opdate,<br>hesin.epistart  | | |
 | concept_id  | NULL  |  |  |
 | stem_source_table | | "hesin_oper" | |
