@@ -17,6 +17,6 @@ description: "Person mapping from source_ukb_hesin.hesin & public_ukb.death tabl
 | --- | --- | :---: | --- |
 | observation_period_id |  |  |  Autogenerate|
 | person_id | eid | | |
-| observation_period_start_date | admidate,<br>epistart,<br>disdate,<br>epiend| Use all four fields incase some of them are null | use the earliest of (admidate,epistart,disdate,epiend) that is not null.|
-| observation_period_end_date |death.date_of_death,<br>disdate,<br>epiend,<br>admidate,<br>epistart |Use all four fields incase some of them are null| use the latest of (disdate, epiend, admidate, epistart)that is not null, then the earliest between that and death.date_of_death.|
+| observation_period_start_date | admidate,<br>epistart,<br>disdate,<br>epiend| Use all four fields in case some of them are null | use the earliest of (admidate,epistart,disdate,epiend) that is not null.|
+| observation_period_end_date |death.date_of_death,<br>disdate,<br>epiend,<br>admidate,<br>epistart |Use all four fields in case some of them are null| use the latest of (disdate, epiend, admidate, epistart) that is not null, then the earliest between that and death.date_of_death.|
 | period_type_concept_id | | [32880 - Standard algorithm](https://athena.ohdsi.org/search-terms/terms/32880)| |
