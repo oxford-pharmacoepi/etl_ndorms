@@ -12,15 +12,15 @@ description: "visit_detail mapping from hesin_critical & hesin_psych tables"
 ## Reading from hesin
 
 
-![](../images/image12.png)
+![](images/ukb_hesin_to_vd.png)
 
 
 | Destination Field | Source field | Logic | Comment field |
 | --- | --- | :---: | --- |
 | visit_detail_id| | | Autogenerate|
 | person_id| eid | | |
-| visit_detail_concept_id| | 9201 = Inpatient visit| |
-| visit_detail_start_date | epistart,<br>admidate | Use the first NOT NULL OF EPISRAT AND ADMIDATE If epistart is null then use either admidate or disdate |    |
+| visit_detail_concept_id| | [9201- Standard algorithm](https://athena.ohdsi.org/search-terms/terms/9201)| | |
+| visit_detail_start_date | epistart,<br>admidate | Use the first not null of epistart and admidate. |    |
 | visit_detail_start_datetime| epistart,<br>admidate | |  |
 | visit_detail_end_date | epiend,<br>disdate,<br>epistart,<br>admidate| use the first not null of (epiend,disdate,epstart,admidate)|  |
 | visit_detail_end_datetime | epiend,<br>disdate,<br>epistart,<br>admidate| | |
