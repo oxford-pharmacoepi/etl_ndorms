@@ -15,7 +15,6 @@ CREATE TABLE {SOURCE_NOK_SCHEMA}.death (LIKE {SOURCE_SCHEMA}.death) TABLESPACE p
 --------------------------------
 -- gp_clinical
 --------------------------------
---Remove withdrawal patients
 INSERT INTO {SOURCE_NOK_SCHEMA}.gp_clinical
 (
 	select t1.* from {SOURCE_SCHEMA}.gp_clinical as t1
@@ -32,10 +31,11 @@ INSERT INTO {SOURCE_NOK_SCHEMA}.gp_clinical
 	where read_2 = '22A..'
 	and COALESCE(value1, value3) = '^'		-- read_2 = 22A.. value1 = ^
 
-	union
-
+	union 
+	
 	select * from {SOURCE_SCHEMA}.gp_clinical
-	where event_dt > to_date(RIGHT(current_database(), 8), 'YYYYMMDD') -- eventdate = '2037-07-07'
+	where event_dt in ('1901-01-01', '1902-02-02', '1903-03-03', '1909-09-09', '2037-07-07') -- https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=819
+	
 );
 
 alter table {SOURCE_NOK_SCHEMA}.gp_clinical add constraint pk_gp_clinical_nok primary key (id) USING INDEX TABLESPACE pg_default;
@@ -60,9 +60,10 @@ INSERT INTO {SOURCE_NOK_SCHEMA}.gp_scripts
 	and (dmd_code is null or dmd_code = '0')  --Remove empty drug
 	
 	union
-
+	
 	select * from {SOURCE_SCHEMA}.gp_scripts
-	where issue_date > to_date(RIGHT(current_database(), 8), 'YYYYMMDD') -- issue_date = '2037-07-07'
+	where issue_date in ('1901-01-01', '1902-02-02', '1903-03-03', '1909-09-09', '2037-07-07')	-- https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=819
+	
 );
 
 alter table {SOURCE_NOK_SCHEMA}.gp_scripts add constraint pk_gp_scripts_nok primary key (id) USING INDEX TABLESPACE pg_default;
@@ -85,13 +86,13 @@ where eid in(
 	select patid from {SOURCE_SCHEMA}._patid_deleted 
 );
 
--- reg_date = '2037-07-07'
+-- https://biobank.ndph.ox.ac.uk/ukb/coding.cgi?id=819
 INSERT INTO {SOURCE_NOK_SCHEMA}.gp_registrations
-select * from {SOURCE_SCHEMA}.gp_registrations
-where reg_date > to_date(RIGHT(current_database(), 8), 'YYYYMMDD');
+select * from source_ukb_gp.gp_registrations
+where reg_date in ('1901-01-01', '1902-02-02', '1903-03-03', '1909-09-09', '2037-07-07');
 
 DELETE FROM {SOURCE_SCHEMA}.gp_registrations  
-where reg_date > to_date(RIGHT(current_database(), 8), 'YYYYMMDD');
+where reg_date in ('1901-01-01', '1902-02-02', '1903-03-03', '1909-09-09', '2037-07-07');
 
 --------------------------------
 -- baseline
