@@ -9,7 +9,7 @@ description: "UKB Cancer to Observation Period"
 
 # CDM Table name: observation_period
 
-## Reading from ukb_cancer.cancer2 (transform from ukb_cancer.cancer), ukb_cancer.death
+## Reading from ukb_cancer.cancer_longitude (transform from ukb_cancer.cancer), ukb_cancer.death
 
 ![](images/ukb_cancer_to_op.png)
 

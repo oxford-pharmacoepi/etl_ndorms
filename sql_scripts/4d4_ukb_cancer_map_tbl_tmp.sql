@@ -25,7 +25,7 @@ WITH cte as (
 		t1.eid, 
 		t1.p40005 as diagnosis_date,
 		COALESCE(t2.description, t1.p40021) as data_source
-	from {SOURCE_SCHEMA}.cancer2 as t1
+	from {SOURCE_SCHEMA}.cancer_longitude as t1
 	left join {SOURCE_SCHEMA}.lookup1970 as t2 on t1.p40021 = t2.code
 )
 insert into {SOURCE_SCHEMA}.temp_visit_detail

@@ -1,6 +1,6 @@
 CREATE TABLE {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM_SOURCE);
 
---insert into stem_source from cancer2 
+--insert into stem_source from cancer_longitude 
 --map (Histology/Behaviour-ICD10) by ICDO3
 WITH cte0 as (
 	select person_id
@@ -17,7 +17,7 @@ WITH cte0 as (
 		t1.p40012,  
 		COALESCE(lkup.description, t1.p40021),
 		t1.id
-	from {SOURCE_SCHEMA}.cancer2 as t1
+	from {SOURCE_SCHEMA}.cancer_longitude as t1
 	join cte0 on t1.eid = cte0.person_id
 	left join {SOURCE_SCHEMA}.lookup1970 as lkup on t1.p40021 = lkup.code
 	join {TARGET_SCHEMA}.visit_detail as t2 on t1.eid = t2.person_id and t2.visit_detail_start_date = t1.p40005 and t2.visit_detail_source_value = COALESCE(lkup.description, t1.p40021)
@@ -45,7 +45,7 @@ select distinct
 	t1.p40005 as start_date,
 	t1.p40005 as end_date,
 	'00:00:00'::time start_time,
-	'cancer2-Histology' as stem_source_table,
+	'cancer-Histology' as stem_source_table,
 	t1.id as stem_source_id
 from cte1 as t1
 join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on 
@@ -70,7 +70,7 @@ WITH cte0 as (
 		t1.p40011 || '/' || t1.p40012 as source_value,
 		COALESCE(lkup.description, t1.p40021),
 		t1.id
-	from {SOURCE_SCHEMA}.cancer2 as t1
+	from {SOURCE_SCHEMA}.cancer_longitude as t1
 	join cte0 on t1.eid = cte0.person_id
 	left join {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} as t3 on t1.id = t3.stem_source_id::numeric
 	left join {SOURCE_SCHEMA}.lookup1970 as lkup on t1.p40021 = lkup.code
@@ -89,14 +89,14 @@ WITH cte0 as (
 		t1.p40005 as start_date,
 		t1.p40005 as end_date,
 		'00:00:00'::time start_time,
-		'cancer2-Histology' as stem_source_table,
+		'cancer-Histology' as stem_source_table,
 		t1.id as stem_source_id
 	from base as t1
 	join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t1.source_value = t2.source_code and t2.source_vocabulary_id = 'ICDO3' and t2.target_domain_id = 'Condition'
 
 	UNION
 
-	-- 'cancer2-Topography'
+	-- 'cancer-Topography'
 	select distinct 
 		t1.eid as person_id, 
 		t1.visit_occurrence_id,
@@ -110,7 +110,7 @@ WITH cte0 as (
 		t1.p40005 as start_date,
 		t1.p40005 as end_date,
 		'00:00:00'::time start_time,
-		'cancer2-Topography' as stem_source_table,
+		'cancer-Topography' as stem_source_table,
 		t1.id as stem_source_id
 	from base as t1
 	join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t5 on t1.source_value = t5.source_code and t5.source_vocabulary_id = 'ICDO3' and t5.target_domain_id = 'Condition'
@@ -151,7 +151,7 @@ WITH cte0 as (
 		t1.p40011 || '/' || t1.p40012 as source_value,
 		COALESCE(lkup.description, t1.p40021),
 		t1.id
-	from {SOURCE_SCHEMA}.cancer2 as t1
+	from {SOURCE_SCHEMA}.cancer_longitude as t1
 	join cte0 on t1.eid = cte0.person_id
 	left join {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} as t3 on t1.id = t3.stem_source_id::numeric
 	left join {SOURCE_SCHEMA}.lookup1970 as lkup on t1.p40021 = lkup.code
@@ -170,8 +170,8 @@ WITH cte0 as (
 		t1.p40005 as end_date,
 		'00:00:00'::time start_time,
 		CASE
-			WHEN t3.target_domain_id = 'Measurement' THEN 'cancer2-Behaviour' 
-			ELSE 'cancer2-Histology' 
+			WHEN t3.target_domain_id = 'Measurement' THEN 'cancer-Behaviour' 
+			ELSE 'cancer-Histology' 
 		END as stem_source_table,
 		t1.id as stem_source_id
 	from base as t1
@@ -180,7 +180,7 @@ WITH cte0 as (
 
 	UNION
 
-	-- 'cancer2-Topography'
+	-- 'cancer-Topography'
 	select 
 		t1.eid as person_id, 
 		t1.visit_occurrence_id,
@@ -194,7 +194,7 @@ WITH cte0 as (
 		t1.p40005 as start_date,
 		t1.p40005 as end_date,
 		'00:00:00'::time start_time,
-		'cancer2-Topography' as stem_source_table,
+		'cancer-Topography' as stem_source_table,
 		t1.id as stem_source_id
 	from base as t1
 	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on COALESCE(t1.p40006, t1.p40013) = Replace(t2.source_code, '.', '') and t2.source_vocabulary_id in ('ICDO3')
@@ -235,7 +235,7 @@ WITH cte0 as (
 		t1.p40011 || '/' || t1.p40012 as source_value,
 		COALESCE(lkup.description, t1.p40021),
 		t1.id
-	from {SOURCE_SCHEMA}.cancer2 as t1
+	from {SOURCE_SCHEMA}.cancer_longitude as t1
 	join cte0 on t1.eid = cte0.person_id
 	left join {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} as t3 on t1.id = t3.stem_source_id::numeric
 	left join {SOURCE_SCHEMA}.lookup1970 as lkup on t1.p40021 = lkup.code
@@ -273,8 +273,8 @@ select
 		WHEN COALESCE(t4.source_concept_id, t3.source_concept_id, t2.source_concept_id) is not null 
 			and COALESCE(t4.target_domain_id, t3.target_domain_id, t2.target_domain_id)= 'Condition' 
 			and COALESCE(t4.target_concept_class_id, t3.target_concept_class_id, t2.target_concept_class_id) = 'Disorder' 
-			THEN 'cancer2-Histology' 
-		ELSE 'cancer2-Topography' 
+			THEN 'cancer-Histology' 
+		ELSE 'cancer-Topography' 
 	END as stem_source_table,
 	t1.id as stem_source_id
 from base as t1
