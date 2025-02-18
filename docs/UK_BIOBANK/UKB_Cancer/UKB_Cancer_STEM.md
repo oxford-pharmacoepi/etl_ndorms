@@ -30,9 +30,9 @@ The STEM table is a staging area where UKB CANCER source codes like Read codes w
 | measurement_event_id | 
 | meas_event_field_concept_id | 
 
-## Reading from ukb_cancer.cancer2 (transform from ukb_cancer.cancer)
+## Reading from ukb_cancer.cancer_longitude (transform from ukb_cancer.cancer)
 
-The cancer data in ukb_cancer.cancer is stored in a latitudinal format, meaning that all cancer records for a single patient are stored in a single row. This structure makes the ETL process challenging and inefficient. To address this, a transformation is required before performing the ETL, converting the data into a longitudinal format, which stores the cancer records in ukb_cancer.cancer2.
+The cancer data in ukb_cancer.cancer is stored in a latitudinal format, meaning that all cancer records for a single patient are stored in a single row. This structure makes the ETL process challenging and inefficient. To address this, a transformation is required before performing the ETL, converting the data into a longitudinal format, which stores the cancer records in ukb_cancer.cancer_longitude.
 
 The UK Biobank cancer data contains only cancer diagnoses: histology, behavior, and topography information.
 These diagnoses are ideally mapped in the form of ****[Histology]/[behavour]-[Topography]**** (For example, ****8010/3-C50.9****) to the CDM Condition.

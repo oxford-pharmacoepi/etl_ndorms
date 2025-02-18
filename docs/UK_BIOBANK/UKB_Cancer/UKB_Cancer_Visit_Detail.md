@@ -9,7 +9,7 @@ description: "UKB Cancer to Visit Detail"
 
 # CDM Table name: visit_detail
 
-## Reading from ukb_cancer.cancer2 (transform from ukb_cancer.cancer)
+## Reading from ukb_cancer.cancer_longitude (transform from ukb_cancer.cancer)
 
 ![](images/ukb_cancer_to_visit_detail.png)
 

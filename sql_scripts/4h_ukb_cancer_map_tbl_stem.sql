@@ -136,7 +136,7 @@ select distinct
 	t1.value_source_value, 
 	t1.qualifier_source_value,
 	t1.qualifier_concept_id,
-	'cancer2-Behaviour' as stem_source_table,
+	'cancer-Behaviour' as stem_source_table,
 	t1.stem_source_id
 from {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} as t1
 join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t1.source_concept_id = t2.source_concept_id
@@ -145,7 +145,7 @@ left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t4.source_co
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t5 on t5.source_concept_id = 4268747 and t1.source_value like '%/9'
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t6 on t6.source_concept_id = 42512996 and t1.source_value like '%/1'
 where t1.source_concept_id <> 0
-and t1.stem_source_table = 'cancer2-Histology'
+and t1.stem_source_table = 'cancer-Histology'
 and t2.source_code <> t1.source_value
 and LEFT(t2.source_code,6) <> t1.source_value;
 
@@ -219,7 +219,7 @@ from {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} as t1
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_vocabulary_id = 'CANCER_ICDO3_STCM' and t1.source_value = t2.source_code and t2.target_domain_id = 'Condition'
 left join {VOCABULARY_SCHEMA}.concept as t3 on t3.vocabulary_id = 'ICDO3' and t1.source_value = t3.concept_code
 where t1.source_concept_id = 0
-and t1.stem_source_table <> 'cancer2-Behaviour';
+and t1.stem_source_table <> 'cancer-Behaviour';
 
 
 ALTER TABLE {CHUNK_SCHEMA}.stem_{CHUNK_ID} ADD CONSTRAINT pk_stem_{CHUNK_ID} PRIMARY KEY (id);
@@ -233,14 +233,14 @@ With _measurement AS(
 	select id, stem_source_id
 	from {CHUNK_SCHEMA}.stem_{CHUNK_ID}
 	where domain_id = 'Measurement'
-	--and stem_source_table = 'cancer2-Behaviour'
+	--and stem_source_table = 'cancer-Behaviour'
 ), _condition AS(
 	select 	
 		id, 
 		1147127 as event_field_concept_id, 
 		stem_source_id 
 	from {CHUNK_SCHEMA}.stem_{CHUNK_ID}
-	where domain_id = 'Condition' and stem_source_table = 'cancer2-Histology'
+	where domain_id = 'Condition' and stem_source_table = 'cancer-Histology'
 ), cte as(
 	select  
 		t1.id, 
@@ -289,7 +289,7 @@ select distinct
 	stem_source_table,
 	stem_source_id
 from {CHUNK_SCHEMA}.stem_{CHUNK_ID} 
-where stem_source_table = 'cancer2-Histology'
+where stem_source_table = 'cancer-Histology'
 and domain_id = 'Condition';	
 
 -----------------------------------------

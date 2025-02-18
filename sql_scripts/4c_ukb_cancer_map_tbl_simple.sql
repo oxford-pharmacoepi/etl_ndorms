@@ -53,7 +53,7 @@ With cancer AS(
 	select 	eid, 
 			min(p40005) as min_p40005,
 			max(p40005) as max_p40005
-	from {SOURCE_SCHEMA}.cancer2
+	from {SOURCE_SCHEMA}.cancer_longitude
 	group by eid
 )
 INSERT INTO {TARGET_SCHEMA}.observation_period(

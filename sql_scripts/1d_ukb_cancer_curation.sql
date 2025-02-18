@@ -18,9 +18,9 @@ WHERE t1.eid = t2.eid;
 ------------------------------------
 -- reform the cancer table structure
 ------------------------------------
-DROP TABLE IF EXISTS {SOURCE_SCHEMA}.cancer2 CASCADE;
+DROP TABLE IF EXISTS {SOURCE_SCHEMA}.cancer_longitude CASCADE;
 
-CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.cancer2 (
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.cancer_longitude (
 	id 				BIGSERIAL 	NOT NULL,
 	eid				bigint 		not null,	
 	p40005			date,
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.cancer2 (
 	p40021			varchar(4)			--Data-Coding 262: Cancer information source
 )TABLESPACE pg_default;
 
-ALTER TABLE {SOURCE_SCHEMA}.cancer2 SET (autovacuum_enabled = False);
+ALTER TABLE {SOURCE_SCHEMA}.cancer_longitude SET (autovacuum_enabled = False);
 
 With cte as(
 select 
@@ -80,7 +80,7 @@ select
 				 p40021_i20::TEXT, p40021_i21::TEXT]) as p40021
 from {SOURCE_SCHEMA}.cancer
 )
-insert into {SOURCE_SCHEMA}.cancer2(eid, p40005, p40006, p40009, p40011, p40012, p40013, p40019, p40021)
+insert into {SOURCE_SCHEMA}.cancer_longitude(eid, p40005, p40006, p40009, p40011, p40012, p40013, p40019, p40021)
 select 
 	eid, 
 	p40005::date, 
@@ -94,24 +94,24 @@ select
 	p40021
 from cte;
 
-alter table {SOURCE_SCHEMA}.cancer2 add constraint pk_cancer2 primary key (id) USING INDEX TABLESPACE pg_default;
+alter table {SOURCE_SCHEMA}.cancer_longitude add constraint pk_cancer_longitude primary key (id) USING INDEX TABLESPACE pg_default;
 
 ------------------------------------
 -- curation
 ------------------------------------
 
-DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.cancer2 CASCADE;
+DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.cancer_longitude CASCADE;
 
 DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.baseline CASCADE;
 DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.death CASCADE;
 
-CREATE TABLE {SOURCE_NOK_SCHEMA}.cancer2 (LIKE {SOURCE_SCHEMA}.cancer2) TABLESPACE pg_default;
+CREATE TABLE {SOURCE_NOK_SCHEMA}.cancer_longitude (LIKE {SOURCE_SCHEMA}.cancer_longitude) TABLESPACE pg_default;
 
 CREATE TABLE {SOURCE_NOK_SCHEMA}.baseline (LIKE {SOURCE_SCHEMA}.baseline) TABLESPACE pg_default;
 CREATE TABLE {SOURCE_NOK_SCHEMA}.death (LIKE {SOURCE_SCHEMA}.death) TABLESPACE pg_default;
 
 --------------------------------
--- cancer2
+-- cancer_longitude
 --------------------------------
 With cte as(
 	select 
@@ -125,11 +125,11 @@ With cte as(
 		p40013, 
 		p40019, 
 		p40021
-	from {SOURCE_SCHEMA}.cancer2
+	from {SOURCE_SCHEMA}.cancer_longitude
 	group by eid, p40005, p40006, p40009, p40011, p40012, p40013, p40019, p40021   --167936
 )
-INSERT INTO {SOURCE_NOK_SCHEMA}.cancer2(
-	select * from {SOURCE_SCHEMA}.cancer2
+INSERT INTO {SOURCE_NOK_SCHEMA}.cancer_longitude(
+	select * from {SOURCE_SCHEMA}.cancer_longitude
 	where p40005 is NULL
 	and p40006 is NULL			-- Type of cancer: ICD10
 	and p40011 is NULL 			-- Histology of cancer tumour is null
@@ -138,7 +138,7 @@ INSERT INTO {SOURCE_NOK_SCHEMA}.cancer2(
 
 	UNION
 
-	select * from {SOURCE_SCHEMA}.cancer2
+	select * from {SOURCE_SCHEMA}.cancer_longitude
 	where p40011 is null 
 	and p40012 is null 
 	and p40006 is null 
@@ -146,15 +146,15 @@ INSERT INTO {SOURCE_NOK_SCHEMA}.cancer2(
 
 	UNION
 
-	select t1.* from {SOURCE_SCHEMA}.cancer2 as t1			-- eliminate duplication
+	select t1.* from {SOURCE_SCHEMA}.cancer_longitude as t1			-- eliminate duplication
 	left join cte as t2 on t1.id = t2.min_id
 	where t2.min_id is null
 );
 
-alter table {SOURCE_NOK_SCHEMA}.cancer2 add constraint pk_cancer2_nok primary key (id) USING INDEX TABLESPACE pg_default;
+alter table {SOURCE_NOK_SCHEMA}.cancer_longitude add constraint pk_cancer_longitude_nok primary key (id) USING INDEX TABLESPACE pg_default;
 
-DELETE FROM {SOURCE_SCHEMA}.cancer2 as t1 
-using {SOURCE_NOK_SCHEMA}.cancer2 as t2
+DELETE FROM {SOURCE_SCHEMA}.cancer_longitude as t1 
+using {SOURCE_NOK_SCHEMA}.cancer_longitude as t2
 WHERE t1.id = t2.id;
 
 --------------------------------
@@ -163,7 +163,7 @@ WHERE t1.id = t2.id;
 INSERT INTO {SOURCE_NOK_SCHEMA}.baseline
 select t1.*
 from {SOURCE_SCHEMA}.baseline as t1
-left join {SOURCE_SCHEMA}.cancer2 as t2 on t1.eid = t2.eid
+left join {SOURCE_SCHEMA}.cancer_longitude as t2 on t1.eid = t2.eid
 where t2.eid is null;
 
 alter table {SOURCE_NOK_SCHEMA}.baseline add constraint pk_baseline_nok primary key (eid) USING INDEX TABLESPACE pg_default;
@@ -187,12 +187,12 @@ using {SOURCE_NOK_SCHEMA}.death as t2
 WHERE t1.eid = t2.eid
 and t1.ins_index = t2.ins_index;
 
--- create index in cancer2
-create index idx_cancer2_1 on {SOURCE_SCHEMA}.cancer2(eid) TABLESPACE pg_default;
-create index idx_cancer2_2 on {SOURCE_SCHEMA}.cancer2(p40011, p40012, p40006) TABLESPACE pg_default;
-create index idx_cancer2_3 on {SOURCE_SCHEMA}.cancer2(p40011, p40012, p40013) TABLESPACE pg_default;
-create index idx_cancer2_4 on {SOURCE_SCHEMA}.cancer2(p40006) TABLESPACE pg_default;
-create index idx_cancer2_5 on {SOURCE_SCHEMA}.cancer2(p40013) TABLESPACE pg_default;
+-- create index in cancer_longitude
+create index idx_cancer_longitude_1 on {SOURCE_SCHEMA}.cancer_longitude(eid) TABLESPACE pg_default;
+create index idx_cancer_longitude_2 on {SOURCE_SCHEMA}.cancer_longitude(p40011, p40012, p40006) TABLESPACE pg_default;
+create index idx_cancer_longitude_3 on {SOURCE_SCHEMA}.cancer_longitude(p40011, p40012, p40013) TABLESPACE pg_default;
+create index idx_cancer_longitude_4 on {SOURCE_SCHEMA}.cancer_longitude(p40006) TABLESPACE pg_default;
+create index idx_cancer_longitude_5 on {SOURCE_SCHEMA}.cancer_longitude(p40013) TABLESPACE pg_default;
 
-VACUUM (ANALYZE) {SOURCE_SCHEMA}.cancer2;
-ALTER TABLE {SOURCE_SCHEMA}.cancer2 SET (autovacuum_enabled = True);
+VACUUM (ANALYZE) {SOURCE_SCHEMA}.cancer_longitude;
+ALTER TABLE {SOURCE_SCHEMA}.cancer_longitude SET (autovacuum_enabled = True);
