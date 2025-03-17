@@ -49,4 +49,3 @@ source_code,source_concept_id,source_vocabulary_id,source_code_description,targe
 727,0,HES_SPEC_STCM,Dementia Assessment Service,44811432,SNOMED,2014-04-01,2099-12-31,
 730,0,HES_SPEC_STCM,Neuropsychiatry Service,38004505,Medicare Specialty,1970-01-01,2099-12-31,
 920,0,HES_SPEC_STCM,Diabetic Education Service,42536211,SNOMED,2018-01-31,2099-12-31,
-
