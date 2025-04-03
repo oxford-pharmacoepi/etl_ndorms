@@ -20,26 +20,25 @@ cte3 AS (
 	t1.patid AS person_id,
 	9201 AS visit_concept_id,
 	COALESCE(t1.admidate, t3.date_min, t1.discharged) AS visit_start_date, 
-	COALESCE(t1.admidate, t3.date_min, t1.discharged) AS visit_start_datetime,
+	COALESCE(t1.admidate, t3.date_min, t1.discharged) AS visit_start_datetime::timestamp,
 	COALESCE(t1.discharged, t3.date_max, t3.date_min) AS visit_end_date,
-	COALESCE(t1.discharged, t3.date_max, t3.date_min) AS visit_end_datetime,
+	COALESCE(t1.discharged, t3.date_max, t3.date_min) AS visit_end_datetime::timestamp,
 	32818 AS visit_type_concept_id,
 	NULL::bigint AS provider_id,
 	NULL::int AS care_site_id,
 	t1.spno AS visit_source_value,
 	NULL::int AS visit_source_concept_id,
-	t4.source_code_description AS admitting_source_value,
-	t4.target_concept_id AS admitting_source_concept_id,
-	NULL AS discharge_to_source_value,
+	t1.admisorc::varchar || '/' || t1.admimeth AS admitting_source_value,
+	NULL::int AS admitting_source_concept_id,
+	t1.disdest::varchar || '/' || t1.dismeth::varchar AS discharge_to_source_value,
 	NULL::int AS discharge_to_concept_id,
 	NULL::int AS preceding_visit_occurrence_id
 	FROM {SOURCE_SCHEMA}.hes_hospital AS t1
 	INNER JOIN cte1 as t2 ON t1.patid = t2.person_id
 	LEFT JOIN cte2 as t3 ON t1.spno = t3.spno
-	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t1.admimeth = t4.source_code and t4.source_vocabulary_id = 'HESAPC_ADMIMETH_STCM'
 ),
 cte4 AS (
-	SELECT visit_occurrence_id, visit_source_value,
+	SELECT person_id, visit_source_value,
 	CASE WHEN visit_start_date <= visit_end_date 
 		THEN visit_start_date ELSE visit_end_date 
 	END AS visit_start_date,
@@ -159,17 +158,16 @@ cte2 AS (
 	NULL::int AS care_site_id,
 	t1.epikey AS visit_detail_source_value,
 	NULL::int AS visit_detail_source_concept_id,
-	t2.source_code_description AS admitting_source_value,
-	t2.target_concept_id AS admitting_source_concept_id,
-	NULL AS discharge_to_source_value,
+	t1.admisorc::varchar || '/' || t1.admimeth AS admitting_source_value,
+	NULL::int  AS admitting_source_concept_id,
+	t1.disdest::varchar || '/' || t1.dismeth::varchar AS discharge_to_source_value,
 	NULL::int AS discharge_to_concept_id,
 	NULL::int AS preceding_visit_detail_id,
 	NULL::int AS visit_detail_parent_id,
-	NULL::int as visit_occurrence_id,
+	NULL::int AS visit_occurrence_id,
 	t1.spno
 	FROM cte1 as t0 
 	INNER JOIN {SOURCE_SCHEMA}.hes_episodes AS t1 ON t1.patid = t0.person_id
-	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t2 on t1.admimeth = t2.source_code and t2.source_vocabulary_id = 'HESAPC_ADMIMETH_STCM'
 ),
 cte3 AS (
 	SELECT person_id, visit_detail_source_value,
@@ -227,18 +225,16 @@ cte5 AS (
 	NULL::int AS care_site_id,
 	t1.epikey AS visit_detail_source_value,
 	NULL::int AS visit_detail_source_concept_id,
-	t2.source_code_description AS admitting_source_value,
-	t2.target_concept_id AS admitting_source_concept_id,
-	t3.source_code_description AS discharge_to_source_value,
-	t3.target_concept_id AS discharge_to_concept_id,
+	t1.acpsour::varchar AS admitting_source_value,
+	NULL::int  AS admitting_source_concept_id,
+	t1.acpdisp::varchar AS discharge_to_source_value,
+	NULL::int  AS discharge_to_concept_id,
 	NULL::int AS preceding_visit_detail_id,
 	NULL::int AS visit_detail_parent_id,
 	NULL::int AS visit_occurrence_id,
 	t1.spno
 	FROM cte1 as t0 
 	INNER JOIN {SOURCE_SCHEMA}.hes_acp AS t1 ON t1.patid = t0.person_id
-	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t2 on t1.acpsour::varchar = t2.source_code and t2.source_vocabulary_id = 'HESAPC_ACPSOUR_STCM'
-	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t3 on t1.acpdisp::varchar = t3.source_code and t3.source_vocabulary_id = 'HESAPC_ACPDISP_STCM'
 ),
 cte6 AS (
 --------------------------------
@@ -262,18 +258,16 @@ cte6 AS (
 	NULL::int AS care_site_id,
 	epikey AS visit_detail_source_value,
 	NULL::int AS visit_detail_source_concept_id,
-	t2.source_code_description AS admitting_source_value,
-	t2.target_concept_id AS admitting_source_concept_id,
-	t3.source_code_description AS discharge_to_source_value,
-	t3.target_concept_id AS discharge_to_concept_id,
+	t1.ccadmisorc::varchar AS admitting_source_value,
+	NULL::int  AS admitting_source_concept_id,
+	t1.ccdisdest::varchar AS discharge_to_source_value,
+	NULL::int AS discharge_to_concept_id,
 	NULL::int AS preceding_visit_detail_id, 
 	NULL::int AS visit_detail_parent_id,
 	NULL::int AS visit_occurrence_id,
 	t1.spno
 	FROM cte1 as t0 
 	INNER JOIN {SOURCE_SCHEMA}.hes_ccare AS t1 ON t1.patid = t0.person_id
-	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t2 on t1.ccadmisorc::varchar = t2.source_code and t2.source_vocabulary_id = 'HESAPC_ADMISORC_STCM'
-	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t3 on t1.ccdisdest::varchar = t3.source_code and t3.source_vocabulary_id = 'HESAPC_DISDEST_STCM'
 ),
 cte7 AS (
 	SELECT * FROM cte4
