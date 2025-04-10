@@ -20,9 +20,9 @@ cte3 AS (
 	t1.patid AS person_id,
 	9201 AS visit_concept_id,
 	COALESCE(t1.admidate, t3.date_min, t1.discharged) AS visit_start_date, 
-	COALESCE(t1.admidate, t3.date_min, t1.discharged) AS visit_start_datetime::timestamp,
+	COALESCE(t1.admidate, t3.date_min, t1.discharged)::timestamp AS visit_start_datetime,
 	COALESCE(t1.discharged, t3.date_max, t3.date_min) AS visit_end_date,
-	COALESCE(t1.discharged, t3.date_max, t3.date_min) AS visit_end_datetime::timestamp,
+	COALESCE(t1.discharged, t3.date_max, t3.date_min)::timestamp AS visit_end_datetime,
 	32818 AS visit_type_concept_id,
 	NULL::bigint AS provider_id,
 	NULL::int AS care_site_id,
@@ -210,32 +210,32 @@ cte4 AS (
 	INNER JOIN cte3 AS t2 ON t1.person_id = t2.person_id AND t1.visit_detail_source_value = t2.visit_detail_source_value
 ),
 --------------------------------
--- VISIT_DETAIL FROM hes_acp
+-- VISIT_DETAIL FROM hes_acp -- TABLE REMOVED
 --------------------------------
-cte5 AS (
-	SELECT
-	t1.patid AS person_id,
-	32037 AS visit_detail_concept_id,
-	COALESCE(t1.acpstar,t1.epistart) AS visit_detail_start_date,
-	COALESCE(t1.acpstar,t1.epistart) AS visit_detail_start_datetime,
-	COALESCE(t1.acpend,t1.epiend) AS visit_detail_end_date,
-	COALESCE(t1.acpend,t1.epiend) AS visit_detail_end_datetime,
-	32818 AS visit_detail_type_concept_id,
-	NULL::int AS provider_id,
-	NULL::int AS care_site_id,
-	t1.epikey AS visit_detail_source_value,
-	NULL::int AS visit_detail_source_concept_id,
-	t1.acpsour::varchar AS admitted_from_source_value,
-	NULL::int AS admitted_from_concept_id,
-	t1.acpdisp::varchar AS discharged_to_source_value,
-	NULL::int AS discharged_to_concept_id,
-	NULL::int AS preceding_visit_detail_id,
-	NULL::int AS parent_visit_detail_id,
-	NULL::int AS visit_occurrence_id,
-	t1.spno
-	FROM cte1 as t0 
-	INNER JOIN {SOURCE_SCHEMA}.hes_acp AS t1 ON t1.patid = t0.person_id
-),
+--cte5 AS (
+--	SELECT
+--	t1.patid AS person_id,
+--	32037 AS visit_detail_concept_id,
+--	COALESCE(t1.acpstar,t1.epistart) AS visit_detail_start_date,
+--	COALESCE(t1.acpstar,t1.epistart) AS visit_detail_start_datetime,
+--	COALESCE(t1.acpend,t1.epiend) AS visit_detail_end_date,
+--	COALESCE(t1.acpend,t1.epiend) AS visit_detail_end_datetime,
+--	32818 AS visit_detail_type_concept_id,
+--	NULL::int AS provider_id,
+--	NULL::int AS care_site_id,
+--	t1.epikey AS visit_detail_source_value,
+--	NULL::int AS visit_detail_source_concept_id,
+--	t1.acpsour::varchar AS admitted_from_source_value,
+--	NULL::int AS admitted_from_concept_id,
+--	t1.acpdisp::varchar AS discharged_to_source_value,
+--	NULL::int AS discharged_to_concept_id,
+--	NULL::int AS preceding_visit_detail_id,
+--	NULL::int AS parent_visit_detail_id,
+--	NULL::int AS visit_occurrence_id,
+--	t1.spno
+--	FROM cte1 as t0 
+--	INNER JOIN {SOURCE_SCHEMA}.hes_acp AS t1 ON t1.patid = t0.person_id
+--),
 cte6 AS (
 --------------------------------
 -- VISIT_DETAIL FROM hes_ccare
@@ -271,8 +271,8 @@ cte6 AS (
 ),
 cte7 AS (
 	SELECT * FROM cte4
-	UNION ALL
-	SELECT * FROM cte5
+--	UNION ALL
+--	SELECT * FROM cte5
 	UNION ALL
 	SELECT * FROM cte6
 ),
