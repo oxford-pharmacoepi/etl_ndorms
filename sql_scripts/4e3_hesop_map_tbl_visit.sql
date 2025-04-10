@@ -44,7 +44,7 @@ cte4 AS (
 	FROM {SOURCE_SCHEMA}.hesop_appointment AS t1
 	INNER JOIN cte1 as t2 ON t1.person_id = t2.person_id
 	INNER JOIN cte3 as t3 ON t1.patid = t3.person_id AND t1.attendkey = t3.attendkey
-	WHERE t1.attended = 5     -- 5 = (Seen, having attended on time or, if late, before the relevant care professional was ready to see the patient) 
+	WHERE t1.attended in (5, 6)     -- Seen
 	AND t1.apptdate >= t2.observation_period_start_date
 	AND t1.apptdate <= t2.observation_period_end_date
 	ORDER BY t1.patid, t1.apptdate, t1.attendkey
