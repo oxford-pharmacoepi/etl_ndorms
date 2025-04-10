@@ -2,10 +2,8 @@
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_patient (
 	patid 			bigint,
 	pracid 			int,
-	gen_hesid 		bigint,
-	n_patid_hes 	int,
-	gen_ethnicity 	varchar(10),
-	match_rank 		int)
+	mpsid			bigint,
+	gen_ethnicity 	varchar(10))
 	TABLESPACE pg_default;
 	
 ---------------Creating Hospitalisations Table---------------------------
@@ -69,6 +67,17 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_diagnosis_hosp (
 	icd			varchar(5),
 	icdx		varchar(5))
 	TABLESPACE pg_default;
+
+------Creating Hes_Primary_diag_hosp Table------------------
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_primary_diag_hosp (
+	patid		bigint,
+	spno		int,
+	admidate	date,
+	discharged	date,
+	icd_primary	varchar(5),
+	icdx		varchar(5))
+	TABLESPACE pg_default;
+
 	
 ----------- Creating Procedures Table --------------------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_procedures_epi (
@@ -84,31 +93,31 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_procedures_epi (
 	p_order 	int)
 	TABLESPACE pg_default;
 	
------------ Creating  Augmented Care Periods – ACP Table ------------------------
-CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_acp (
-	patid		bigint,
-	spno		int,
-	epikey 		bigint,
-	epistart 	date,
-	epiend 		date,
-	eorder 		int,
-	epidur 		int,
-	numacp 		int,
-	acpn 		int,
-	acpstar 	date,
-	acpend 		date,
-	acpdur 		int,
-	intdays 	int,
-	depdays 	int,
-	acploc 		int,
-	acpsour 	int,
-	acpdisp 	int,
-	acpout 		int,
-	acpplan 	char(1),
-	acpspef 	varchar(3),
-	orgsup 		int,
-	acpdqind 	char(1))
-	TABLESPACE pg_default;
+----------- FILE WAS REMOVED --Creating  Augmented Care Periods – ACP Table ------------------------
+--CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_acp ( --
+--	patid		bigint,
+--	spno		int,
+--	epikey 		bigint,
+--	epistart 	date,
+--	epiend 		date,
+--	eorder 		int,
+--	epidur 		int,
+--	numacp 		int,
+--	acpn 		int,
+--	acpstar 	date,
+--	acpend 		date,
+--	acpdur 		int,
+--	intdays 	int,
+--	depdays 	int,
+--	acploc 		int,
+--	acpsour 	int,
+--	acpdisp 	int,
+--	acpout 		int,
+--	acpplan 	char(1),
+--	acpspef 	varchar(3),
+--	orgsup 		int,
+--	acpdqind 	char(1))
+--	TABLESPACE pg_default;
 	
 -------------Creating Critical Care Table----------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_ccare (
@@ -126,7 +135,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_ccare (
 	ccdisrdytime 	varchar(8),
 	ccdisdate 		date,
 	ccdistime 		varchar(8),
-	ccadmitype 		int,
+	ccadmitype 		varchar(9),
 	ccadmisorc 		int,
 	ccsorcloc 		int,
 	ccdisstat 		int,
@@ -202,12 +211,3 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_hrg (
 	hes_yr 		smallint)
 	TABLESPACE pg_default;
 	
-------Creating Hes_Primary_diag_hosp Table------------------
-CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.hes_primary_diag_hosp (
-	patid		bigint,
-	spno		int,
-	admidate	date,
-	discharged	date,
-	icd_primary	varchar(5),
-	icdx		varchar(5))
-	TABLESPACE pg_default;
