@@ -98,7 +98,7 @@ def main():
 				database_type = 'hes'
 			elif database_type[:5].upper() == 'NCRAS':
 				database_type = 'ncras'
-			source_schema = db_conf['source_schema']
+			linkage_schema = db_conf['linkage_schema']
 			dir_sql = os.getcwd() + '\\sql_scripts\\'
 			dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
 			if not os.path.exists(dir_sql_processed):
@@ -138,14 +138,15 @@ def main():
 						if ret == True:
 							tbl_lookup = 'tbl_' + database_type + '_lookup'
 							tbl_lookup_list =  [tbl for tbl in db_conf[tbl_lookup]]
+							print(tbl_lookup_list)
 							if 'ukb' == data_provider:
 								file_lookup_list = [[dir_lookup + '*' + tbl.replace("lookup", "coding") + '*.tsv'] for tbl in tbl_lookup_list]
 							else:
 								file_lookup_list = [[dir_lookup + '*' + tbl + '*.txt'] for tbl in tbl_lookup_list]
-
+							print(file_lookup_list)
 							if not os.path.exists(dir_lookup_processed):
 								os.makedirs(dir_lookup_processed)
-							ret = mapping_util.load_files_parallel(db_conf, source_schema, tbl_lookup_list, file_lookup_list, dir_lookup_processed)
+							ret = mapping_util.load_files_parallel(db_conf, linkage_schema, tbl_lookup_list, file_lookup_list, dir_lookup_processed)
 # ---------------------------------------------------------
 # Load special LOOKUP tables - Sequential execution
 # ---------------------------------------------------------
