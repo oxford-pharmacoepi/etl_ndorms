@@ -14,10 +14,10 @@ DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.hes_procedures_epi CASCADE;
 CREATE TABLE {SOURCE_NOK_SCHEMA}.hes_patient (LIKE {SOURCE_SCHEMA}.hes_patient) TABLESPACE pg_default;
 
 WITH cte1 as (
-	SELECT patid FROM {SOURCE_SCHEMA}.hes_patient
-	WHERE match_rank in (3,4,5)
-	UNION DISTINCT
-	SELECT patid from source_nok.patient
+--	SELECT patid FROM {SOURCE_SCHEMA}.hes_patient
+--	WHERE match_rank in (3,4,5) match_rank has been removed from the patient table
+--	UNION DISTINCT
+	SELECT patid from {SOURCE_NOK_SCHEMA_TO_LINK}.patient
 )
 INSERT INTO {SOURCE_NOK_SCHEMA}.hes_patient
 SELECT t1.* 
