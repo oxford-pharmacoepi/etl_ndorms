@@ -1,7 +1,8 @@
 ------------------
 -- BUILD DRUG_ERA 
 ------------------
-DROP TABLE IF EXISTS cteFinalTarget;
+DROP TABLE IF EXISTS {TARGET_SCHEMA}.cteFinalTarget;
+DROP TABLE IF EXISTS {TARGET_SCHEMA}.drug_era;
 
 WITH ctePreDrugTarget(drug_exposure_id, person_id, ingredient_concept_id, drug_exposure_start_date, days_supply, drug_exposure_end_date) AS
 (-- Normalize DRUG_EXPOSURE_END_DATE to either the existing drug exposure end date, or add days supply, or add 1 day to the start date
@@ -115,10 +116,10 @@ WITH ctePreDrugTarget(drug_exposure_id, person_id, ingredient_concept_id, drug_e
 		, drug_sub_exposure_end_date
 		, drug_exposure_count
 		, drug_sub_exposure_end_date - drug_sub_exposure_start_date AS days_exposed
-	INTO cteFinalTarget
+	INTO {TARGET_SCHEMA}.cteFinalTarget
 	FROM cteSubExposures;
 	
-CREATE INDEX idx_cteFinalTarget ON cteFinalTarget (person_id ASC, ingredient_concept_id ASC, drug_sub_exposure_start_date ASC);
+CREATE INDEX idx_cteFinalTarget ON {TARGET_SCHEMA}.cteFinalTarget (person_id ASC, ingredient_concept_id ASC, drug_sub_exposure_start_date ASC);
 	
 WITH cteEndDates (person_id, ingredient_concept_id, end_date) AS -- the magic
 (
@@ -143,7 +144,7 @@ WITH cteEndDates (person_id, ingredient_concept_id, end_date) AS -- the magic
 				, drug_sub_exposure_start_date AS event_date
 				, -1 AS event_type
 				, ROW_NUMBER() OVER (PARTITION BY person_id, ingredient_concept_id ORDER BY drug_sub_exposure_start_date) AS start_ordinal
-			FROM cteFinalTarget
+			FROM {TARGET_SCHEMA}.cteFinalTarget
 		
 			UNION ALL
 		
@@ -154,7 +155,7 @@ WITH cteEndDates (person_id, ingredient_concept_id, end_date) AS -- the magic
 				, drug_sub_exposure_end_date + INTERVAL '30 days'
 				, 1 AS event_type
 				, NULL
-			FROM cteFinalTarget
+			FROM {TARGET_SCHEMA}.cteFinalTarget
 		) RAWDATA
 	) e
 	WHERE (2 * e.start_ordinal) - e.overall_ord = 0 
@@ -169,7 +170,7 @@ SELECT
 	, MIN(e.end_date) AS era_end_date
 	, ft.drug_exposure_count
 	, ft.days_exposed
-FROM cteFinalTarget ft
+FROM {TARGET_SCHEMA}.cteFinalTarget ft
 JOIN cteEndDates e ON ft.person_id = e.person_id AND ft.ingredient_concept_id = e.ingredient_concept_id AND e.end_date >= ft.drug_sub_exposure_start_date
 GROUP BY 
 	  	ft.person_id
@@ -184,23 +185,24 @@ cte0 AS (
 		WHERE lower(tbl_name) = 'drug_era') 
 		END as start_id
 )
-INSERT INTO {TARGET_SCHEMA}.drug_era(drug_era_id, person_id, drug_concept_id, drug_era_start_date, drug_era_end_date, drug_exposure_count, gap_days)
+--INSERT INTO {TARGET_SCHEMA}.drug_era(drug_era_id, person_id, drug_concept_id, drug_era_start_date, drug_era_end_date, drug_exposure_count, gap_days)
 SELECT drug_era_id + cte0.start_id as drug_era_id, person_id, drug_concept_id,
 	drug_era_start_date, drug_era_end_date, drug_exposure_count, gap_days
-	FROM cte0, (
+INTO {TARGET_SCHEMA}.drug_era --(drug_era_id, person_id, drug_concept_id, drug_era_start_date, drug_era_end_date, drug_exposure_count, gap_days)
+FROM cte0, (
 	SELECT
 		row_number() over (order by person_id, drug_concept_id) as drug_era_id
 		, person_id
 		, drug_concept_id
 		, MIN(drug_sub_exposure_start_date) AS drug_era_start_date
-		, drug_era_end_date
-		, SUM(drug_exposure_count) AS drug_exposure_count
-		, EXTRACT(EPOCH FROM drug_era_end_date - MIN(drug_sub_exposure_start_date) - SUM(days_exposed)) / 86400 AS gap_days
+		, drug_era_end_date::date
+		, SUM(drug_exposure_count)::int AS drug_exposure_count
+		, (EXTRACT(EPOCH FROM drug_era_end_date - MIN(drug_sub_exposure_start_date) - SUM(days_exposed)) / 86400)::int AS gap_days
 FROM cteDrugEraEnds
 GROUP BY person_id, drug_concept_id, drug_era_end_date
 ORDER BY person_id, drug_concept_id) as t;
 
-DROP TABLE IF EXISTS cteFinalTarget;
+DROP TABLE IF EXISTS {TARGET_SCHEMA}.cteFinalTarget;
 
 --------------------------------
 -- Add PK / IDX / FK to DRUG_ERA
