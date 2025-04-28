@@ -28,7 +28,7 @@ def main():
 				time1 = time.time()
 				print('Create ERA tables ...')
 				sql_file_list = sorted(glob.iglob(dir_sql + '6a_cdm_era_*.sql'))
-				ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, True)
+				ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, True, False)
 				if ret == True:
 					msg = 'All ERA tables built on ' + database_type.upper() + ' in ' + mapping_util.calc_time(time.time() - time1)
 					print(msg)
