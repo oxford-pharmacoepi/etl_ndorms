@@ -10,6 +10,7 @@ db_conf = dict({
 	'datestyle': 'ISO,DMY',
 	'source_schema': 'source',
 	'source_nok_schema': 'source_nok',
+	'linkage_schema': 'linkage',
 	'target_schema': 'public',
 	'vocabulary_schema': 'public',			#e.g. 'public', 'vocabulary'
 	'target_schema_to_link': 'schema to which we want to link the data. If no link is required, it MUST be equal to target_schema',	#e.g. 'public_aurum'
@@ -29,8 +30,7 @@ db_conf = dict({
 	'tbl_aurum' : ['practice', 'staff', 'patient', 'consultation', 'observation', 'problem', 'referral', 'drugissue'],
 	'tbl_aurum_lookup': ['gender', 'region', 'jobcat', 'numunit', 'quantunit', 'refservicetype', 'medicaldictionary', 'productdictionary', 'visiontoemismigrators'],
 	'tbl_aurum_denom': ['aurum_acceptablepats', 'aurum_practices'],
-	'tbl_hes_lookup': ['linkage_coverage'],
-	'tbl_ncrascr_lookup': ['linkage_coverage'],
+	'tbl_linkage_lookup': ['linkage_coverage'],
 	'tbl_hesapc': ['hes_patient', 'hes_hospital', 'hes_acp', 'hes_ccare', 'hes_maternity', 'hes_episodes', 'hes_diagnosis_hosp', 'hes_primary_diag_hosp', 'hes_diagnosis_epi', 'hes_procedures_epi', 'hes_hrg'],
 	'tbl_hesop': ['hesop_patient', 'hesop_appointment', 'hesop_clinical'],
 	'tbl_hesae': ['hesae_patient', 'hesae_attendance', 'hesae_diagnosis', 'hesae_investigation', 'hesae_treatment', 'hesae_hrg', 'hesae_pathway'],
