@@ -1,6 +1,8 @@
 -----------------------
 -- BUILT CONDITION_ERA 
 -----------------------
+DROP TABLE IF EXISTS {TARGET_SCHEMA}.condition_era;
+
 WITH cteConditionTarget (condition_occurrence_id, person_id, condition_concept_id, condition_start_date, condition_end_date) AS
 (
 	SELECT
@@ -80,18 +82,17 @@ cte0 AS (
 		END as start_id
 )
 --------------------------------------------------------------------------------------------------------------
-INSERT INTO {TARGET_SCHEMA}.condition_era(condition_era_id, person_id, condition_concept_id, 
-condition_era_start_date, condition_era_end_date, condition_occurrence_count)
 SELECT condition_era_id + cte0.start_id as condition_era_id, person_id, condition_concept_id,
 	condition_era_start_date, condition_era_end_date, condition_occurrence_count
+INTO {TARGET_SCHEMA}.condition_era	
 	FROM cte0, (
 	SELECT
 		row_number() over (order by person_id, condition_concept_id) as condition_era_id
 		, person_id
 		, condition_concept_id
 		, MIN(condition_start_date) AS condition_era_start_date
-		, era_end_date AS condition_era_end_date
-		, COUNT(*) AS condition_occurrence_count
+		, era_end_date::date AS condition_era_end_date
+		, COUNT(*)::int AS condition_occurrence_count
 	FROM cteConditionEnds
 	GROUP BY person_id, condition_concept_id, era_end_date
 	ORDER BY person_id, condition_concept_id) as t;
