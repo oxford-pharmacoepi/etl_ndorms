@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.linkage_coverage
+CREATE TABLE IF NOT EXISTS {LINKAGE_SCHEMA}.linkage_coverage
 (
 	data_source varchar(10) NOT NULL,
 	"start" DATE NOT NULL,

@@ -94,51 +94,56 @@ def main():
 		if ret == True and dir_study != '':
 			data_provider = db_conf['data_provider']
 			database_type = db_conf['database_type']
+			database_name = database_type.upper()
+			schema = db_conf['target_schema']
+			
 			if database_type[:3].upper() == 'HES':
-				database_type = 'hes'
+				database_name = 'HES'
+				database_type = 'linkage'
+				schema = db_conf['linkage_schema']
 			elif database_type[:5].upper() == 'NCRAS':
-				database_type = 'ncras'
-			linkage_schema = db_conf['linkage_schema']
+				database_name = 'NCRAS'
+				database_type = 'linkage'
+				schema = db_conf['linkage_schema']
 			dir_sql = os.getcwd() + '\\sql_scripts\\'
 			dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
 			if not os.path.exists(dir_sql_processed):
 				os.makedirs(dir_sql_processed)
 			dir_lookup = db_conf['dir_lookup'] + "\\"
 			dir_lookup_processed = db_conf['dir_lookup'] + db_conf['dir_processed']
-			if not os.path.exists(dir_lookup_processed):
-				os.makedirs(dir_lookup_processed)
+#			if not os.path.exists(dir_lookup_processed):
+#				os.makedirs(dir_lookup_processed)
 			fname = dir_sql + '2a_' + database_type + '_lookup_drop.sql'
 			if os.path.isfile(fname) == False:
-				print('No lookup files to process for ' + database_type.upper() + ' dataset')
+				print('No lookup files to process for ' + database_name + ' dataset')
 			else:
 # ---------------------------------------------------------
 # Drop LOOKUP tables - Parallel execution of queries in the file - Ask the user for DROP confirmation
 # ---------------------------------------------------------
-				qa = input('Are you sure you want to DROP all the ' + database_type.upper() + ' LOOKUP tables (y/n):') 
+				qa = input('Are you sure you want to DROP all the ' + database_name + ' LOOKUP tables (y/n):') 
 				while qa.lower() not in ['y', 'n', 'yes', 'no']:
-					qa = input('I did not understand that. Are you sure you want to DROP all the ' + database_type.upper() + ' LOOKUP tables (y/n):') 
+					qa = input('I did not understand that. Are you sure you want to DROP all the ' + database_name + ' LOOKUP tables (y/n):') 
 				if qa.lower() in ['y', 'yes']:
 					fname = dir_sql + '2a_' + database_type + '_lookup_drop.sql'
 					print('Calling ' + fname + ' ...')
-					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
 # ---------------------------------------------------------
 # Create LOOKUP tables - Parallel execution of queries in the file - Ask the user for CREATE/LOAD confirmation
 # ---------------------------------------------------------
 				if ret == True:
-					qa = input('Are you sure you want to CREATE/LOAD all the ' + database_type.upper() + ' LOOKUP tables (y/n):') 
+					qa = input('Are you sure you want to CREATE/LOAD all the ' + database_name + ' LOOKUP tables (y/n):') 
 					while qa.lower() not in ['y', 'n', 'yes', 'no']:
-						qa = input('I did not understand that. Are you sure you want to CREATE/LOAD all the ' + database_type.upper() + ' LOOKUP tables (y/n):') 
+						qa = input('I did not understand that. Are you sure you want to CREATE/LOAD all the ' + database_name + ' LOOKUP tables (y/n):') 
 					if qa.lower() in ['y', 'yes']:
 						fname = dir_sql + '2b_' + database_type + '_lookup_create.sql'
 						print('Calling ' + fname + ' ...')
-						ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+						ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
 # ---------------------------------------------------------
 # Load normal LOOKUP tables - Parallel execution
 # ---------------------------------------------------------
 						if ret == True:
 							tbl_lookup = 'tbl_' + database_type + '_lookup'
 							tbl_lookup_list =  [tbl for tbl in db_conf[tbl_lookup]]
-							print(tbl_lookup_list)
 							if 'ukb' == data_provider:
 								file_lookup_list = [[dir_lookup + '*' + tbl.replace("lookup", "coding") + '*.tsv'] for tbl in tbl_lookup_list]
 							else:
@@ -146,7 +151,7 @@ def main():
 							print(file_lookup_list)
 							if not os.path.exists(dir_lookup_processed):
 								os.makedirs(dir_lookup_processed)
-							ret = mapping_util.load_files_parallel(db_conf, linkage_schema, tbl_lookup_list, file_lookup_list, dir_lookup_processed)
+							ret = mapping_util.load_files_parallel(db_conf, schema, tbl_lookup_list, file_lookup_list, dir_lookup_processed)
 # ---------------------------------------------------------
 # Load special LOOKUP tables - Sequential execution
 # ---------------------------------------------------------
