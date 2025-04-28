@@ -83,7 +83,7 @@ select
 	GREATEST(cte2.min_date, t3.start) as observation_period_start_date,  
 	LEAST(cte2.max_date,t3.end) as observation_period_end_date,
 	32880
-from cte2, {SOURCE_SCHEMA}.linkage_coverage as t3 
+from cte2, {LINKAGE_SCHEMA}.linkage_coverage as t3 
 where t3.data_source = 'ncras_cr'; 
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.observation_period_seq;

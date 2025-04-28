@@ -75,7 +75,7 @@ select
 	GREATEST(cte.min_date, t3.start) as observation_period_start_date,  
 	LEAST(cte.max_date,t3.end) as observation_period_end_date,
 	32880
-from cte, {SOURCE_SCHEMA}.linkage_coverage as t3 
+from cte, {LINKAGE_SCHEMA}.linkage_coverage as t3 
 where t3.data_source = 'hes_ae'; 
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.observation_period_seq;

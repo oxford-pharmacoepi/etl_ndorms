@@ -15,7 +15,7 @@ INSERT INTO {SOURCE_NOK_SCHEMA}.tumour(
 
 	select t1.* 
 	from {SOURCE_SCHEMA}.tumour as t1
-	join {SOURCE_SCHEMA}.linkage_coverage as t2 on t2.data_source = 'ncras_cr'	
+	join {LINKAGE_SCHEMA}.linkage_coverage as t2 on t2.data_source = 'ncras_cr'	
 	where t1.diagnosisdatebest < t2.start or t1.diagnosisdatebest > t2.end		-- Eliminate tumour out of linkage_coverage period
 );
 
@@ -65,7 +65,7 @@ INSERT INTO {SOURCE_NOK_SCHEMA}.treatment(
 
 	select t1.* 
 	from {SOURCE_SCHEMA}.treatment as t1
-	join {SOURCE_SCHEMA}.linkage_coverage as t2 on t2.data_source = 'ncras_cr'
+	join {LINKAGE_SCHEMA}.linkage_coverage as t2 on t2.data_source = 'ncras_cr'
 	where t1.eventdate < t2.start or t1.eventdate > t2.end						-- Eliminate treatment out of linkage_coverage period
 	
 	UNION
