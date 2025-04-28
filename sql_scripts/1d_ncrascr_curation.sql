@@ -8,7 +8,7 @@ CREATE TABLE {SOURCE_NOK_SCHEMA}.treatment (LIKE {SOURCE_SCHEMA}.treatment) TABL
 INSERT INTO {SOURCE_NOK_SCHEMA}.tumour(
 	select t1.* 
 	from {SOURCE_SCHEMA}.tumour as t1
-	left join {TARGET_SCHEMA_TO_LINK}.person as t2 on t1.e_patid = t2.person_id
+	left join {SOURCE_NOK_SCHEMA_TO_LINK}.person as t2 on t1.e_patid = t2.person_id
 	where t2.person_id is null													-- Eliminated by patients not exist in {target_to_link}.person
 
 	UNION
@@ -58,7 +58,7 @@ With cte as(
 INSERT INTO {SOURCE_NOK_SCHEMA}.treatment(
 	select t1.* 
 	from {SOURCE_SCHEMA}.treatment as t1
-	left join {TARGET_SCHEMA_TO_LINK}.person as t2 on t1.e_patid = t2.person_id
+	left join {SOURCE_NOK_SCHEMA_TO_LINK}.person as t2 on t1.e_patid = t2.person_id
 	where t2.person_id is null													-- Eliminated by patients not exist in {target_to_link}.person
 
 	UNION

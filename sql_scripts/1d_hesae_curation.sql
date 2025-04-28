@@ -8,7 +8,7 @@ WITH cte1 as (
 	SELECT patid FROM {SOURCE_SCHEMA}.hesae_patient
 	WHERE match_rank in (3,4,5)
 	UNION DISTINCT
-	SELECT patid from source_nok.patient
+	SELECT patid from {SOURCE_NOK_SCHEMA_TO_LINK}.patient
 )
 INSERT INTO {SOURCE_NOK_SCHEMA}.hesae_patient
 SELECT t1.* 
