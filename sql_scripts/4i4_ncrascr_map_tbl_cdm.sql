@@ -20,7 +20,7 @@ cte1 as (
 		visit_occurrence_id,
 		visit_detail_id,
 		source_value as condition_source_value,
-		source_concept_id as condition_source_concept_id,
+		CASE WHEN source_concept_id = 0 THEN null ELSE source_concept_id END as condition_source_concept_id,
 		NULL as condition_status_source_value
 	from cte0, {CHUNK_SCHEMA}.stem_{CHUNK_ID}
 	where domain_id = 'Condition'
@@ -60,7 +60,7 @@ cte2 as (
 		visit_occurrence_id,
 		visit_detail_id,
 		source_value as drug_source_value,
-		source_concept_id as drug_source_concept_id,
+		CASE WHEN source_concept_id = 0 THEN null ELSE source_concept_id END as drug_source_concept_id,
 		route_source_value,
 		dose_unit_source_value
 	from cte0, {CHUNK_SCHEMA}.stem_{CHUNK_ID}
@@ -96,7 +96,7 @@ cte4 as (
 		visit_occurrence_id,
 		visit_detail_id,
 		source_value as device_source_value,
-		source_concept_id as device_source_concept_id,
+		CASE WHEN source_concept_id = 0 THEN null ELSE source_concept_id END as device_source_concept_id,
 		unit_concept_id,  
 		unit_source_value, 
 		unit_source_concept_id
@@ -132,7 +132,7 @@ cte5 as (
 		visit_occurrence_id,
 		visit_detail_id,
 		source_value as procedure_source_value,
-		source_concept_id as procedure_source_concept_id,
+		CASE WHEN source_concept_id = 0 THEN null ELSE source_concept_id END as procedure_source_concept_id,
 		modifier_source_value
 	from cte0, {CHUNK_SCHEMA}.stem_{CHUNK_ID}
 	where domain_id = 'Procedure'
@@ -169,7 +169,7 @@ with cte0 AS (
 		t1.visit_occurrence_id,
 		t1.visit_detail_id,
 		t1.source_value as measurement_source_value,
-		t1.source_concept_id as measurement_source_concept_id,	
+		CASE WHEN t1.source_concept_id = 0 THEN null ELSE t1.source_concept_id END as measurement_source_concept_id,	
 		t1.unit_source_value, 
 		CASE
 			WHEN t1.unit_source_value is not null THEN COALESCE(t2.source_concept_id, 0)
@@ -344,7 +344,7 @@ with cte0 AS (
 		t1.visit_occurrence_id,
 		t1.visit_detail_id,
 		t1.source_value as observation_source_value,
-		t1.source_concept_id as observation_source_concept_id,
+		CASE WHEN t1.source_concept_id = 0 THEN null ELSE t1.source_concept_id END as observation_source_concept_id,
 		t1.unit_source_value,
 		t1.qualifier_source_value,
 		CASE 

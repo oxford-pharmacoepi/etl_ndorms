@@ -24,7 +24,7 @@ cte1 as (
 		s.visit_occurrence_id,
 		s.visit_detail_id,
 		s.source_value as condition_source_value,
-		s.source_concept_id as condition_source_concept_id,
+		CASE WHEN s.source_concept_id = 0 THEN null ELSE s.source_concept_id END as condition_source_concept_id,
 		s.disease_status_source_value as condition_status_source_value
 	from cte0, {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
 	inner join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id
@@ -73,7 +73,7 @@ cte2 as (
 		s.visit_occurrence_id,
 		s.visit_detail_id,
 		s.source_value as drug_source_value,
-		s.source_concept_id as drug_source_concept_id,
+		CASE WHEN s.source_concept_id = 0 THEN null ELSE s.source_concept_id END as drug_source_concept_id,
 		s.route_source_value,
 		s.dose_unit_source_value
 from cte0, {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
@@ -113,7 +113,7 @@ cte4 as (
 		s.visit_occurrence_id,
 		s.visit_detail_id,
 		s.source_value as device_source_value,
-		s.source_concept_id as device_source_concept_id
+		CASE WHEN s.source_concept_id = 0 THEN null ELSE s.source_concept_id END as device_source_concept_id
 	from cte0, {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
 	inner join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id
 	where s.domain_id = 'Device'
@@ -156,7 +156,7 @@ cte5 as (
 		s.visit_occurrence_id,
 		s.visit_detail_id,
 		s.source_value as procedure_source_value,
-		s.source_concept_id as procedure_source_concept_id,
+		CASE WHEN s.source_concept_id = 0 THEN null ELSE s.source_concept_id END as procedure_source_concept_id,
 		s.modifier_source_value
 	from cte0, {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
 	inner join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id
@@ -200,7 +200,7 @@ with cte0 AS (
 		s.visit_occurrence_id,
 		s.visit_detail_id,
 		s.source_value as measurement_source_value,
-		s.source_concept_id as measurement_source_concept_id,
+		CASE WHEN s.source_concept_id = 0 THEN null ELSE s.source_concept_id END as measurement_source_concept_id,
 		s.unit_source_value,
 		s.value_source_value
 	from cte0, {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
@@ -247,7 +247,7 @@ with cte0 AS (
 		s.visit_occurrence_id,
 		s.visit_detail_id,
 		s.source_value as observation_source_value,
-		s.source_concept_id as observation_source_concept_id,
+		CASE WHEN s.source_concept_id = 0 THEN null ELSE s.source_concept_id END as observation_source_concept_id,
 		s.unit_source_value,
 		s.qualifier_source_value
 	from cte0, {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
