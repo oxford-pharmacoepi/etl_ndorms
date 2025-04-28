@@ -577,7 +577,7 @@ def execute_sql_file_parallel(db_conf, fname, debug = True, move_files = True):
 	return(ret)	
 
 # ---------------------------------------------------------
-def execute_sql_files_parallel(db_conf, fname_list, debug = True): 
+def execute_sql_files_parallel(db_conf, fname_list, debug = True, move_files = True): 
 # The sql files are executed in parallel
 # ---------------------------------------------------------
 	ret = True
@@ -587,7 +587,7 @@ def execute_sql_files_parallel(db_conf, fname_list, debug = True):
 		fname_list = [fname for fname in fname_list if os.path.isfile(fname)]
 		if len(fname_list) > 0:
 			with ProcessPoolExecutor(int(db_conf['max_workers'])) as executor:
-				futures = [executor.submit(execute_multiple_queries, db_conf, fname, None, None, True, debug) for fname in fname_list]
+				futures = [executor.submit(execute_multiple_queries, db_conf, fname, None, None, True, debug, move_files) for fname in fname_list]
 				for future in as_completed(futures):
 					if future.result() == False:
 						ret = False
