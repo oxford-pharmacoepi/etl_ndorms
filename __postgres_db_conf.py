@@ -43,6 +43,6 @@ db_conf = dict({
 	'tbl_ukb_gp': ['baseline', 'death', 'gp_clinical', 'gp_registrations', 'gp_scripts'],
 	'tbl_ukb_hesin': ['baseline', 'death', 'hesin', 'hesin_critical', 'hesin_delivery', 'hesin_diag', 'hesin_maternity', 'hesin_oper', 'hesin_psych'],
 	'tbl_cprd': ['denominators', 'documentation', 'lookups', 'reference'],
-	'tbl_cdm': ['care_site', 'condition_era', 'condition_occurrence', 'death', 'device_exposure', 'dose_era', 'drug_era', 'drug_exposure', 'location', 'measurement', 'observation', 'observation_period', 'person', 'procedure_occurrence', 'provider', 'visit_detail', 'visit_occurrence', 'specimen'],
+	'tbl_cdm': ['care_site', 'condition_era', 'condition_occurrence', 'death', 'device_exposure', 'dose_era', 'drug_era', 'drug_exposure', 'location', 'measurement', 'observation', 'observation_period', 'person', 'procedure_occurrence', 'provider', 'specimen', 'visit_detail', 'visit_occurrence'],
 	'tbl_cdm_voc': ['drug_strength', 'concept', 'concept_relationship', 'concept_ancestor', 'concept_synonym', 'vocabulary', 'relationship', 'concept_class', 'domain']
 })
