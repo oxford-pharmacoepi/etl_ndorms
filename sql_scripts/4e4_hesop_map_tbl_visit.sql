@@ -1,10 +1,10 @@
 --------------------------------
--- VISIT_OCCURRENCE FROM hesop_appointment, hesop_clinical
+-- VISIT_OCCURRENCE FROM hesop_appointment, hesop_clinical, hesop_operation
 --------------------------------
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_vo;
 CREATE SEQUENCE {TARGET_SCHEMA}.sequence_vo INCREMENT 1;
 SELECT setval('{TARGET_SCHEMA}.sequence_vo', 
-			(SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'visit_occurrence'));
+			(SELECT next_id from {TARGET_SCHEMA}._next_ids WHERE lower(tbl_name) = 'visit_occurrence'));
 
 with cte1 AS (
 	SELECT person_id, observation_period_start_date, observation_period_end_date
@@ -15,6 +15,11 @@ cte2 AS (
 	CASE WHEN t2.tretspef <> '&' THEN t2.tretspef ELSE CASE WHEN t2.mainspef <> '&' THEN t2.mainspef ELSE Null END END as specialty
 	FROM cte1 as t1
 	INNER JOIN {SOURCE_SCHEMA}.hesop_clinical AS t2 on t1.person_id = t2.patid
+	UNION DISTINCT
+	select t1.person_id, t2.attendkey,
+	CASE WHEN t2.tretspef <> '&' THEN t2.tretspef ELSE CASE WHEN t2.mainspef <> '&' THEN t2.mainspef ELSE Null END END as specialty
+	FROM cte1 as t1
+	INNER JOIN {SOURCE_SCHEMA}.hesop_operation AS t2 on t1.person_id = t2.patid
 ),	
 cte3 AS (	
 	select t1.person_id, t1.attendkey, t3.provider_id
@@ -42,7 +47,7 @@ cte4 AS (
 	NULL::varchar AS discharged_to_source_value,
 	NULL::int AS discharged_to_concept_id
 	FROM {SOURCE_SCHEMA}.hesop_appointment AS t1
-	INNER JOIN cte1 as t2 ON t1.person_id = t2.person_id
+	INNER JOIN cte1 as t2 ON t1.patid = t2.person_id
 	INNER JOIN cte3 as t3 ON t1.patid = t3.person_id AND t1.attendkey = t3.attendkey
 	WHERE t1.attended in (5, 6)     -- Seen
 	AND t1.apptdate >= t2.observation_period_start_date
@@ -94,7 +99,7 @@ CREATE INDEX idx_visit_source_value ON {TARGET_SCHEMA}.visit_occurrence (visit_s
 --------------------------------
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_vd;
 CREATE SEQUENCE {TARGET_SCHEMA}.sequence_vd INCREMENT 1; 
-SELECT setval('{TARGET_SCHEMA}.sequence_vd', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'visit_detail'));
+SELECT setval('{TARGET_SCHEMA}.sequence_vd', (SELECT next_id from {TARGET_SCHEMA}._next_ids WHERE lower(tbl_name) = 'visit_detail'));
 
 with cte1 AS (
 	SELECT person_id, observation_period_start_date, observation_period_end_date
