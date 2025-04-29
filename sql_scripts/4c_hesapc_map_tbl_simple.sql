@@ -54,7 +54,7 @@ CLUSTER {TARGET_SCHEMA}.person USING xpk_person;
 --------------------------------
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_pro;
 CREATE SEQUENCE {TARGET_SCHEMA}.sequence_pro INCREMENT 1;
-SELECT setval('{TARGET_SCHEMA}.sequence_pro', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'provider'));
+SELECT setval('{TARGET_SCHEMA}.sequence_pro', (SELECT next_id from {TARGET_SCHEMA}._next_ids WHERE lower(tbl_name) = 'provider'));
 
 -- We have duplicated people with more than 1 speciality to save that information and use it in episodes
 with cte1 AS (

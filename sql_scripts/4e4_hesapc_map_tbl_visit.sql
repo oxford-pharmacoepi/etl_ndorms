@@ -3,7 +3,7 @@
 --------------------------------
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_vo;
 CREATE SEQUENCE {TARGET_SCHEMA}.sequence_vo INCREMENT 1;
-SELECT setval('{TARGET_SCHEMA}.sequence_vo', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'visit_occurrence'));
+SELECT setval('{TARGET_SCHEMA}.sequence_vo', (SELECT next_id from {TARGET_SCHEMA}._next_ids WHERE lower(tbl_name) = 'visit_occurrence'));
 
 with cte1 AS (
 	SELECT person_id, observation_period_start_date, observation_period_end_date
@@ -139,7 +139,7 @@ CREATE INDEX idx_visit_source_value ON {TARGET_SCHEMA}.visit_occurrence (visit_s
 --------------------------------
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_vd;
 CREATE SEQUENCE {TARGET_SCHEMA}.sequence_vd INCREMENT 1; 
-SELECT setval('{TARGET_SCHEMA}.sequence_vd', (SELECT max_id from {TARGET_SCHEMA_TO_LINK}._max_ids WHERE lower(tbl_name) = 'visit_detail'));
+SELECT setval('{TARGET_SCHEMA}.sequence_vd', (SELECT next_id from {TARGET_SCHEMA}._next_ids WHERE lower(tbl_name) = 'visit_detail'));
 
 with cte1 AS (
 	SELECT person_id, observation_period_start_date, observation_period_end_date
