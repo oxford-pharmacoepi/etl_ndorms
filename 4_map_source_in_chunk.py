@@ -103,7 +103,7 @@ def main():
 			if ret == True:
 				if 'target_schema_to_link' in db_conf and db_conf['target_schema_to_link'] != db_conf['target_schema']:
 					target_schema_to_link = db_conf['target_schema_to_link']
-					qa = input('Do you want to CREATE/RECREATE the _max_ids table in ' + target_schema_to_link + '? (y/n):').lower() 
+					qa = input('Do you want to CREATE/RECREATE ' + target_schema_to_link.upper() + '._max_ids and ' + target_schema.upper() + '._next_ids? (y/n):').lower() 
 					while qa not in ['y', 'n', 'yes', 'no']:
 						qa = input('I did not understand that. Do you want to CREATE/RECREATE the _max_ids table in ' + db_conf['target_schema_to_link'] + '? (y/n):').lower()
 					if qa in ['y', 'yes']:
@@ -120,14 +120,34 @@ def main():
 						if ret == True:
 							query1 = 'with cte as (SELECT MAX(max_id) as max_id FROM ' + tbl_max_ids + ' WHERE tbl_name in \
 									(\'condition_occurrence\', \'device_exposure\', \'drug_exposure\', \'measurement\', \
-									\'observation\', \'procedure_occurrence\', \'visit_detail\', \'visit_occurrence\')) \
+									\'observation\', \'procedure_occurrence\', \'specimen\', \'visit_detail\', \'visit_occurrence\')) \
 									INSERT INTO ' + tbl_max_ids + ' (tbl_name, max_id) \
 									SELECT \'max_of_all\', max_id \
 									FROM cte';
 							cursor1.execute(query1)
 							query1 = 'ALTER TABLE ' + tbl_max_ids + ' ADD CONSTRAINT pk_max_ids PRIMARY KEY (tbl_name);'
 							cursor1.execute(query1)
-							msg = 'Finished calculating max_ids in ' + target_schema_to_link.upper() + ' data in ' + mapping_util.calc_time(time.time() - time1) + '\n'
+# Update _max_ids without records if it is not a primary dataset
+							if 'gold' not in target_schema_to_link and 'aurum' not in target_schema_to_link:
+								tbl_next_ids = target_schema_to_link + '._next_ids'
+								query1 = 'UPDATE ' + tbl_max_ids + ' as t1 \
+										SET max_id = t2.next_id - 1 \
+										from ' + tbl_next_ids + ' as t2 \
+										where t1.tbl_name = t2.tbl_name \
+										and t1.max_id = 0';
+								cursor1.execute(query1)
+# Create table target_schema._next_ids
+							tbl_next_ids = target_schema + '._next_ids'
+							query1 = 'DROP TABLE IF EXISTS ' + tbl_next_ids + ' CASCADE';
+							cursor1.execute(query1)
+							query1 = 'CREATE TABLE ' + tbl_next_ids + ' \
+									(tbl_name varchar(25) NOT NULL, \
+									next_id bigint DEFAULT 0) TABLESPACE pg_default;'
+							cursor1.execute(query1)
+							query1 = 'INSERT INTO ' + tbl_next_ids + ' SELECT tbl_name, COALESCE(max_id+1,0) FROM ' + tbl_max_ids;
+							cursor1.execute(query1)
+							time1 = time.time()
+							msg = 'Finished calculating max_ids in ' + target_schema_to_link.upper() + ' and next_ids in ' + target_schema.upper() + ' in ' + mapping_util.calc_time(time.time() - time1) + '\n'
 							print(msg)
 # ---------------------------------------------------------
 # Tables to load: PERSON, OBSERVATION_PERIOD, etc.
