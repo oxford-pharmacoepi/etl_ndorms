@@ -202,17 +202,19 @@ FROM cteDrugEraEnds
 GROUP BY person_id, drug_concept_id, drug_era_end_date
 ORDER BY person_id, drug_concept_id) as t;
 
+ALTER TABLE {TARGET_SCHEMA}.drug_era SET TABLESPACE pg_default;
+
 DROP TABLE IF EXISTS {TARGET_SCHEMA}.cteFinalTarget;
 
 --------------------------------
 -- Add PK / IDX / FK to DRUG_ERA
 --------------------------------
-ALTER TABLE {TARGET_SCHEMA}.drug_era ADD CONSTRAINT xpk_drug_era PRIMARY KEY (drug_era_id);
+ALTER TABLE {TARGET_SCHEMA}.drug_era ADD CONSTRAINT xpk_drug_era PRIMARY KEY (drug_era_id) USING INDEX TABLESPACE pg_default;;
 
-CREATE INDEX idx_drug_era_person_id  ON {TARGET_SCHEMA}.drug_era (person_id ASC);
+CREATE INDEX idx_drug_era_person_id  ON {TARGET_SCHEMA}.drug_era (person_id ASC) TABLESPACE pg_default;
 CLUSTER {TARGET_SCHEMA}.drug_era USING idx_drug_era_person_id;
 
-CREATE INDEX idx_drug_era_concept_id ON {TARGET_SCHEMA}.drug_era (drug_concept_id ASC);
+CREATE INDEX idx_drug_era_concept_id ON {TARGET_SCHEMA}.drug_era (drug_concept_id ASC) TABLESPACE pg_default;
 
 ALTER TABLE {TARGET_SCHEMA}.drug_era ADD CONSTRAINT fpk_drug_era_person FOREIGN KEY (person_id) REFERENCES {TARGET_SCHEMA}.person (person_id);
 

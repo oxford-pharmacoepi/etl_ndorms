@@ -97,15 +97,16 @@ INTO {TARGET_SCHEMA}.condition_era
 	GROUP BY person_id, condition_concept_id, era_end_date
 	ORDER BY person_id, condition_concept_id) as t;
 
+ALTER TABLE {TARGET_SCHEMA}.condition_era SET TABLESPACE pg_default;
 -----------------------
 -- Add PK / IDX / FK
 -----------------------
-ALTER TABLE {TARGET_SCHEMA}.condition_era ADD CONSTRAINT xpk_condition_era PRIMARY KEY (condition_era_id);
+ALTER TABLE {TARGET_SCHEMA}.condition_era ADD CONSTRAINT xpk_condition_era PRIMARY KEY (condition_era_id) USING INDEX TABLESPACE pg_default;
 
-CREATE INDEX idx_condition_era_person_id  ON {TARGET_SCHEMA}.condition_era (person_id ASC);
+CREATE INDEX idx_condition_era_person_id  ON {TARGET_SCHEMA}.condition_era (person_id ASC) TABLESPACE pg_default;
 CLUSTER {TARGET_SCHEMA}.condition_era  USING idx_condition_era_person_id;
 
-CREATE INDEX idx_condition_era_concept_id ON {TARGET_SCHEMA}.condition_era (condition_concept_id ASC);
+CREATE INDEX idx_condition_era_concept_id ON {TARGET_SCHEMA}.condition_era (condition_concept_id ASC) TABLESPACE pg_default;
 
 ALTER TABLE {TARGET_SCHEMA}.condition_era ADD CONSTRAINT fpk_condition_era_person FOREIGN KEY (person_id) REFERENCES {TARGET_SCHEMA}.person (person_id);
 

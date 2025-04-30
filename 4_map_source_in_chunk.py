@@ -125,7 +125,7 @@ def main():
 									SELECT \'max_of_all\', max_id \
 									FROM cte';
 							cursor1.execute(query1)
-							query1 = 'ALTER TABLE ' + tbl_max_ids + ' ADD CONSTRAINT pk_max_ids PRIMARY KEY (tbl_name);'
+							query1 = 'ALTER TABLE ' + tbl_max_ids + ' ADD CONSTRAINT pk_max_ids PRIMARY KEY (tbl_name) USING INDEX TABLESPACE pg_default;'
 							cursor1.execute(query1)
 # Update _max_ids without records if it is not a primary dataset
 							if 'gold' not in target_schema_to_link and 'aurum' not in target_schema_to_link:
