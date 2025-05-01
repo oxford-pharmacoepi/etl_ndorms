@@ -15,13 +15,14 @@ def main():
 	try:
 		(ret, dir_study, db_conf, debug) = mapping_util.get_parameters()
 		if ret == True and dir_study != '':
+			database = db_conf['database']
 			database_type = db_conf['database_type']
 			target_schema = db_conf['target_schema']
 			dir_sql = os.getcwd() + "\\sql_scripts\\"
 # ---------------------------------------------------------
 # Count records per table
 # ---------------------------------------------------------
-			qa = input('Are you sure you want to build the _RECORDS table (y/n):') 
+			qa = input('Are you sure you want to build the ' + database.upper() + '.' + target_schema.upper() + '._RECORDS table (y/n):') 
 			while qa.lower() not in ['y', 'n', 'yes', 'no']:
 				qa = input('I did not understand that. Are you sure you want to build the _RECORDS table (y/n):') 
 			if qa.lower() in ['y', 'yes']:
@@ -34,7 +35,7 @@ def main():
 					tbl_list_count.extend([target_schema + "." + tbl for tbl in db_conf['tbl_cdm_voc']])
 					ret = mapping_util.get_table_count_parallel(db_conf, tbl_list_count, target_schema + '._records')
 					if ret == True:
-						msg = 'Finished counting on ' + database_type.upper() + ' data in ' + mapping_util.calc_time(time.time() - time1) + '\n'
+						msg = 'Finished counting on ' + database.upper() + '.' + target_schema.upper() + ' data in ' + mapping_util.calc_time(time.time() - time1) + '\n'
 						print(msg)
 	except:
 		print(str(sys.exc_info()[1]))
