@@ -120,7 +120,8 @@ CREATE SEQUENCE {TARGET_SCHEMA}.observation_period_seq;
 with cte as ( 
 	select t1.patid, MIN(t1.apptdate) as min_date, MAX(t1.apptdate) as max_date 
 	from {SOURCE_SCHEMA}.hesop_appointment as t1 
-	inner join {TARGET_SCHEMA}.person as t2 on t2.person_id = t1.patid 
+	inner join {TARGET_SCHEMA}.person as t2 on t2.person_id = t1.patid
+	WHERE t1.attended in (5, 6)     -- Seen
 	group by t1.patid 
 ) 
 INSERT INTO {TARGET_SCHEMA}.OBSERVATION_PERIOD
