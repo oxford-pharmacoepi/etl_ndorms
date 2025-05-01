@@ -29,7 +29,7 @@ WITH ctePreDrugTarget(drug_exposure_id, person_id, ingredient_concept_id, drug_e
 	 * For now, we are filtering those out as well, but this is a data quality issue that we are trying to solve.
 	 */
 	AND d.drug_concept_id != 0
-	AND d.days_supply >= 0
+	AND coalesce(d.days_supply,0) >= 0
 	AND position('vaccine' IN lower(c.concept_name)) = 0 -- do not add vaccines into drug_era
 )
 
