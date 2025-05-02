@@ -19,8 +19,8 @@ Use the hes_hospital & hes_episodes tables to populate the observation_period ta
 
 | Destination Field | Source field | Logic | Comment field |
 | --- | --- | :---: | --- |
-| observation_period_id |  | nextval('public.observation_period_seq') AS observation_period_id |  Autogenerate|
+| observation_period_id |  |  |  Autogenerate|
 | person_id | patid| | |
-| observation_period_start_date | admidate,hes_episodes.epistart | Retrieve the earliest date among those dates like this: LEAST(MIN(admidate), MIN(hes_episodes.epistart)) AS min_date| |
-| observation_period_end_date | discharged,hes_episodes.epiend | Retrieve the latest date among the date fields like this: GREATEST(MAX(discharged), MAX(hes_episodes.epiend)) AS max_date | |
-| period_type_concept_id | | 32880 | |
+| observation_period_start_date | hes_hospital.admidate,<br>hes_episodes.epistart | use the earliest of (hes_hospital.admidate, hes_episodes.epistart) that is not null.| |
+| observation_period_end_date | hes_hospital.discharged,<br>hes_episodes.epiend | use the latest of (hes_hospital.discharged, hes_episodes.epiend) that is not null | |
+| period_type_concept_id | | [32880 - Standard algorithm](https://athena.ohdsi.org/search-terms/terms/32880)| | 
