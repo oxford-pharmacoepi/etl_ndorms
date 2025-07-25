@@ -21,7 +21,39 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.baseline (
 	p22189			NUMERIC, 	--Townsend deprivation index at recruitment
 	p26410			NUMERIC, 	--Index of Multiple Deprivation (England)
 	p26426			NUMERIC, 	--Index of Multiple Deprivation (Wales)
-	p26427			NUMERIC 	--Index of Multiple Deprivation (Scotland)
+	p26427			NUMERIC, 	--Index of Multiple Deprivation (Scotland)
+	p20116 			NUMERIC,	--Smoking status
+    p1558 			NUMERIC,	--Alcohol intake frequency.
+    p30620 			NUMERIC,	--Alanine aminotransferase
+    p30600 			NUMERIC,	--Albumin
+    p30610 			NUMERIC,	--Alkaline phosphatase
+    p30630 			NUMERIC,	--Apolipoprotein A
+    p30640 			NUMERIC,	--Apolipoprotein B
+    p30650 			NUMERIC,	--Aspartate aminotransferase
+    p30710 			NUMERIC,	--C-reactive protein
+    p30680 			NUMERIC,	--Calcium
+    p30690 			NUMERIC,	--Cholesterol
+    p30700 			NUMERIC,	--Creatinine
+    p30720 			NUMERIC,	--Cystatin C
+    p30660 			NUMERIC,	--Direct bilirubin	
+    p30730 			NUMERIC,	--Gamma glutamyltransferase
+    p30740 			NUMERIC,	--Glucose
+    p30750 			NUMERIC,	--Glycated haemoglobin (HbA1c)
+    p30760 			NUMERIC,	--HDL cholesterol
+    p30770 			NUMERIC,	--IGF-1
+    p30780 			NUMERIC,	--LDL direct
+    p30790 			NUMERIC,	--Lipoprotein A	
+    p30800 			NUMERIC,	--Oestradiol
+    p30810 			NUMERIC,	--Phosphate
+    p30820 			NUMERIC,	--Rheumatoid factor
+    p30830 			NUMERIC,	--SHBG
+    p30850 			NUMERIC,	--Testosterone
+    p30840 			NUMERIC,	--Total bilirubin
+    p30860 			NUMERIC,	--Total protein
+    p30870 			NUMERIC,	--Triglycerides
+    p30880 			NUMERIC,	--Urate
+    p30670 			NUMERIC,	--Urea
+    p30890 			NUMERIC		--Vitamin D
 )TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.death (
