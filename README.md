@@ -1,8 +1,8 @@
-How to run the ETL for OMOP CDM 5.3 for Windows in Python (v. 3.2 onwards) using Postgresql
+How to run the ETL for OMOP CDM 5.4 for Windows in Python (v. 3.2 onwards) using Postgresql
 
 First time setup:
 1. If you don't already have it, download the latest version of python 3.x from https://www.python.org/downloads/ and add the path to the directory containing the python executables to your environment variables.
-2. Open a new command prompt as ADMINSTRATOR and navigate to the root of the aurum_etl module.
+2. Open a new command prompt as ADMINSTRATOR and navigate to the root of the etl_ndorms module.
 3. Download the python-postgres client with `pip install psycopg2`.
 4. Download the python sqlparse with `pip install sqlparse`.
 5. If you don't already have it, request an EPI KEY to use with the ATHENA vocabularies from: https://uts.nlm.nih.gov/uts/umls/home
