@@ -50,9 +50,10 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.tumour (
 	gleason_combined		smallint,
 	dco						varchar(5),
 	vitalstatus				varchar(15),
-	vitalstatusdate			date)
-	TABLESPACE pg_default;
-	
+	vitalstatusdate			date
+)
+TABLESPACE pg_default;
+
 --------------Creating treatment Table ---------------------------------------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.treatment (
 	treatment_id			bigserial,		--to allow for a PK
@@ -71,5 +72,71 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.treatment (
 	radiodesc				varchar(30),
 	lesionsize				NUMERIC,
 	chemo_all_drug			varchar(50),
-	chemo_drug_group		varchar(50))
-	TABLESPACE pg_default;
+	chemo_drug_group		varchar(50)
+)
+TABLESPACE pg_default;
+
+--------------Creating RTDS Table ---------------------------------------
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.rtds (
+	e_patid						bigint,
+	e_cr_patid					bigint,
+	e_cr_id						bigint,
+	attendid					bigint,
+	prescriptionid				bigint,
+	apptdate					date,
+	treatmentstartdate			date,
+	radiotherapydiagnosisicd	varchar(7),
+	radiotherapyintent			varchar(2),
+	rttreatmentregion			varchar(2),
+	rttreatmentanatomicalsite	varchar(30),
+	numberofteletherapyfields	smallint,
+	rtprescribeddose			double precision,
+	prescribedfractions			smallint,
+	rtactualdose				double precision,
+	actualfractions				smallint,
+	rttreatmentmodality			varchar(2),
+	radiotherapybeamtype		varchar(2),
+	radiotherapybeamenergy		double precision,
+	primaryprocedureopcs		varchar(4),
+	proceduredate				date
+)
+TABLESPACE pg_default;
+
+--------------Creating SACT Table ---------------------------------------
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.sact (
+	e_patid							bigint,
+	e_cr_patid						bigint,
+	e_cr_id							bigint,
+	pseudo_merged_tumour_id			bigint,
+	primary_diagnosis				varchar(7),
+	morphology_clean				varchar(7),
+	height_at_start_of_regimen		double precision,
+	weight_at_start_of_regimen		double precision,
+	intent_of_treatment				varchar(2),
+	adjunctive_therapy				smallint,
+	analysis_group					varchar(59),
+	benchmark_group					varchar(59),
+	perf_status_start_of_regimen	varchar(2),
+	perf_stat_start_of_reg_adult	varchar(2),
+	perf_stat_start_of_reg_child	varchar(2),
+	comorbidity_adjustment			varchar(1),
+	date_decision_to_treat			date,
+	start_date_of_regimen			date,
+	cycle_number					smallint,
+	start_date_of_cycle				date,
+	perf_stat_start_of_cycle_clean	varchar(1),
+	perf_stat_start_of_cycle_adult	varchar(1),
+	perf_stat_start_of_cycle_child	varchar(1),
+	weight_at_start_of_cycle		double precision,
+	drug_group						varchar(35),
+	actual_dose_per_administration	double precision,
+	admin_measure_per_actual_dose	varchar(2),
+	administration_route			varchar(2),
+	administration_date				date,
+	regimen_modification_dose_red	varchar(1),
+	regoutsum_cur_not_com_plan		varchar(1),
+	regoutsum_non_curat				varchar(1),
+	regoutsum_toxic					varchar(1),
+	regoutsum_cur_com_plan			varchar(1)
+)
+TABLESPACE pg_default;
