@@ -166,7 +166,7 @@ cte2 AS (
 	NULL::int AS discharged_to_concept_id,
 	NULL::int AS preceding_visit_detail_id,
 	NULL::int AS parent_visit_detail_id,
-	NULL::int as visit_occurrence_id,
+	NULL::int AS visit_occurrence_id,
 	t1.spno
 	FROM cte1 as t0 
 	INNER JOIN {SOURCE_SCHEMA}.hes_episodes AS t1 ON t1.patid = t0.person_id
@@ -214,7 +214,7 @@ cte4 AS (
 	INNER JOIN cte3 AS t2 ON t1.person_id = t2.person_id AND t1.visit_detail_source_value = t2.visit_detail_source_value
 ),
 --------------------------------
--- VISIT_DETAIL FROM hes_acp -- TABLE REMOVED
+-- VISIT_DETAIL FROM hes_acp -- TABLE REMOVED BY CPRD
 --------------------------------
 --cte5 AS (
 --	SELECT
