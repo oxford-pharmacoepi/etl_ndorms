@@ -54,6 +54,7 @@ with t as (
 	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map v
 		on s.source_concept_id = v.source_concept_id
 		and s.source_concept_id <> 0
+		and upper(v.source_vocabulary_id) in ('ICD10', 'OPCS4')
 )
 insert into {CHUNK_SCHEMA}.stem_{CHUNK_ID} (domain_id, person_id, visit_occurrence_id, visit_detail_id, provider_id, id, concept_id, source_value,
 										 source_concept_id, type_concept_id, start_date, end_date, start_time, days_supply, dose_unit_concept_id,

@@ -59,18 +59,21 @@ SELECT setval('{TARGET_SCHEMA}.sequence_pro', (SELECT next_id from {TARGET_SCHEM
 -- We have duplicated people with more than 1 speciality to save that information and use it in episodes
 with cte1 AS (
 	select distinct pconsult AS provider_source_value,
-	CASE WHEN tretspef <> '&' THEN tretspef ELSE mainspef END as specialty
+	CASE WHEN tretspef <> '&' and tretspef <> '000' THEN tretspef ELSE mainspef END as specialty
 	from {SOURCE_SCHEMA}.hes_episodes
-	WHERE pconsult <> '&'
-	AND (tretspef <> '&' OR mainspef <> '&')
+	WHERE (tretspef <> '&' and tretspef <> '000') OR mainspef <> '&'
 ),
 cte2 AS (
-	SELECT DISTINCT t2.target_concept_id AS specialty_concept_id, 
+	SELECT DISTINCT COALESCE(t2.target_concept_id, t3.target_concept_id) AS specialty_concept_id, 
 	t1.provider_source_value,
-	t2.source_code_description AS specialty_source_value
+	COALESCE(t2.source_code_description, t3.source_code_description, 
+	CASE WHEN specialty = '620' THEN 'Other than Maternity' ELSE specialty END) AS specialty_source_value,
+	t2.source_concept_id as specialty_source_concept_id
 	FROM cte1 as t1
-	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t2 on t1.specialty = t2.source_code 
-	and t2.source_vocabulary_id = 'HES_SPEC_STCM'
+	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t1.specialty = t2.source_code 
+	and t2.source_vocabulary_id = 'HES Specialty'
+	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t3 on t1.specialty = t3.source_code 
+	and t3.source_vocabulary_id = 'HES_SPEC_STCM' and t2.source_code is null
 )
 INSERT INTO {TARGET_SCHEMA}.PROVIDER (
 	provider_id,
@@ -98,10 +101,11 @@ SELECT
 	NULL::int AS gender_concept_id,
 	provider_source_value,
 	specialty_source_value,
-	NULL::int AS specialty_source_concept_id,
+	specialty_source_concept_id,
 	NULL AS gender_source_value,
 	NULL::int AS gender_source_concept_id
-FROM cte2;
+FROM cte2
+order by provider_source_value, specialty_source_value;
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_pro;
 

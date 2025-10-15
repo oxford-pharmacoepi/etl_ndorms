@@ -155,6 +155,8 @@ cte2 AS (
 	COALESCE(t1.epiend, t1.discharged, t1.epistart) AS visit_detail_end_datetime,
 	32818 AS visit_detail_type_concept_id,
 	NULL::int AS provider_id,
+	pconsult AS provider_source_value,
+	CASE WHEN tretspef <> '&' and tretspef <> '000' THEN tretspef ELSE CASE WHEN mainspef <> '&' THEN mainspef ELSE NULL END END as provider_specialty,
 	NULL::int AS care_site_id,
 	t1.epikey AS visit_detail_source_value,
 	NULL::int AS visit_detail_source_concept_id,
@@ -195,6 +197,8 @@ cte4 AS (
 	t2.visit_detail_end_datetime,
 	t1.visit_detail_type_concept_id,
 	t1.provider_id,
+	t1.provider_source_value,
+	t1.provider_specialty,
 	t1.care_site_id,
 	t1.visit_detail_source_value,
 	t1.visit_detail_source_concept_id,
@@ -255,6 +259,8 @@ cte6 AS (
 	END AS visit_detail_end_datetime,
 	32818 AS visit_detail_type_concept_id,
 	NULL::int AS provider_id,
+	t2.provider_source_value,
+	t2.provider_specialty,
 	NULL::int AS care_site_id,
 	epikey AS visit_detail_source_value,
 	NULL::int AS visit_detail_source_concept_id,
@@ -268,6 +274,7 @@ cte6 AS (
 	t1.spno
 	FROM cte1 as t0 
 	INNER JOIN {SOURCE_SCHEMA}.hes_ccare AS t1 ON t1.patid = t0.person_id
+	INNER JOIN cte2 AS t2 ON t1.patid = t2.person_id and t1.epikey = t2.visit_detail_source_value
 ),
 cte7 AS (
 	SELECT * FROM cte4
@@ -287,6 +294,8 @@ cte8 AS (
 	t1.visit_detail_end_datetime,
 	t1.visit_detail_type_concept_id,
 	t1.provider_id,
+	t1.provider_source_value,
+	t1.provider_specialty,
 	t1.care_site_id,
 	t1.visit_detail_source_value,
 	t1.visit_detail_source_concept_id,
@@ -311,14 +320,37 @@ cte9 AS (
 	WHERE t1.visit_detail_id > t2.visit_detail_id
 	GROUP BY t1.person_id, t1.visit_detail_id
 ),
-cte10 AS (
-	SELECT distinct t1.patid, t1.epikey, t2.provider_id
-	FROM cte1 as t0 
-	INNER JOIN {SOURCE_SCHEMA}.hes_episodes as t1 ON t1.patid = t0.person_id
-	INNER JOIN {TARGET_SCHEMA}.provider AS t2 ON t1.pconsult = t2.provider_source_value 
-	INNER JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t3 ON CASE WHEN t1.tretspef <> '&' THEN t1.tretspef ELSE CASE WHEN t1.mainspef <> '&' THEN t1.mainspef ELSE Null END END = t3.source_code 
+cte11 AS (
+	SELECT distinct t1.person_id, t1.visit_detail_source_value, t2.provider_id, t1.provider_specialty
+	FROM cte8 as t1 
+	INNER JOIN {TARGET_SCHEMA}.provider AS t2 ON t1.provider_source_value = t2.provider_source_value
+	INNER JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 ON t1.provider_specialty = t4.source_code
+	and t4.source_vocabulary_id = 'HES Specialty'
+	WHERE t4.source_code_description = t2.specialty_source_value
+),
+cte12 AS (
+	SELECT distinct t1.person_id, t1.visit_detail_source_value, t2.provider_id, t1.provider_specialty
+	FROM cte8 as t1
+	INNER JOIN {TARGET_SCHEMA}.provider AS t2 ON t1.provider_source_value = t2.provider_source_value
+	INNER JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t3 ON t1.provider_specialty = t3.source_code
 	and t3.source_vocabulary_id = 'HES_SPEC_STCM'
+	LEFT JOIN cte11 as t4 on t1.person_id = t4.person_id and t1.visit_detail_source_value = t4.visit_detail_source_value and t1.provider_specialty = t4.provider_specialty
 	WHERE t3.source_code_description = t2.specialty_source_value
+	and t4.provider_specialty is null
+),
+cte13 AS (
+	select distinct t1.person_id, t1.visit_detail_source_value, t2.provider_id, t1.provider_specialty
+	FROM cte8 as t1
+	INNER JOIN {TARGET_SCHEMA}.provider as t2 ON t1.provider_source_value = t2.provider_source_value
+	WHERE t1.provider_specialty = '620'
+	and t2.specialty_source_value = 'Other than Maternity'
+),
+cte14 AS (
+	select * from cte11
+	UNION DISTINCT
+	select * from cte12
+	UNION DISTINCT
+	select * from cte13
 )
 INSERT INTO {TARGET_SCHEMA}.VISIT_DETAIL (
 	visit_detail_id,
@@ -363,7 +395,8 @@ SELECT
 	t1.visit_occurrence_id
 FROM cte8 as t1
 LEFT JOIN cte9 AS t2 ON t1.visit_detail_id = t2.visit_detail_id
-LEFT JOIN cte10 AS t3 ON t1.person_id = t3.patid and t1.visit_detail_source_value::bigint = t3.epikey;
+LEFT JOIN cte14 AS t3 ON t1.person_id = t3.person_id and t1.visit_detail_source_value = t3.visit_detail_source_value
+and t3.provider_specialty = t1.provider_specialty;
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_vd;
 
