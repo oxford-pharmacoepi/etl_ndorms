@@ -11,24 +11,47 @@ with cte1 AS (
 	FROM {TARGET_SCHEMA}.observation_period
 ),
 cte2 AS (
-	select t1.person_id, t2.attendkey,
-	CASE WHEN t2.tretspef <> '&' THEN t2.tretspef ELSE CASE WHEN t2.mainspef <> '&' THEN t2.mainspef ELSE Null END END as specialty
+	select distinct t1.person_id, t2.attendkey,
+	CASE WHEN t2.tretspef <> '&' THEN t2.tretspef ELSE CASE WHEN t2.mainspef <> '&' THEN t2.mainspef ELSE Null END END as provider_specialty
 	FROM cte1 as t1
 	INNER JOIN {SOURCE_SCHEMA}.hesop_clinical AS t2 on t1.person_id = t2.patid
 	UNION DISTINCT
-	select t1.person_id, t2.attendkey,
-	CASE WHEN t2.tretspef <> '&' THEN t2.tretspef ELSE CASE WHEN t2.mainspef <> '&' THEN t2.mainspef ELSE Null END END as specialty
+	select distinct t1.person_id, t2.attendkey,
+	CASE WHEN t2.tretspef <> '&' THEN t2.tretspef ELSE CASE WHEN t2.mainspef <> '&' THEN t2.mainspef ELSE Null END END as provider_specialty
 	FROM cte1 as t1
 	INNER JOIN {SOURCE_SCHEMA}.hesop_operation AS t2 on t1.person_id = t2.patid
 ),	
 cte3 AS (	
-	select t1.person_id, t1.attendkey, t3.provider_id
+	select distinct t1.person_id, t1.attendkey, t1.provider_specialty, t3.provider_id
 	FROM cte2 as t1
-	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_concept_map as t2 on t1.specialty = t2.source_code 
-	and t2.source_vocabulary_id = 'HES_SPEC_STCM'
-	LEFT JOIN {TARGET_SCHEMA}.provider as t3 on t3.specialty_source_value = t2.source_code_description
+	INNER JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t1.provider_specialty = t2.source_code 
+	and t2.source_vocabulary_id in ('HES Specialty')
+	INNER JOIN {TARGET_SCHEMA}.provider as t3 on t3.specialty_source_value = t2.source_code_description
 ),
 cte4 AS (
+	select distinct t1.person_id, t1.attendkey, t1.provider_specialty, t3.provider_id
+	FROM cte2 as t1
+	INNER JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t1.provider_specialty = t2.source_code 
+	and t2.source_vocabulary_id in ('HES_SPEC_STCM')
+	INNER JOIN {TARGET_SCHEMA}.provider as t3 on t3.specialty_source_value = t2.source_code_description
+	LEFT JOIN cte3 as t4 on t1.person_id = t4.person_id and t1.attendkey = t4.attendkey 
+	and t1.provider_specialty = t4.provider_specialty
+	WHERE t4.provider_specialty is null
+),
+cte5 AS (
+	select distinct t1.person_id, t1.attendkey, t1.provider_specialty, t2.provider_id
+	FROM cte2 as t1, {TARGET_SCHEMA}.provider as t2 
+	WHERE t1.provider_specialty = '620'
+	and t2.specialty_source_value = 'Other than Maternity'
+),
+cte6 AS (
+	select * from cte3
+	UNION DISTINCT
+	select * from cte4
+	UNION DISTINCT
+	select * from cte5
+),
+cte7 AS (
 	SELECT
 	NEXTVAL('{TARGET_SCHEMA}.sequence_vo') AS visit_occurrence_id,
 	t1.patid AS person_id,
@@ -48,16 +71,16 @@ cte4 AS (
 	NULL::int AS discharged_to_concept_id
 	FROM {SOURCE_SCHEMA}.hesop_appointment AS t1
 	INNER JOIN cte1 as t2 ON t1.patid = t2.person_id
-	INNER JOIN cte3 as t3 ON t1.patid = t3.person_id AND t1.attendkey = t3.attendkey
+	LEFT JOIN cte6 as t3 ON t1.patid = t3.person_id AND t1.attendkey = t3.attendkey
 	WHERE t1.attended in (5, 6)     -- Seen
 	AND t1.apptdate >= t2.observation_period_start_date
 	AND t1.apptdate <= t2.observation_period_end_date
 	ORDER BY t1.patid, t1.apptdate, t1.attendkey
 ),
-cte5 AS (
+cte8 AS (
 	SELECT t1.person_id, t1.visit_occurrence_id, MAX(t2.visit_occurrence_id) AS preceding_visit_occurrence_id 
-	FROM cte4 AS t1
-	INNER JOIN cte4 AS t2 ON t1.person_id = t2.person_id
+	FROM cte7 AS t1
+	INNER JOIN cte7 AS t2 ON t1.person_id = t2.person_id
 	WHERE t1.visit_occurrence_id > t2.visit_occurrence_id
 	GROUP BY t1.person_id, t1.visit_occurrence_id
 )
@@ -83,8 +106,8 @@ INSERT INTO {TARGET_SCHEMA}.visit_occurrence (
 SELECT
 	t1.*,
 	t2.preceding_visit_occurrence_id
-	FROM cte4 AS t1
-	LEFT JOIN cte5 AS t2 ON t1.visit_occurrence_id = t2.visit_occurrence_id;
+	FROM cte7 AS t1
+	LEFT JOIN cte8 AS t2 ON t1.visit_occurrence_id = t2.visit_occurrence_id;
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_vo;
 
@@ -126,7 +149,7 @@ cte2 AS (
 	NULL::int AS parent_visit_detail_id
 	FROM {SOURCE_SCHEMA}.hesop_appointment AS t1
 	INNER JOIN cte1 as t2 ON t1.patid = t2.person_id
-	WHERE t1.attended = 5     -- 5 = (Seen, having attended on time or, if late, before the relevant care professional was ready to see the patient)
+	WHERE t1.attended in (5,6)     -- Seen
 	AND t1.apptdate >= t2.observation_period_start_date
 	AND t1.apptdate <= t2.observation_period_end_date
 	ORDER BY t1.patid, t1.apptdate, t1.attendkey
