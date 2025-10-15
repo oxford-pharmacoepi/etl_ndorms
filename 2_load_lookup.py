@@ -95,7 +95,7 @@ def main():
 			data_provider = db_conf['data_provider']
 			database_type = db_conf['database_type']
 			database_name = database_type.upper()
-			schema = db_conf['target_schema']
+			schema = db_conf['source_schema']
 			
 			if database_type[:3].upper() == 'HES':
 				database_name = 'HES'
