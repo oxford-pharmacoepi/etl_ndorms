@@ -216,16 +216,16 @@ select 	NULL,
 		NULL::int,
 		dc.dmdid as source_value,
 		t.dmd_source_concept_id as source_concept_id,
-		32838,
-		t4.issuedate,
+		32838 as type_concept_id,
+		t4.issuedate as start_date,
 		case when t4.duration is null then t4.issuedate
 			when t4.duration <= 0 then t4.issuedate
 			else t4.issuedate + (t4.duration-1) * INTERVAL '1 day'
 		end as end_date,
 		'00:00:00'::time,
-		case when t4.duration < 0 then null else t4.duration end,
+		case when t4.duration < 0 then null else t4.duration end as days_supply,
 		0,
-		q.description,
+		q.description as dose_unit_source_value,
 		NULL,
 		NULL,
 		NULL,
@@ -253,8 +253,8 @@ select 	NULL,
 		NULL,
 		NULL,
 		0,
-		'DrugIssue',
-		t4.issueid
+		'DrugIssue' as stem_source_table,
+		t4.issueid as stem_source_id
 from t4
 left join {SOURCE_SCHEMA}.productdictionary dc on t4.prodcodeid = dc.prodcodeid
 left join {SOURCE_SCHEMA}.quantunit q	on t4.quantunitid = q.quantunitid
