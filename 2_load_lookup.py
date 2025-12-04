@@ -137,7 +137,7 @@ def main():
 					if qa.lower() in ['y', 'yes']:
 						fname = dir_sql + '2b_' + database_type + '_lookup_create.sql'
 						print('Calling ' + fname + ' ...')
-						ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)
 # ---------------------------------------------------------
 # Load normal LOOKUP tables - Parallel execution
 # ---------------------------------------------------------
