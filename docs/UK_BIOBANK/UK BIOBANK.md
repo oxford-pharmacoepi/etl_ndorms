@@ -1,7 +1,7 @@
 ---
 layout: default
 title: UK BIOBANK
-nav_order: 6
+nav_order: 8
 description: "UK Biobank"
 has_children: true
 permalink: /docs/UK_BIOBANK
