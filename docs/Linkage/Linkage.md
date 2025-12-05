@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Linkage
-nav_order: 8
+nav_order: 7
 description: "Linkage Source Data ETL Documentation"
 has_children: true
 permalink: /docs/Linkage
