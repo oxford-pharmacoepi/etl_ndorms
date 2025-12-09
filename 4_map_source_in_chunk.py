@@ -128,14 +128,14 @@ def main():
 							query1 = 'ALTER TABLE ' + tbl_max_ids + ' ADD CONSTRAINT pk_max_ids PRIMARY KEY (tbl_name) USING INDEX TABLESPACE pg_default;'
 							cursor1.execute(query1)
 # Update _max_ids without records if it is not a primary dataset
-							if 'gold' not in target_schema_to_link and 'aurum' not in target_schema_to_link:
-								tbl_next_ids = target_schema_to_link + '._next_ids'
-								query1 = 'UPDATE ' + tbl_max_ids + ' as t1 \
-										SET max_id = t2.next_id - 1 \
-										from ' + tbl_next_ids + ' as t2 \
-										where t1.tbl_name = t2.tbl_name \
-										and t1.max_id = 0';
-								cursor1.execute(query1)
+#							if 'gold' not in target_schema_to_link and 'aurum' not in target_schema_to_link:
+#								tbl_next_ids = target_schema_to_link + '._next_ids'
+#								query1 = 'UPDATE ' + tbl_max_ids + ' as t1 \
+#										SET max_id = t2.next_id - 1 \
+#										from ' + tbl_next_ids + ' as t2 \
+#										where t1.tbl_name = t2.tbl_name \
+#										and t1.max_id = 0';
+#								cursor1.execute(query1)
 # Create table target_schema._next_ids
 							tbl_next_ids = target_schema + '._next_ids'
 							query1 = 'DROP TABLE IF EXISTS ' + tbl_next_ids + ' CASCADE';
@@ -164,7 +164,7 @@ def main():
 # Tables to load: TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL
 # ---------------------------------------------------------
 			if ret == True:
-				if database_type in ['aurum', 'ukb_gp', 'ukb_hesin', 'ukb_cancer', 'ncrascr']:
+				if database_type in ['aurum', 'ukb_gp', 'ukb_hesin', 'ukb_cancer', 'ncrascr1', 'ncrascr2']:
 					qa = input('Do you want to CREATE/RECREATE the temp tables (TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL)? (y/n):').lower() 
 					while qa not in ['y', 'n', 'yes', 'no']:
 						qa = input('I did not understand that. Do you want to CREATE/RECREATE the temp tables (TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL? (y/n):').lower()
@@ -209,7 +209,7 @@ def main():
 								if stem_list[tbl_id] != None:
 									query1 = 'DROP TABLE IF EXISTS ' + chunk_schema + '.' + stem_list[tbl_id];
 									cursor1.execute(query1)
-						fname = dir_sql + '4f_' + database_type + '_map_tbl_chunk.sql'
+						fname = dir_sql + '4f_' + (database_type[:7] if (database_type[:7] == 'ncrascr') else database_type) + '_map_tbl_chunk.sql'
 						print('Executing ' + fname + ' ... (CHUNK)')
 						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)
 # Necessary to recall 4b here if the CDM tables were deleted
@@ -262,8 +262,6 @@ def main():
 							for chunk_id in chunk_id_list:
 								print(f'Executing chunk {str(chunk_id)} / {str(chunk_id_list[-1])}')
 								chunk_time1 = time.time()
-								if chunk_id == chunk_id_list[-1]:
-									move_files = True
 								fname = dir_sql + '4g_' + database_type + '_map_tbl_stem_source.sql'
 								print('Executing ' + fname + ' ... (STEM_SOURCE)')
 								ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
@@ -272,7 +270,7 @@ def main():
 									print('Executing ' + fname + ' ... (STEM)')
 									ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
 								if ret == True:
-									fname = dir_sql + '4i' + db_conf['cdm_version'][2] + '_' + database_type + '_map_tbl_cdm.sql'
+									fname = dir_sql + '4i' + db_conf['cdm_version'][2] + '_' + (database_type[:7] if (database_type[:7] == 'ncrascr') else database_type) + '_map_tbl_cdm.sql'
 									print('Executing ' + fname + ' ... (CONDITION_OCCURRENCE, DEVICE_EXPOSURE, DRUG_EXPOSURE, MEASUREMENT, OBSERVATION, PROCEDURE_OCCURRENCE, SPECIMEN)')
 									ret = mapping_util.execute_multiple_queries(db_conf, fname, str(chunk_id), cnx, False, debug, move_files)
 								if ret == True:
