@@ -750,7 +750,7 @@ from {CHUNK_SCHEMA}.stem_{CHUNK_ID}
 where stem_source_table = 'Tumour'
 and domain_id = 'Condition';					
 
--- -- Treatment Regimen Episode
+-- Treatment Regimen Episode
 With cte0 as(
 	select  distinct
 	t1.person_id,
