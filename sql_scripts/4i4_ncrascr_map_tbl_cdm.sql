@@ -224,7 +224,7 @@ insert into {TARGET_SCHEMA}.specimen(specimen_id, person_id, specimen_concept_id
 select * FROM cte7;
 
 --------------------------------
---insert into episode from stem
+--insert into episode from stem for Tumour and Treatment
 --------------------------------
 with cte0 AS (
 	SELECT max_id  + 1 as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
@@ -247,12 +247,46 @@ with cte0 AS (
 		END as episode_source_concept_id
 	from cte0, {CHUNK_SCHEMA}.stem_{CHUNK_ID}
 	where domain_id = 'Episode'
+	and stem_source_table in ('Tumour', 'Treatment')
 )
 insert into {TARGET_SCHEMA}.episode(episode_id, person_id, episode_concept_id, episode_start_date, episode_start_datetime, 
 								episode_end_date, episode_end_datetime, episode_parent_id, episode_number, 
 								episode_object_concept_id, episode_type_concept_id, episode_source_value, 
 								episode_source_concept_id)
 select * FROM cte8;
+
+--------------------------------
+-- insert into episode from stem for RTDS and SACT
+--------------------------------
+with cte0 AS (
+	SELECT max_id + 1 as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
+	WHERE lower(tbl_name) = 'max_of_all'
+), cte8 as (
+	SELECT cte0.start_id + id as episode_id,
+		person_id,
+		concept_id as episode_concept_id,
+		start_date as episode_start_date,
+		start_date as episode_start_datetime,
+		end_date as episode_end_date,
+		end_date as episode_end_datetime,
+		source_concept_id as episode_parent_id,
+		value_as_number as episode_number,
+		value_as_concept_id as episode_object_concept_id,
+		type_concept_id as episode_type_concept_id,
+		source_value as episode_source_value,
+		CASE 
+			WHEN source_value is not null THEN 0
+		END as episode_source_concept_id
+	from cte0, {CHUNK_SCHEMA}.stem_{CHUNK_ID}
+	where domain_id = 'Episode'
+	and stem_source_table in ('RTDS', 'SACT')
+)
+insert into {TARGET_SCHEMA}.episode(episode_id, person_id, episode_concept_id, episode_start_date, episode_start_datetime, 
+									episode_end_date, episode_end_datetime, episode_parent_id, episode_number, 
+									episode_object_concept_id, episode_type_concept_id, episode_source_value, 
+									episode_source_concept_id)
+select * FROM cte8;
+
 
 -----------------------------------------
 -- EPISODE_EVENT
@@ -319,8 +353,40 @@ join cte1 as t2 on t2.stem_source_id = t1.stem_source_id  --treatment_id
 where t1.stem_source_table like 'Treatment%'
 and t1.domain_id <> 'Episode';
 
+-- RTDS Episode
+with cte0 AS (
+	SELECT max_id  + 1 as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
+	WHERE lower(tbl_name) = 'max_of_all'
+), cte1 as(
+	select 
+		cte0.start_id + id as episode_id,
+		person_id,
+		stem_source_id --Radiotherapy prescriptionid
+	from cte0, {CHUNK_SCHEMA}.stem_{CHUNK_ID}
+	where concept_id = 32940  -- Radiotherapy Episode
+)
+insert into {TARGET_SCHEMA}.episode_event
+select   
+		t2.episode_id, 
+		cte0.start_id + t1.id as event_id,
+		CASE 
+			WHEN t1.domain_id = 'Condition' THEN 1147127
+			WHEN t1.domain_id = 'Measurement' THEN 1147138
+			WHEN t1.domain_id = 'Observation' THEN 1147165
+			WHEN t1.domain_id = 'Procedure' THEN 1147082	
+			WHEN t1.domain_id = 'Drug' THEN 1147094		
+			WHEN t1.domain_id = 'Specimen' THEN 1147049
+			WHEN t1.domain_id = 'Device' THEN 1147115
+			ELSE 1147165
+		END as event_field_concept_id
+from cte0, {CHUNK_SCHEMA}.stem_{CHUNK_ID} as t1
+join cte1 as t2 on t2.stem_source_id = t1.stem_source_id  --treatment_id
+where t1.stem_source_table = 'RTDS'
+and t1.domain_id <> 'Episode';
+
+
 --------------------------------
---insert into observation from stem.
+--insert into observation from stem
 --------------------------------
 with cte0 AS (
 	SELECT max_id  + 1 as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
@@ -337,6 +403,7 @@ with cte0 AS (
 		t1.value_as_concept_id,
 		t1.qualifier_concept_id,
 		CASE 
+			WHEN t1.unit_concept_id is not null then t1.unit_concept_id
 			WHEN t1.unit_source_value is NULL THEN NULL
 			ELSE COALESCE(t2.target_concept_id, 0)
 		END as unit_concept_id,	
