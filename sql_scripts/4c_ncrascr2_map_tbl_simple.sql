@@ -62,13 +62,12 @@ CREATE SEQUENCE {TARGET_SCHEMA}.observation_period_seq;
 
 with cte2 as ( 
 	select t1.e_patid as person_id, 
-	LEAST(MIN(t1.diagnosisdatebest), MIN(t3.eventdate), MIN(t4.apptdate), MIN(t5.administration_date)) as min_date, 
-	GREATEST(MAX(t1.diagnosisdatebest), MAX(t3.eventdate), MAX(t4.apptdate), MAX(t5.administration_date)) as max_date 
+	LEAST(MIN(t1.diagnosisdatebest), MIN(t3.eventdate), MIN(t4.apptdate)) as min_date, 
+	GREATEST(MAX(t1.diagnosisdatebest), MAX(t3.eventdate), MAX(t4.apptdate)) as max_date 
 	from {SOURCE_SCHEMA}.tumour as t1 
 	inner join {TARGET_SCHEMA}.person as t2 on t2.person_id = t1.e_patid 
 	left join {SOURCE_SCHEMA}.treatment as t3 on t3.e_patid = t1.e_patid 
 	left join {SOURCE_SCHEMA}.rtds as t4 on t4.e_patid = t1.e_patid 
-	left join {SOURCE_SCHEMA}.sact as t5 on t5.e_patid = t1.e_patid 
 	group by t1.e_patid 
 ) 
 INSERT INTO {TARGET_SCHEMA}.OBSERVATION_PERIOD

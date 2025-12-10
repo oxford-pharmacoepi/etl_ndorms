@@ -148,7 +148,7 @@ create index idx_stem_{CHUNK_ID}_2 on {CHUNK_SCHEMA}.stem_{CHUNK_ID} (stem_sourc
 create index idx_stem_{CHUNK_ID}_3 on {CHUNK_SCHEMA}.stem_{CHUNK_ID} (unit_source_value);
 
 -----------------------------------------
--- link Radiotherapy event to Measurement
+-- Link Radiotherapy event to Measurement
 -----------------------------------------
 With _measurement AS(
 	select id, stem_source_id
@@ -186,76 +186,7 @@ SET measurement_event_id = cte.measurement_event_id,
 FROM cte
 WHERE t1.id = cte.id;
 
--------------------------------------------
----- link Treatment to Measurement
--------------------------------------------
---With _measurement AS(
---	select id, stem_source_id
---	from {CHUNK_SCHEMA}.stem_{CHUNK_ID}
---	where domain_id = 'Measurement'
---	and stem_source_table like 'Treatment-%'
---), _others AS(
---	select 	
---		id, 
---		CASE 
---			WHEN domain_id = 'Condition' THEN 1147127
---			WHEN domain_id = 'Observation' THEN 1147165
---			WHEN domain_id = 'Procedure' THEN 1147082	
---			WHEN domain_id = 'Drug' THEN 1147094
---			-- Device
---			-- Specimen
---			ELSE 1147165
---		END as event_field_concept_id, 
---		stem_source_id 
---	from {CHUNK_SCHEMA}.stem_{CHUNK_ID}
---	where domain_id not in ('Episode', 'Measurement') and stem_source_table = 'Treatment'
---), cte as(
---	select  
---		t1.id, 
---		t2.id as measurement_event_id,
---		t2.event_field_concept_id as meas_event_field_concept_id
---	from _measurement as t1
---	join _others as t2 on t1.stem_source_id = t2.stem_source_id
---)
---UPDATE {CHUNK_SCHEMA}.stem_{CHUNK_ID} as t1
---SET measurement_event_id = cte.measurement_event_id, 
---	meas_event_field_concept_id = cte.meas_event_field_concept_id
---FROM cte
---WHERE t1.id = cte.id;
---
------------------------------------------
--- EPISODE
------------------------------------------
----- Disease Episode
---insert into {CHUNK_SCHEMA}.stem_{CHUNK_ID} (
---	domain_id, 
---	person_id, 
---	id, 
---	concept_id, 
---	type_concept_id, 
---	start_date, 
---	end_date, 
---	start_time, 
---	value_as_concept_id, 	
---	stem_source_table, 
---	stem_source_id
---)
---select distinct
---	'Episode' as domain_id,
---	person_id, 
---	nextval('{CHUNK_SCHEMA}.stem_id_seq') as id, 	--episode_id
---	32533 as concept_id, 							--episode_concept_id: Disease Episode
---	32879 as type_concept_id, 						--episode_type_concept_id
---	start_date as start_date,						--episode_start_date
---	NULL::date as end_date,							--episode_end_date
---	'00:00:00'::time as start_time,	
---	concept_id as value_as_concept_id,				--episode_object_concept_id
---	stem_source_table,
---	stem_source_id
---from {CHUNK_SCHEMA}.stem_{CHUNK_ID} 
---where stem_source_table = 'Tumour'
---and domain_id = 'Condition';					
---
+
 -- Radiotherapy Episode
 With cte0 as(
 	select distinct
@@ -287,7 +218,6 @@ cte3 as (
 	from {CHUNK_SCHEMA}.stem_{CHUNK_ID}
 	where stem_source_table = 'RTDS'
 	and value_source_value = 'rttreatmentmodality'
---	and stem_source_id::bigint = value_as_number
 )
 insert into {CHUNK_SCHEMA}.stem_{CHUNK_ID} (
 	domain_id, 
