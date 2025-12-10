@@ -10,8 +10,8 @@ WITH cte01 as (
 	where chunk_id = {CHUNK_ID}
 ),
 cte1 as (
-	select distinct t2.e_patid as person_id, 
-	t2.treatmentstartdate as start_date, 
+	select t2.e_patid as person_id, 
+	MIN(t2.treatmentstartdate) as start_date, 
 	'prescriptionid' as source_value, 
 	t2.prescriptionid as value_as_number,
 	'prescriptionid' as value_source_value,
@@ -20,6 +20,7 @@ cte1 as (
 	inner join {SOURCE_SCHEMA}.rtds as t2 on t1.person_id = t2.e_patid
 	WHERE (radiotherapydiagnosisicd is null OR upper(radiotherapydiagnosisicd) = 'C61') --only prostate cancer diagnoses in this case
 	AND prescriptionid is not null
+	group by t2.e_patid, t2.prescriptionid
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
@@ -63,8 +64,8 @@ WITH cte01 as (
 	where chunk_id = {CHUNK_ID}
 ),
 cte1 as (
-	select distinct t2.e_patid as person_id, 
-	t2.treatmentstartdate as start_date, 
+	select t2.e_patid as person_id, 
+	MIN(t2.treatmentstartdate) as start_date, 
 	t2.radiotherapyintent as source_value, 
 	'radiotherapyintent' as value_source_value,
 	t2.prescriptionid as stem_source_id
@@ -72,6 +73,8 @@ cte1 as (
 	inner join {SOURCE_SCHEMA}.rtds as t2 on t1.person_id = t2.e_patid
 	WHERE (radiotherapydiagnosisicd is null OR upper(radiotherapydiagnosisicd) = 'C61') --only prostate cancer diagnoses in this case
 	AND radiotherapyintent is not null
+	group by t2.e_patid, t2.prescriptionid, t2.radiotherapyintent
+
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
@@ -113,8 +116,8 @@ WITH cte02 as (
 	where chunk_id = {CHUNK_ID}
 ),
 cte1 as (
-	select distinct t2.e_patid as person_id, 
-	t2.treatmentstartdate as start_date, 
+	select t2.e_patid as person_id, 
+	MIN(t2.treatmentstartdate) as start_date, 
 	CASE WHEN UPPER(t2.rttreatmentregion) in ('P', 'PR', 'R') THEN UPPER(t2.rttreatmentregion) end as source_value,
 	CASE WHEN UPPER(t2.rttreatmentregion) in ('P', 'PR', 'R') THEN 'rttreatmentregion' end as value_source_value,
 	t2.prescriptionid as stem_source_id
@@ -122,6 +125,7 @@ cte1 as (
 	inner join {SOURCE_SCHEMA}.rtds as t2 on t1.person_id = t2.e_patid
 	WHERE (radiotherapydiagnosisicd is null OR upper(radiotherapydiagnosisicd) = 'C61')
 	AND UPPER(rttreatmentregion) in ('P', 'PR', 'R')
+	group by t2.e_patid, t2.prescriptionid, t2.rttreatmentregion
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
@@ -164,8 +168,8 @@ WITH cte03 as (
 	where chunk_id = {CHUNK_ID}
 ),
 cte1 as (
-	select distinct t2.e_patid as person_id, 
-	t2.treatmentstartdate as start_date, 
+	select t2.e_patid as person_id, 
+	MIN(t2.treatmentstartdate) as start_date, 
 	CASE WHEN length(t2.rttreatmentanatomicalsite) = 4 
 		THEN CONCAT(UPPER(LEFT(t2.rttreatmentanatomicalsite,3)),'.',RIGHT(t2.rttreatmentanatomicalsite,1)) 
 		ELSE UPPER(t2.rttreatmentanatomicalsite) 
@@ -176,6 +180,7 @@ cte1 as (
 	inner join {SOURCE_SCHEMA}.rtds as t2 on t1.person_id = t2.e_patid
 	WHERE (radiotherapydiagnosisicd is null OR upper(radiotherapydiagnosisicd) = 'C61')
 	AND rttreatmentregion in ('A', 'O', 'M') AND rttreatmentanatomicalsite is not null
+	group by t2.e_patid, t2.prescriptionid, t2.rttreatmentanatomicalsite
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
@@ -218,8 +223,8 @@ WITH cte04 as (
 	where chunk_id = {CHUNK_ID}
 ),
 cte1 as (
-	select distinct t2.e_patid as person_id, 
-	t2.treatmentstartdate as start_date, 
+	select t2.e_patid as person_id, 
+	MIN(t2.treatmentstartdate) as start_date, 
 	CASE WHEN t2.numberofteletherapyfields = 1 THEN 'numberofteletherapyfields1'
 		 WHEN t2.numberofteletherapyfields = 2 THEN 'numberofteletherapyfields2'
 		 WHEN t2.numberofteletherapyfields = 3 THEN 'numberofteletherapyfields3'
@@ -232,6 +237,7 @@ cte1 as (
 	inner join {SOURCE_SCHEMA}.rtds as t2 on t1.person_id = t2.e_patid
 	WHERE (radiotherapydiagnosisicd is null OR upper(radiotherapydiagnosisicd) = 'C61')
 	AND t2.numberofteletherapyfields is not null AND t2.numberofteletherapyfields <> 0
+	group by t2.e_patid, t2.prescriptionid, t2.numberofteletherapyfields
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
@@ -275,8 +281,8 @@ WITH cte05 as (
 	where chunk_id = {CHUNK_ID}
 ),
 cte1 as (
-	select distinct t2.e_patid as person_id, 
-	t2.treatmentstartdate as start_date, 
+	select t2.e_patid as person_id, 
+	MIN(t2.treatmentstartdate) as start_date, 
 	'rtprescribeddose' as source_value, 
 	t2.rtprescribeddose as value_as_number,
 	'rtprescribeddose' as value_source_value,
@@ -285,6 +291,7 @@ cte1 as (
 	inner join {SOURCE_SCHEMA}.rtds as t2 on t1.person_id = t2.e_patid 
 	WHERE (radiotherapydiagnosisicd is null OR upper(radiotherapydiagnosisicd) = 'C61')
 	AND rtprescribeddose is not null AND rtprescribeddose <> 0
+	group by t2.e_patid, t2.prescriptionid, t2.rtprescribeddose
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
@@ -332,8 +339,8 @@ WITH cte06 as (
 	where chunk_id = {CHUNK_ID}
 ),
 cte1 as (
-	select distinct t2.e_patid as person_id, 
-	treatmentstartdate as start_date, 
+	select t2.e_patid as person_id, 
+	MIN(t2.treatmentstartdate) as start_date, 
 	'prescribedfractions' as source_value, 
 	t2.prescribedfractions as value_as_number,
 	'prescribedfractions' as value_source_value,
@@ -342,6 +349,7 @@ cte1 as (
 	inner join {SOURCE_SCHEMA}.rtds as t2 on t1.person_id = t2.e_patid
 	WHERE (radiotherapydiagnosisicd is null OR upper(radiotherapydiagnosisicd) = 'C61')
 	AND prescribedfractions is not null AND prescribedfractions <> 0
+	group by t2.e_patid, t2.prescriptionid, t2.prescribedfractions
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
@@ -384,9 +392,9 @@ WITH cte07 as (
 	where chunk_id = {CHUNK_ID}
 ),
 cte1 as (
-	select distinct t2.e_patid as person_id, 
-	t2.prescriptionid, 
-	treatmentstartdate as start_date, 
+	select t2.e_patid as person_id, 
+--	t2.prescriptionid, 
+	MIN(treatmentstartdate) as start_date, 
 	'rtactualdose' as source_value, 
 	t2.rtactualdose as value_as_number,
 	'rtactualdose' as value_source_value,
@@ -395,6 +403,7 @@ cte1 as (
 	inner join {SOURCE_SCHEMA}.rtds as t2 on t1.person_id = t2.e_patid
 	WHERE (radiotherapydiagnosisicd is null OR upper(radiotherapydiagnosisicd) = 'C61')
 	AND rtactualdose is not null AND rtactualdose <> 0
+	group by t2.e_patid, t2.prescriptionid, t2.rtactualdose
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
@@ -442,9 +451,9 @@ WITH cte08 as (
 	where chunk_id = {CHUNK_ID}
 ),
 cte1 as (
-	select distinct t2.e_patid as person_id, 
-	t2.prescriptionid, 
-	treatmentstartdate as start_date, 
+	select t2.e_patid as person_id, 
+--	t2.prescriptionid, 
+	MIN(treatmentstartdate) as start_date, 
 	'actualfractions' as source_value, 
 	t2.actualfractions as value_as_number,
 	'actualfractions' as value_source_value,
@@ -453,6 +462,7 @@ cte1 as (
 	inner join {SOURCE_SCHEMA}.rtds as t2 on t1.person_id = t2.e_patid
 	WHERE (radiotherapydiagnosisicd is null OR upper(radiotherapydiagnosisicd) = 'C61')
 	AND actualfractions is not null AND actualfractions <> 0
+	group by t2.e_patid, t2.prescriptionid, t2.actualfractions
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
@@ -496,8 +506,8 @@ WITH cte09 as (
 	where chunk_id = {CHUNK_ID}
 ),
 cte1 as (
-	select distinct t2.e_patid as person_id, 
-	treatmentstartdate as start_date, 
+	select t2.e_patid as person_id, 
+	MIN(treatmentstartdate) as start_date, 
 	rttreatmentmodality as source_value, 
 	'rttreatmentmodality' as value_source_value,
 	t2.prescriptionid as stem_source_id
@@ -505,6 +515,7 @@ cte1 as (
 	inner join {SOURCE_SCHEMA}.rtds as t2 on t1.person_id = t2.e_patid
 	WHERE (radiotherapydiagnosisicd is null OR upper(radiotherapydiagnosisicd) = 'C61')
 	AND rttreatmentmodality is not null --AND rttreatmentmodality <> 0
+	group by t2.e_patid, t2.prescriptionid, t2.rttreatmentmodality
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
@@ -547,7 +558,7 @@ WITH cte10 as (
 ),
 cte1 as (
 	select distinct t2.e_patid, 
-	t2.prescriptionid, 
+--	t2.prescriptionid, 
 	t2.apptdate as start_date, 
 	CASE
 		WHEN length(t2.primaryprocedureopcs) > 5 AND POSITION(' ' in t2.primaryprocedureopcs) > 0 THEN
@@ -603,7 +614,7 @@ WITH cte011 as (
 ),
 cte1 as (
 	select distinct t2.e_patid as person_id, 
-	t2.prescriptionid, 
+--	t2.prescriptionid, 
 	t2.apptdate as start_date, 
 	t2.radiotherapybeamtype as source_value,
 	t2.prescriptionid as stem_source_id
@@ -699,46 +710,6 @@ from cte1 as t1
 inner join {SOURCE_SCHEMA}.temp_visit_detail as t2 on t1.person_id = t2.person_id AND t1.start_date = t2.visit_start_date
 WHERE t2.source_table = 'RTDS'
 AND t1.stem_source_id = t2.visit_detail_source_id;
-
--------------------------------------------
---insert into stem_source table from SACT
--------------------------------------------
-
---e_patid
---e_cr_patid
---e_cr_id
---pseudo_merged_tumour_id
---primary_diagnosis
---morphology_clean
---height_at_start_of_regimen
---weight_at_start_of_regimen
---intent_of_treatment
---adjunctive_therapy
---analysis_group
---benchmark_group
---perf_status_start_of_regimen
---perf_stat_start_of_reg_adult
---perf_stat_start_of_reg_child
---comorbidity_adjustment
---date_decision_to_treat
---start_date_of_regimen
---cycle_number
---start_date_of_cycle
---perf_stat_start_of_cycle_clean
---perf_stat_start_of_cycle_adult
---perf_stat_start_of_cycle_child
---weight_at_start_of_cycle
---drug_group
---actual_dose_per_administration 
---admin_measure_per_actual_dose 
---administration_route 
---administration_date 
---regimen_modification_dose_red
---regoutsum_cur_not_com_plan 
---regoutsum_non_curat 
---regoutsum_toxic 
---regoutsum_cur_com_plan
-
 
 create index idx_stem_source_{CHUNK_ID}_1 on {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (source_concept_id);
 create index idx_stem_source_{CHUNK_ID}_2 on {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (source_value);
