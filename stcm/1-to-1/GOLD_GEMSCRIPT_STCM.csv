@@ -8,7 +8,7 @@ source_code,source_concept_id,source_vocabulary_id,source_code_description,targe
 14345022,0,GOLD_GEMSCRIPT_STCM,Nevolat 6mg/ml solution for injection 3ml pre-filled pens (Zentiva Pharma UK Ltd),842609,RxNorm Extension,2025-08-04,2099-12-31,
 08561022,0,GOLD_GEMSCRIPT_STCM,Victoza 6mg/ml solution for injection 3ml pre-filled pens (Pharmaram Ltd),842604,RxNorm Extension,2025-08-24,2099-12-31,
 85446021,0,GOLD_GEMSCRIPT_STCM,Insulin glargine 100units/ml / Lixisenatide 33micrograms/ml solution for injection 3ml pre-filled disposable devices,784293,RxNorm Extension,2019-04-01,2099-12-31,
-8505602,0,GOLD_GEMSCRIPT_STCM,Ozempic 0.25mg/0.19ml solution for injection 1.5ml pre-filled pens (Novo Nordisk Ltd),36809147,RxNorm Extension,2022-01-28,2099-12-31,
+85056021,0,GOLD_GEMSCRIPT_STCM,Ozempic 0.25mg/0.19ml solution for injection 1.5ml pre-filled pens (Novo Nordisk Ltd),36809147,RxNorm Extension,2022-01-28,2099-12-31,
 94297021,0,GOLD_GEMSCRIPT_STCM,Ozempic 1mg/0.74ml solution for injection 3ml pre-filled pens (Pharmaram Ltd),36055865,RxNorm Extension,2020-08-17,2099-12-31,
 94794021,0,GOLD_GEMSCRIPT_STCM,Rybelsus 14mg tablets (Novo Nordisk Ltd),35886132,RxNorm Extension,2020-12-07,2099-12-31,
 11208022,0,GOLD_GEMSCRIPT_STCM,Rybelsus 14mg tablets (Pharmaram Ltd),861692,RxNorm Extension,2025-08-04,2099-12-31,
