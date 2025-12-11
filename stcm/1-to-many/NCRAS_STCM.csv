@@ -59,3 +59,6 @@ prescribedfractions,0,NCRAS_STCM,Prescribed number of fractions of a teletherapy
 rtactualdose,0,NCRAS_STCM,Actual radiation dose in Grays,4160593,SNOMED,2003-07-31,2099-12-31,
 actualfractions,0,NCRAS_STCM,Actual number of fractions of a teletherapy treatment,4163416,SNOMED,1970-01-01,2099-12-31,
 teletherapy,0,NCRAS_STCM,teletherapy,4141448,SNOMED,2002-01-31,2099-12-31,
+5,0,NCRAS_STCM,teletherapy,4141448,SNOMED,2002-01-31,2099-12-31,
+6,0,NCRAS_STCM,brachytherapy,40317890,SNOMED,2018-07-31,2099-12-31,
+prescriptionid,0,NCRAS_STCM,Radiotherapy planning,4044940,SNOMED,2002-01-31,2099-12-31,
