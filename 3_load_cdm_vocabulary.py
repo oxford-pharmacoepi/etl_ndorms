@@ -485,7 +485,7 @@ def main():
 # ---------------------------------------------------------							
 					fname = dir_sql + '3f_create_temp_stcm_tbl.sql'
 					#print('Calling ' + fname + ' ...')
-					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, True)
+					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)
 					
 					if ret == True:		
 						fname = dir_sql + '3g_check_stcm.sql'
