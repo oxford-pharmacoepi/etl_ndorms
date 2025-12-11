@@ -365,7 +365,7 @@ def main():
 				if qa.lower() in ['y', 'yes']:
 					fname = dir_sql + '3b_cdm_create_vocabulary.sql'
 					print('Calling ' + fname + ' ...')
-					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
 # ---------------------------------------------------------
 # Load vocabularies tables - Parallel execution
 # ---------------------------------------------------------
@@ -402,7 +402,7 @@ def main():
 				if qa.lower() in ['y', 'yes']:
 					print('Build PKs and IDXs ...')
 					sql_file_list = sorted(glob.iglob(dir_sql + '3c_cdm_pk_idx_*.sql'))
-					ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, True)
+					ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, True, False)
 # ---------------------------------------------------------
 # Build FKs - Parallel execution
 # ---------------------------------------------------------
@@ -457,21 +457,21 @@ def main():
 					if ret == True:
 						fname = dir_sql + '3e_cdm_source_to_concept_map.sql'
 						print('Calling ' + fname + ' ...')
-						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True, False)
 # ---------------------------------------------------------
 # CREATE/LOAD source_to_source_vocab_map
 # ---------------------------------------------------------
 					if ret == True:
 						fname = dir_sql + '3e_cdm_source_to_source_vocab_map.sql'
 						print('Calling ' + fname + ' ...')
-						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True, False)
 # ---------------------------------------------------------
 # CREATE/LOAD source_to_standard_vocab_map
 # ---------------------------------------------------------
 					if ret == True:
 						fname = dir_sql + '3e_cdm_source_to_standard_vocab_map.sql'
 						print('Calling ' + fname + ' ...')
-						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True, False)
 						if ret == True:
 							print('Finished loading source_to_..._map tables')
 # ---------------------------------------------------------
