@@ -414,7 +414,7 @@ def main():
 					print('Build FKs ...')
 					if ret == True:
 						fname = dir_sql + '3d_cdm_fk_voc.sql'
-						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True, False)
 						if ret == True:
 							print('Finished building FKs')
 # ---------------------------------------------------------
