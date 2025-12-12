@@ -201,19 +201,32 @@ With cte0 as(
 	and t1.stem_source_id::bigint = value_as_number
 ),
 cte1 as (
+	select distinct
+	t1.person_id,
+	MIN(t2.episode_id) as episode_id, 
+	t1.start_date,
+	t1.stem_source_table,
+	t1.stem_source_id
+	from cte0 as t1
+	left join {TARGET_SCHEMA_TO_LINK}.episode as t2 on t1.person_id = t2.person_id 
+	where t2.episode_concept_id = 32533				-- link Radiotherapy Episode to Disease Episode 
+	and t2.episode_parent_id is null
+	group by t1.person_id, t1.start_date, t1.stem_source_table, t1.stem_source_id
+),
+cte2 as (
 --Calculate episode_number
 	select person_id, MAX(episode_number) as max_episode_number
 	from {TARGET_SCHEMA_TO_LINK}.episode
 	group by person_id
 ),
-cte2 as (
+cte3 as (
 --Calculate episode_end_date
 	select person_id, stem_source_id, MAX(end_date) as end_date 
 	from {CHUNK_SCHEMA}.stem_{CHUNK_ID}
 	where stem_source_table = 'RTDS'
 	group by person_id, stem_source_id
 ),
-cte3 as (
+cte4 as (
 	select person_id, stem_source_id, concept_id
 	from {CHUNK_SCHEMA}.stem_{CHUNK_ID}
 	where stem_source_table = 'RTDS'
@@ -239,24 +252,21 @@ select distinct
 	'Episode' as domain_id,
 	t1.person_id,
 	nextval('{CHUNK_SCHEMA}.stem_id_seq') as id,	--episode_id
-	t2.episode_id as source_concept_id, 			--episode_parent_id,
+	t1.episode_id as source_concept_id, 			--episode_parent_id,
 	32940 as concept_id, 							--episode_concept_id: Radiotherapy Episode					
 	'Radiotherapy' as source_value,					--episode_source_value
 	32879 as type_concept_id, 						--episode_type_concept_id - Registry
 	t1.start_date, 									--episode_start_date
-	t4.end_date,									--episode_end_date
+	t3.end_date,									--episode_end_date
 	'00:00:00'::time as start_time,
-	ROW_NUMBER () OVER (PARTITION BY t1.person_id ORDER BY t1.person_id, t1.start_date) + t3.max_episode_number as value_as_number, --episode_number,
-	COALESCE(t5.concept_id, 4044940),				--episode_object_concept_id: if missing "Radiotehrapy planning"
+	ROW_NUMBER () OVER (PARTITION BY t1.person_id ORDER BY t1.person_id, t1.start_date) + t2.max_episode_number as value_as_number, --episode_number,
+	COALESCE(t4.concept_id, 4044940),				--episode_object_concept_id: if missing "Radiotehrapy planning"
 	t1.stem_source_table,
 	t1.stem_source_id
-from cte0 as t1
-left join {TARGET_SCHEMA_TO_LINK}.episode as t2 on t1.person_id = t2.person_id 
-left join cte1 as t3 on t1.person_id = t3.person_id
-left join cte2 as t4 on t1.person_id = t4.person_id and t1.stem_source_id = t4.stem_source_id
-left join cte3 as t5 on t1.person_id = t5.person_id and t1.stem_source_id = t5.stem_source_id
-where t2.episode_concept_id = 32533					-- link Radiotherapy Episode to Disease Episode 
-and t2.episode_parent_id is null;						
+from cte1 as t1 
+left join cte2 as t2 on t1.person_id = t2.person_id
+left join cte3 as t3 on t1.person_id = t3.person_id and t1.stem_source_id = t3.stem_source_id
+left join cte4 as t4 on t1.person_id = t4.person_id and t1.stem_source_id = t4.stem_source_id;						
 
 
 -----------------------------------------
