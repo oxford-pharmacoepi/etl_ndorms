@@ -137,7 +137,7 @@ select distinct
 	t1.stem_source_table,
 	t1.stem_source_id
 from {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} as t1
-left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_vocabulary_id = 'NCRAS_RTDS_STCM'
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_vocabulary_id = 'NCRAS_MIX_STCM'
 and t1.source_value = t2.source_code 
 where t1.source_concept_id = 0
 and stem_source_table = 'RTDS';

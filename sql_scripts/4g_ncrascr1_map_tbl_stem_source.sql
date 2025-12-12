@@ -153,7 +153,7 @@ WITH cte1 as (
 		left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on upper(t1.source_code) = upper(t2.source_code_description) 
 		and t2.source_vocabulary_id in ('RxNorm', 'RxNorm Extension') and t2.source_concept_class_id = 'Ingredient'
 		left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t3 on t3.source_code = t1.source_code
-		and t2.source_concept_id is null and t3.source_vocabulary_id = 'NCRAS_STCM'
+		and t2.source_concept_id is null and t3.source_vocabulary_id = 'NCRAS_MIX_STCM'
 	),
 	cte2b_3 as (
 		select t1.person_id, 
@@ -184,7 +184,7 @@ WITH cte1 as (
 		COALESCE(t2.source_concept_id, 0) as source_concept_id
 		from cte2b_3 as t1
 		left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_code = t1.source_code
-		and t2.source_vocabulary_id = 'NCRAS_STCM'
+		and t2.source_vocabulary_id = 'NCRAS_MIX_STCM'
 	),
 	cte3 as (
 		select * from cte3a

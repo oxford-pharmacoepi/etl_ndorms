@@ -138,7 +138,7 @@ select distinct
 	t1.stem_source_table,
 	t1.stem_source_id
 from {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} as t1
-left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_vocabulary_id = 'NCRAS_STCM' 
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_vocabulary_id = 'NCRAS_MIX_STCM' 
 and t1.source_value = t2.source_code 
 where t1.source_concept_id = 0
 and (stem_source_table in ('Tumour', 'Treatment', 'Tumour-Stage') 
@@ -764,7 +764,7 @@ With cte0 as(
 	from {CHUNK_SCHEMA}.stem_{CHUNK_ID} as t1
 	join {SOURCE_SCHEMA}.treatment as t2 on t2.treatment_id = t1.stem_source_id::numeric 
 	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t5 on t2.eventdesc = t5.source_code and t5.source_vocabulary_id = 'NCRAS_TREATMENT_EPISODE_STCM' 
-	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t6 on t2.eventdesc = t6.source_code and t6.source_vocabulary_id = 'NCRAS_STCM' 
+	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t6 on t2.eventdesc = t6.source_code and t6.source_vocabulary_id = 'NCRAS_MIX_STCM' 
 	where t1.stem_source_table = 'Treatment'
 )
 insert into {CHUNK_SCHEMA}.stem_{CHUNK_ID} (
