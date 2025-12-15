@@ -499,7 +499,7 @@ WHERE t2.source_table = 'RTDS'
 AND t1.stem_source_id = t2.visit_detail_source_id;
 
 
---PRESCRIPTION - rttreatmentmodality
+--PRESCRIPTION or EXPOSURE?? - rttreatmentmodality (It can change from one event to another, it cannot be recorded under prescription date)
 WITH cte09 as (
 	select person_id
 	from {CHUNK_SCHEMA}.chunk_person
@@ -514,7 +514,7 @@ cte1 as (
 	from cte09 as t1
 	inner join {SOURCE_SCHEMA}.rtds as t2 on t1.person_id = t2.e_patid
 	WHERE (radiotherapydiagnosisicd is null OR upper(radiotherapydiagnosisicd) = 'C61')
-	AND rttreatmentmodality is not null --AND rttreatmentmodality <> 0
+	AND rttreatmentmodality is not null AND radiotherapybeamtype is not null
 	group by t2.e_patid, t2.prescriptionid, t2.rttreatmentmodality
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
@@ -558,7 +558,6 @@ WITH cte10 as (
 ),
 cte1 as (
 	select distinct t2.e_patid, 
---	t2.prescriptionid, 
 	t2.apptdate as start_date, 
 	CASE
 		WHEN length(t2.primaryprocedureopcs) > 5 AND POSITION(' ' in t2.primaryprocedureopcs) > 0 THEN
@@ -606,7 +605,7 @@ inner join {SOURCE_SCHEMA}.temp_visit_detail as t2 on t1.e_patid = t2.person_id 
 AND t2.source_table = 'RTDS' AND t1.stem_source_id = t2.visit_detail_source_id
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t3 on t1.source_value = t3.source_code AND upper(t3.source_vocabulary_id) = 'OPCS4';
 
---EXPOSURE - radiotherapybeamtype (It can change from one event to another, it cannot be recorded under prescription)
+--EXPOSURE - radiotherapybeamtype (It can change from one event to another, it cannot be recorded under prescription date)
 WITH cte011 as (
 	select person_id
 	from {CHUNK_SCHEMA}.chunk_person
@@ -614,7 +613,6 @@ WITH cte011 as (
 ),
 cte1 as (
 	select distinct t2.e_patid as person_id, 
---	t2.prescriptionid, 
 	t2.apptdate as start_date, 
 	t2.radiotherapybeamtype as source_value,
 	t2.prescriptionid as stem_source_id
