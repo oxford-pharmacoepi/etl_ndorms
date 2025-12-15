@@ -49,5 +49,6 @@ truncate table {TARGET_SCHEMA}.device_exposure;
 truncate table {TARGET_SCHEMA}.drug_exposure;
 truncate table {TARGET_SCHEMA}.observation;
 truncate table {TARGET_SCHEMA}.specimen;
-truncate table {TARGET_SCHEMA}.episode;
-truncate table {TARGET_SCHEMA}.episode_event;
+truncate table {TARGET_SCHEMA}.episode_event CASCADE;
+truncate table {TARGET_SCHEMA}.episode CASCADE;
+
