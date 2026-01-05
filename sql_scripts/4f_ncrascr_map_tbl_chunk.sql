@@ -34,7 +34,7 @@ CLUSTER {CHUNK_SCHEMA}.chunk USING idx_chunk_id;
 CREATE INDEX idx_chunk_completed ON {CHUNK_SCHEMA}.chunk (completed) TABLESPACE pg_default ;
 
 ---------------------------------
--- SEQUENCE for steam
+-- SEQUENCE for stem
 ---------------------------------
 DROP SEQUENCE IF EXISTS {CHUNK_SCHEMA}.stem_id_seq;
 CREATE SEQUENCE {CHUNK_SCHEMA}.stem_id_seq as bigint START WITH 1 INCREMENT BY 1 NO MAXVALUE CACHE 1;
