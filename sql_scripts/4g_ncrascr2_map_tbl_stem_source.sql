@@ -514,7 +514,7 @@ cte1 as (
 	from cte09 as t1
 	inner join {SOURCE_SCHEMA}.rtds as t2 on t1.person_id = t2.e_patid
 	WHERE (radiotherapydiagnosisicd is null OR upper(radiotherapydiagnosisicd) = 'C61')
-	AND rttreatmentmodality is not null AND radiotherapybeamtype is not null
+	AND rttreatmentmodality is not null --AND radiotherapybeamtype is not null
 	group by t2.e_patid, t2.prescriptionid, t2.rttreatmentmodality
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
