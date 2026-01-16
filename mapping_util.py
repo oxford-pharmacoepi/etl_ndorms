@@ -62,7 +62,8 @@ def does_db_exist(db_conf):
 		cnx = sql.connect(
 			user=db_conf['username'],
 			password=db_conf['password'],
-			database='postgres'
+			database='postgres',
+			port=db_conf['port']
 		)
 		database = db_conf['database']
 		cursor1 = cnx.cursor()
@@ -73,6 +74,7 @@ def does_db_exist(db_conf):
 			exist = True
 		cursor1.close()
 		cnx.close()
+		print('EXISTS=',exist)
 	except:
 		ret = False
 		err = sys.exc_info()
@@ -95,7 +97,8 @@ def create_db(db_conf):
 		cnx = sql.connect(
 			user=db_conf['username'],
 			password=db_conf['password'],
-			database='postgres'
+			database='postgres',
+			port=db_conf['port']
 		)
 		cnx.autocommit = True
 		database = db_conf['database']
@@ -173,7 +176,8 @@ def load_files(db_conf, schema, tbl_name, file_list, dir_processed, separator, w
 			cnx = sql.connect(
 				user=db_conf['username'],
 				password=db_conf['password'],
-				database=db_conf['database']
+				database=db_conf['database'],
+				port=db_conf['port']
 			)
 			cnx.autocommit = True
 			cursor1 = cnx.cursor()
@@ -267,7 +271,8 @@ def get_table_count(db_conf, tbl_name, tbl_result, cnx=None):
 			cnx = sql.connect(
 				user=db_conf['username'],
 				password=db_conf['password'],
-				database=db_conf['database']
+				database=db_conf['database'],
+				port=db_conf['port']
 			)
 			cnx.autocommit = True
 		cursor1 = cnx.cursor()
@@ -360,7 +365,8 @@ def get_table_max_ids(db_conf, tbl_name, tbl_result, cnx=None):
 			cnx = sql.connect(
 				user=db_conf['username'],
 				password=db_conf['password'],
-				database=db_conf['database']
+				database=db_conf['database'],
+				port=db_conf['port']
 			)
 			cnx.autocommit = True
 		schema_tbl, tbl_name_short = tbl_name.split(".")
@@ -472,7 +478,8 @@ def execute_query(db_conf, query, debug = True):
 		cnx = sql.connect(
 			user=db_conf['username'],
 			password=db_conf['password'],
-			database=db_conf['database']
+			database=db_conf['database'],
+			port=db_conf['port']
 		)
 		cursor1 = cnx.cursor()
 		cnx.autocommit = True
@@ -510,7 +517,8 @@ def execute_multiple_queries(db_conf, filename, chunk_id = None, cnx = None, com
 				cnx = sql.connect(
 					user=db_conf['username'],
 					password=db_conf['password'],
-					database=db_conf['database']
+					database=db_conf['database'],
+					port=db_conf['port']
 				)
 				cnx.autocommit = commit
 #			print(cnx.info.dsn_parameters)
@@ -693,7 +701,8 @@ def load_folders(db_conf, schema, folder):
 			cnx = sql.connect(
 				user=db_conf['username'],
 				password=db_conf['password'],
-				database=db_conf['database']
+				database=db_conf['database'],
+				port=db_conf['port']
 			)
 			cnx.autocommit = True
 			cursor1 = cnx.cursor()
