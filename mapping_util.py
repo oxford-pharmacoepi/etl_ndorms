@@ -74,7 +74,6 @@ def does_db_exist(db_conf):
 			exist = True
 		cursor1.close()
 		cnx.close()
-		print('EXISTS=',exist)
 	except:
 		ret = False
 		err = sys.exc_info()
