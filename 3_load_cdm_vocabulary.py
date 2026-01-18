@@ -59,7 +59,8 @@ def export_csv(query, params, subdir, fcsv, debug):
 		cnx = sql.connect(
 			user=db_conf['username'],
 			password=db_conf['password'],
-			database=db_conf['database']
+			database=db_conf['database'],
+			port=db_conf['port']
 		)
 		cursor1 = cnx.cursor()
 		cnx.autocommit = True
@@ -132,7 +133,8 @@ def check_stcm(fname, stcm, debug):
 		cnx = sql.connect(
 			user=db_conf['username'],
 			password=db_conf['password'],
-			database=db_conf['database']
+			database=db_conf['database'],
+			port=db_conf['port']
 		)
 		cursor1 = cnx.cursor()
 		cnx.autocommit = True	
@@ -188,7 +190,8 @@ def generate_suggested_stcm(fname, subdir, stcm, debug):
 		cnx = sql.connect(
 			user=db_conf['username'],
 			password=db_conf['password'],
-			database=db_conf['database']
+			database=db_conf['database'],
+			port=db_conf['port']
 		)
 		cursor1 = cnx.cursor()
 		cnx.autocommit = True	
@@ -238,7 +241,8 @@ def update_stcm(fname, fcsv, debug):
 		cnx = sql.connect(
 			user=db_conf['username'],
 			password=db_conf['password'],
-			database=db_conf['database']
+			database=db_conf['database'],
+			port=db_conf['port']
 		)
 		cursor1 = cnx.cursor()
 		cnx.autocommit = False			
