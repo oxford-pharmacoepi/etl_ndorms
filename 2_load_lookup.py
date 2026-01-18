@@ -24,7 +24,8 @@ def populate_tbl_lookup_gold(dir_files):
 		cnx = sql.connect(
 			user=db_conf['username'],
 			password=db_conf['password'],
-			database=db_conf['database']
+			database=db_conf['database'],
+			port=db_conf['port']
 		)
 		cnx.autocommit = True
 		cursor1 = cnx.cursor()
