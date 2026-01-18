@@ -23,8 +23,8 @@ source_code,source_concept_id,source_vocabulary_id,source_code_description,targe
 07433022,0,GOLD_GEMSCRIPT_STCM,Semaglutide 2.4mg/0.75ml solution for injection 3ml pre-filled disposable device,842649,RxNorm Extension,2025-08-04,2099-12-31,
 94914021,0,GOLD_GEMSCRIPT_STCM,Semaglutide 3mg tablets,37496840,RxNorm,2020-05-04,2099-12-31,
 94807021,0,GOLD_GEMSCRIPT_STCM,Semaglutide 7mg tablets,37496844,RxNorm,2020-05-04,2099-12-31,
-07439022,0,GOLD_GEMSCRIPT_STCM,Wegovy FlexTouch 0.25mg/0.37ml solution for injection 1.5ml pre-filled pens (Novo Nordisk Ltd),843633,RxNorm Extension,2025-08-04,2099-12-
-07298022,0,GOLD_GEMSCRIPT_STCM,Wegovy FlexTouch 0.5mg/0.37ml solution for injection 1.5ml pre-filled pens (Novo Nordisk Ltd),843624,RxNorm Extension,2025-08-04,2099-12-3
+07439022,0,GOLD_GEMSCRIPT_STCM,Wegovy FlexTouch 0.25mg/0.37ml solution for injection 1.5ml pre-filled pens (Novo Nordisk Ltd),843633,RxNorm Extension,2025-08-04,2099-12-31,
+07298022,0,GOLD_GEMSCRIPT_STCM,Wegovy FlexTouch 0.5mg/0.37ml solution for injection 1.5ml pre-filled pens (Novo Nordisk Ltd),843624,RxNorm Extension,2025-08-04,2099-12-31,
 07315022,0,GOLD_GEMSCRIPT_STCM,Wegovy FlexTouch 1.7mg/0.75ml solution for injection 3ml pre-filled pens (Novo Nordisk Ltd),842653,RxNorm Extension,2025-08-04,2099-12-31,
 07317022,0,GOLD_GEMSCRIPT_STCM,Wegovy FlexTouch 1mg/0.75ml solution for injection 3ml pre-filled pens (Novo Nordisk Ltd),842661,RxNorm Extension,2025-08-04,2099-12-31,
 07434022,0,GOLD_GEMSCRIPT_STCM,Wegovy FlexTouch 2.4mg/0.75ml solution for injection 3ml pre-filled pens (Novo Nordisk Ltd),842645,RxNorm Extension,2025-08-04,2099-12-31,
