@@ -84,7 +84,7 @@ def main():
 				if qa.lower() in ['y', 'yes']:
 					fname = dir_sql + '1a_' + database_type + '_drop.sql'
 					print('Calling ' + fname + ' ...')
-					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
 			if ret == True:
 # ---------------------------------------------------------
 # Ask the user for LOAD confirmation
