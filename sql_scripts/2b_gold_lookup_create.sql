@@ -77,7 +77,12 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.medical
 (
 	medcode bigint NOT NULL,
 	readcode varchar(7) DEFAULT NULL,
-	"desc" varchar(100) DEFAULT NULL
+	clinicalevents bigint DEFAULT NULL,	
+	immunisationevents bigint DEFAULT NULL,
+	referralevents bigint DEFAULT NULL,
+	testevents bigint DEFAULT NULL,
+	"desc" varchar(100) DEFAULT NULL,
+	databaserelease varchar(15) DEFAULT NULL
 )TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.packtype
@@ -91,13 +96,15 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.product
 	prodcode bigint NOT NULL,
 	dmdcode varchar(20) DEFAULT NULL,
 	gemscriptcode varchar(8) DEFAULT NULL,
+	therapyevents bigint DEFAULT NULL,
 	productname varchar(500) DEFAULT NULL,
 	drugsubstance varchar(1500) DEFAULT NULL,
 	strength varchar(1100) DEFAULT NULL,
 	formulation varchar(100) DEFAULT NULL,
-	route varchar(100) DEFAULT NULL,
+	route varchar(110) DEFAULT NULL,
 	bnfcode varchar(100) DEFAULT NULL,
-	bnfchapter varchar(500) DEFAULT NULL
+	bnfchapter varchar(500) DEFAULT NULL,
+	databaserelease varchar(15) DEFAULT NULL
 )TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.scoremethod
