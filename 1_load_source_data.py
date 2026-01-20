@@ -73,7 +73,7 @@ def main():
 # ---------------------------------------------------------
 				fname = dir_sql + '1__schema_create.sql'
 				print('Calling ' + fname + ' ...')
-				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
 			if ret == True:
 # ---------------------------------------------------------
 # Ask the user for DROP confirmation
@@ -99,7 +99,7 @@ def main():
 					time1 = time.time()
 					fname = dir_sql + '1b_' + database_type + '_create.sql'
 					print('Calling ' + fname + ' ...')
-					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
 # ---------------------------------------------------------
 # Load source data
 # ---------------------------------------------------------
