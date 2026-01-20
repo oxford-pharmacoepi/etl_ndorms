@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.DRUG_EXPOSURE (
 			visit_detail_id bigint NULL,
 			drug_source_value varchar(250) NULL,
 			drug_source_concept_id integer NULL,
-			route_source_value varchar(100) NULL,
+			route_source_value varchar(110) NULL,
 			dose_unit_source_value varchar(50) NULL )
 			TABLESPACE pg_default;
 
@@ -497,7 +497,7 @@ CREATE TABLE IF NOT EXISTS {TARGET_SCHEMA}.stem_source
     range_low double precision,
     refills integer,
     route_concept_id integer,
-    route_source_value character varying(100) COLLATE pg_catalog."default",
+    route_source_value character varying(110) COLLATE pg_catalog."default",
     sig character varying(255) COLLATE pg_catalog."default",
     stop_reason character varying(20) COLLATE pg_catalog."default",
     unique_device_id character varying(50) COLLATE pg_catalog."default",
