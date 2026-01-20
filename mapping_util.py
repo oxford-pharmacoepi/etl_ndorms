@@ -101,13 +101,14 @@ def create_db(db_conf):
 		)
 		cnx.autocommit = True
 		database = db_conf['database']
+		tablespace = db_conf['tablespace']
 		cursor1 = cnx.cursor()
 		query1 = "CREATE DATABASE " + database + " WITH \
 			OWNER = postgres \
 			ENCODING = 'UTF8' \
 			LC_COLLATE = 'English_United States.1252' \
 			LC_CTYPE = 'English_United States.1252' \
-			TABLESPACE = tablespace_e \
+			TABLESPACE = " + tablespace + " \
 			CONNECTION LIMIT = -1 \
 			IS_TEMPLATE = False;"
 		cursor1.execute(query1)
