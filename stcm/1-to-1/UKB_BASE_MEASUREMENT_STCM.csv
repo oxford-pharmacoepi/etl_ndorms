@@ -1,6 +1,6 @@
 source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
 p22189,0,UKB_BASE_MEASUREMENT_STCM,Townsend deprivation index at recruitment,715996,OMOP Extension,2022-04-08,2099-12-31,
-p21001,0,UKB_BASE_MEASUREMENT_STCM,Body mass index (BMI),44783982,SNOMED,2014-01-31,2099-12-31,
+p21001,0,UKB_BASE_MEASUREMENT_STCM,Body mass index (BMI),3038553,LOINC,1970-01-31,2099-12-31,
 p30620,0,UKB_BASE_MEASUREMENT_STCM,Alanine aminotransferase,44788835,SNOMED,2006-04-01,2099-12-31,
 p30600,0,UKB_BASE_MEASUREMENT_STCM,Albumin,4017497,SNOMED,2002-01-31,2099-12-31,
 p30610,0,UKB_BASE_MEASUREMENT_STCM,Alkaline phosphatase,4156813,SNOMED,2002-01-31,2099-12-31,
