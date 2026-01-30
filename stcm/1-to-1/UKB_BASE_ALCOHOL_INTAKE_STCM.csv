@@ -1,0 +1,8 @@
+source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
+p1558,0,UKB_BASE_ALCOHOL_INTAKE_STCM,Alcohol intake frequency,35810226,UK Biobank,2012-01-05,2099-12-31,
+1,0,UKB_BASE_ALCOHOL_INTAKE_STCM,Daily or almost daily,35817657,UK Biobank,2012-01-05,2099-12-31,
+2,0,UKB_BASE_ALCOHOL_INTAKE_STCM,Three or four times a week,35824290,UK Biobank,2012-01-05,2099-12-31,
+3,0,UKB_BASE_ALCOHOL_INTAKE_STCM,Once or twice a week,35821820,UK Biobank,2012-01-05,2099-12-31,
+4,0,UKB_BASE_ALCOHOL_INTAKE_STCM,One to three times a month,35821830,UK Biobank,2012-01-05,2099-12-31,
+5,0,UKB_BASE_ALCOHOL_INTAKE_STCM,Special occasions only,35823801,UK Biobank,2012-01-05,2099-12-31,
+6,0,UKB_BASE_ALCOHOL_INTAKE_STCM,Never,35821330,UK Biobank,2012-01-05,2099-12-31,
