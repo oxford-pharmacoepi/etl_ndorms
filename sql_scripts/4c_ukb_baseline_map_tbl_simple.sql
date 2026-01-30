@@ -162,7 +162,7 @@ with cte as(
 			distinct 
 			t1.eid, 
 			t1.p53_i0, 
-			COALESCE(t2.date_of_death, to_date(RIGHT(current_database(), 8), 'YYYYMMDD')),
+			COALESCE(t2.date_of_death, to_date(RIGHT(current_database(), 6), 'YYYYMM' || '01')),
 			32880		-- same as GOLD 
 	from {SOURCE_SCHEMA}.baseline as t1
 	left join {SOURCE_SCHEMA}.death as t2 on t1.eid = t2.eid
@@ -177,43 +177,3 @@ ALTER TABLE {TARGET_SCHEMA}.observation_period ADD CONSTRAINT xpk_observation_pe
 CREATE INDEX IF NOT EXISTS idx_observation_period_id ON {TARGET_SCHEMA}.observation_period (person_id ASC) TABLESPACE pg_default;
 CLUSTER {TARGET_SCHEMA}.observation_period USING idx_observation_period_id;
 
---------------------------------
--- Map p22189 "Townsend Deprivation Index" to Measurement
---------------------------------
-
--- SEQUENCE for ukb baseline Measurement
-DROP SEQUENCE IF EXISTS {SOURCE_SCHEMA}.meas_seq;
-CREATE SEQUENCE {SOURCE_SCHEMA}.meas_seq as bigint START WITH 1 INCREMENT BY 1 NO MAXVALUE CACHE 1;
-
-insert into {TARGET_SCHEMA}.measurement
-select 
-	nextval('{SOURCE_SCHEMA}.meas_seq') as measurement_id,
-	t1.eid,
-	t2.target_concept_id as measurement_concept_id,
-	t1.p53_i0 as measurement_date,			-- Initial assessment visit (2006-2010) at which participants were recruited and consent given
-	t1.p53_i0 as measurement_datetime,
-	NULL as measurement_time,
-	32880 as measurement_type_concept_id,  -- Standard algorithm (Townsend deprivation index calculated immediately prior to participant joining UK Biobank.)
-	NULL::int as operator_concept_id,
-	t1.p22189 as value_as_number,
-	NULL::int as value_as_concept_id,
-	NULL::int as unit_concept_id,  
-	NULL::int as range_low,
-	NULL::int as range_high,
-	NULL::int as provider_id,
-	NULL::bigint as visit_occurrence_id,
-	NULL::bigint as visit_detail_id,
-	t2.source_code as measurement_source_value,
-	t2.source_concept_id as measurement_source_concept_id,	
-	NULL as unit_source_value, 
-	NULL::int as unit_source_concept_id,
-	NULL as value_source_value,
-	NULL::bigint as measurement_event_id,
-	NULL::int as meas_event_field_concept_id
-from {SOURCE_SCHEMA}.baseline as t1
-join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on '189' = t2.source_code 
-join {TARGET_SCHEMA}.observation_period as t3 on t1.eid = t3.person_id
-where t1.p22189 is not null
-and t1.p53_i0 >= t3.observation_period_start_date and p53_i0 <= observation_period_end_date
-and t2.source_vocabulary_id = 'UKB_MEASUREMENT_STCM'
-and t2.target_domain_id = 'Measurement';
