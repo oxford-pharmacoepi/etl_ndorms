@@ -738,7 +738,8 @@ def load_folders(db_conf, schema, folder):
 				stream.seek(0)
 				stream.readline()	#To avoid headers
 				if data_provider == 'ukb':
-					if tbl_name == 'baseline' or tbl_name == 'cancer':
+#					if tbl_name == 'baseline' or tbl_name == 'cancer':
+					if tbl_name == 'cancer':
 						cursor1.copy_expert("COPY " + tbl_name + " FROM STDIN WITH (FORMAT CSV, delimiter ',', quote '\"', NULL 'NA')", stream)
 					else:
 						cursor1.copy_expert("COPY " + tbl_name + " FROM STDIN WITH (FORMAT CSV, delimiter '	', quote '\u0007', NULL '')", stream)
