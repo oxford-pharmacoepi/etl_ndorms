@@ -57,7 +57,8 @@ def main():
 				cnx = sql.connect(
 					user=db_conf['username'],
 					password=db_conf['password'],
-					database=database
+					database=database,
+					port=db_conf['port']
 				)
 				cursor1 = cnx.cursor()
 				cnx.autocommit = True
@@ -101,7 +102,8 @@ def main():
 # If this is a linked dataset, create/recreate _max_ids table in target_schema_to_link
 # ---------------------------------------------------------
 			if ret == True:
-				if 'target_schema_to_link' in db_conf and db_conf['target_schema_to_link'] != db_conf['target_schema']:
+				if 'target_schema_to_link' in db_conf and db_conf['target_schema_to_link'] != '' \
+					and db_conf['target_schema_to_link'] != db_conf['target_schema']:
 					target_schema_to_link = db_conf['target_schema_to_link']
 					qa = input('Do you want to CREATE/RECREATE ' + target_schema_to_link.upper() + '._max_ids and ' + target_schema.upper() + '._next_ids? (y/n):').lower() 
 					while qa not in ['y', 'n', 'yes', 'no']:
@@ -164,7 +166,7 @@ def main():
 # Tables to load: TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL
 # ---------------------------------------------------------
 			if ret == True:
-				if database_type in ['aurum', 'ukb_gp', 'ukb_hesin', 'ukb_cancer', 'ncrascr1', 'ncrascr2']:
+				if database_type in ['aurum', 'ukb_baseline', 'ukb_gp', 'ukb_hesin', 'ukb_cancer', 'ncrascr1', 'ncrascr2']:
 					qa = input('Do you want to CREATE/RECREATE the temp tables (TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL)? (y/n):').lower() 
 					while qa not in ['y', 'n', 'yes', 'no']:
 						qa = input('I did not understand that. Do you want to CREATE/RECREATE the temp tables (TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL? (y/n):').lower()
@@ -188,7 +190,16 @@ def main():
 # Create/Recreate CHUNK table and any chunk job previously done?
 # ---------------------------------------------------------
 			if ret == True:
-				if database_type not in ('hesop', 'ukb'): #They do not use STEM and do not need chunking 
+				if database_type == 'ukb_baseline':
+					qa = input('Do you want to PROCEED with UKBB baseline MEASUREMENTS/OBSERVATIONS mapping? (y/n):').lower() 
+					while qa not in ['y', 'n', 'yes', 'no']:
+						qa = input('I did not understand that. Do you want to PROCEED with UKBB baseline MEASUREMENTS/OBSERVATIONS mapping? (y/n):').lower()
+					if qa in ['y', 'yes']:
+						fname = dir_sql + '4i' + db_conf['cdm_version'][2] + '_' + database_type + '_map_tbl_cdm.sql'
+						print('Executing ' + fname + ' ... (MEASUREMENT)')
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, cnx, True, debug, False)
+					
+				elif database_type not in ('hesop'): #They do not use STEM and do not need chunking 
 					qa = input('Do you want to CREATE/RECREATE the chunk table and remove any chunk work previously done? (y/n):').lower() 
 					while qa not in ['y', 'n', 'yes', 'no']:
 						qa = input('I did not understand that. Do you want to CREATE/RECREATE the chunk table and remove any chunk work previously done? (y/n):').lower()
