@@ -221,10 +221,10 @@ cte2 as (
 ),
 cte3 as (
 --Calculate episode_end_date
-	select person_id, stem_source_id, MAX(end_date) as end_date 
+	select person_id, stem_source_id, rttreatmentmodality, MAX(end_date) as end_date 
 	from {CHUNK_SCHEMA}.stem_{CHUNK_ID}
 	where stem_source_table = 'RTDS'
-	group by person_id, stem_source_id
+	group by person_id, stem_source_id, rttreatmentmodality
 ),
 cte4 as (
 	select person_id, stem_source_id, concept_id
