@@ -1,6 +1,7 @@
 db_conf = dict({
 	'username': 'user',
 	'password': 'pwd',
+	'port': 6543,							# 6543 = Postgres 15, 5432 = Postgres 13
 	'database': 'database_name',
 	'data_provider': 'name_of_provider',	#e.g. 'cprd', 'thin', 'ukb'('ukbiobank' for the exisiting mapped one)
 	'database_type': 'type of database',	#e.g. 'gold, 'aurum', 'hesapc', 'ukb'(baseline), 'ukb_gp', 'ukb_hesin'
@@ -36,12 +37,12 @@ db_conf = dict({
 	'tbl_hesae': ['hesae_patient', 'hesae_attendance', 'hesae_diagnosis', 'hesae_investigation', 'hesae_treatment', 'hesae_hrg', 'hesae_pathway'],
 	'tbl_ons': ['linkage_coverage','ons_death'],
 	'tbl_ncrascr': ['tumour', 'treatment'],
-	'tbl_ukb_gp_lookup': ['lookup626', 'gold_product' , 'gold_daysupply_decodes', 'gold_daysupply_modes'],
-	'tbl_ukb_cancer_lookup': ['lookup1970'],
-	'tbl_ukb_baseline': ['baseline', 'death', 'death_cause'],
-	'tbl_ukb_cancer': ['baseline', 'death', 'cancer'],
+	'tbl_ukb_baseline': ['_patid_deleted', 'baseline', 'death', 'death_cause'],
 	'tbl_ukb_gp': ['baseline', 'death', 'gp_clinical', 'gp_registrations', 'gp_scripts'],
+	'tbl_ukb_gp_lookup': ['lookup626', 'gold_product' , 'gold_daysupply_decodes', 'gold_daysupply_modes'],
 	'tbl_ukb_hesin': ['baseline', 'death', 'hesin', 'hesin_critical', 'hesin_delivery', 'hesin_diag', 'hesin_maternity', 'hesin_oper', 'hesin_psych'],
+	'tbl_ukb_cancer': ['baseline', 'death', 'cancer'],
+	'tbl_ukb_cancer_lookup': ['lookup1970'],
 	'tbl_cprd': ['denominators', 'documentation', 'lookups', 'reference'],
 	'tbl_cdm': ['care_site', 'condition_era', 'condition_occurrence', 'death', 'device_exposure', 'dose_era', 'drug_era', 'drug_exposure', 'location', 'measurement', 'observation', 'observation_period', 'person', 'procedure_occurrence', 'provider', 'specimen', 'visit_detail', 'visit_occurrence'],
 	'tbl_cdm_voc': ['drug_strength', 'concept', 'concept_relationship', 'concept_ancestor', 'concept_synonym', 'vocabulary', 'relationship', 'concept_class', 'domain']
