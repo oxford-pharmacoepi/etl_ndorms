@@ -47,6 +47,7 @@ def is_curation_needed_aurum(tbl_patient, tbl_observation):
 def main():
 	ret = True
 	global db_conf
+	global debug
 
 	try:
 		(ret, dir_study, db_conf, debug) = mapping_util.get_parameters()
@@ -73,7 +74,7 @@ def main():
 # ---------------------------------------------------------
 				fname = dir_sql + '1__schema_create.sql'
 				print('Calling ' + fname + ' ...')
-				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
+				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, debug, False)
 			if ret == True:
 # ---------------------------------------------------------
 # Ask the user for DROP confirmation
@@ -84,7 +85,7 @@ def main():
 				if qa.lower() in ['y', 'yes']:
 					fname = dir_sql + '1a_' + database_type + '_drop.sql'
 					print('Calling ' + fname + ' ...')
-					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
+					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, debug, False)
 			if ret == True:
 # ---------------------------------------------------------
 # Ask the user for LOAD confirmation
@@ -99,7 +100,7 @@ def main():
 					time1 = time.time()
 					fname = dir_sql + '1b_' + database_type + '_create.sql'
 					print('Calling ' + fname + ' ...')
-					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
+					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, debug, False)
 # ---------------------------------------------------------
 # Load source data
 # ---------------------------------------------------------
@@ -126,7 +127,7 @@ def main():
 					sql_file_list = sorted(glob.iglob(dir_sql + '1c_' + database_type + '_pk_idx*.sql'))
 					print(dir_sql + '1c_' + database_type + '_pk_idx*.sql')
 					print(sql_file_list)
-					ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, True)
+					ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, debug)
 					if ret == True:
 						task_finished = 'Finished adding PKs/indexes to ' + database_type.upper() + ' in {0}'.format(mapping_util.calc_time(time.time() - time1))
 						print(task_finished)
@@ -152,7 +153,7 @@ def main():
 					if ret == True and curation == True:
 						fname = dir_sql + '1d_' + database_type + '_curation.sql'
 						print('Executing ' + fname + ' ...')
-						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
 						if ret == True:
 							task_finished = "Finished curation on  " + database_type.upper() + " data in {0}".format(mapping_util.calc_time(time.time() - time1))
 							print(task_finished)
