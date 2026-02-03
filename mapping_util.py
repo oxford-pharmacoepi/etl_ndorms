@@ -741,6 +741,12 @@ def load_folders(db_conf, schema, folder):
 #					if tbl_name == 'baseline' or tbl_name == 'cancer':
 					if tbl_name == 'cancer':
 						cursor1.copy_expert("COPY " + tbl_name + " FROM STDIN WITH (FORMAT CSV, delimiter ',', quote '\"', NULL 'NA')", stream)
+					elif tbl_name == 'gp_clinical':
+						col_gp_clinical = ('eid', 'data_provider', 'event_dt', 'read_2', 'read_3', 'value1', 'value2', 'value3')
+						cursor1.copy_from(stream, tbl_name, sep = '	', null = '', columns=col_gp_clinical)
+					elif tbl_name == 'gp_scripts':
+						col_gp_scripts = ('eid', 'data_provider', 'issue_date', 'read_2', 'bnf_code', 'dmd_code', 'drug_name', 'quantity')
+						cursor1.copy_from(stream, tbl_name, sep = '	', null = '', columns=col_gp_scripts)
 					else:
 						cursor1.copy_expert("COPY " + tbl_name + " FROM STDIN WITH (FORMAT CSV, delimiter '	', quote '\u0007', NULL '')", stream)
 				else:
