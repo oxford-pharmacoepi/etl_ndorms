@@ -505,7 +505,7 @@ def execute_query(db_conf, query, debug = True):
 	return(ret)	
 
 # ---------------------------------------------------------
-def execute_multiple_queries(db_conf, filename, chunk_id = None, cnx = None, commit = True, debug = True, move_files = True):
+def execute_multiple_queries(db_conf, filename, chunk_id = None, cnx = None, commit = True, debug = True, move_files = False):
 # ---------------------------------------------------------
 	ret 			= True
 	new_connection 	= False
