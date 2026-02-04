@@ -11,6 +11,8 @@ mapping_util = SourceFileLoader('mapping_util', os.path.dirname(os.path.realpath
 # ---------------------------------------------------------
 def main():
 	ret = True
+	global db_conf
+	global debug
 	
 	try:
 		(ret, dir_study, db_conf, debug) = mapping_util.get_parameters()
@@ -29,7 +31,7 @@ def main():
 				time1 = time.time()
 				fname = dir_sql + '7a_cdm_records_create.sql'
 				print('Calling ' + fname + ' ...')
-				ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True, False)			
+				ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)			
 				if ret == True:
 					tbl_list_count = [target_schema + "." + tbl for tbl in db_conf['tbl_cdm']]
 					tbl_list_count.extend([target_schema + "." + tbl for tbl in db_conf['tbl_cdm_voc']])
