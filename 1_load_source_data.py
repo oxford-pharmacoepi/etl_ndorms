@@ -153,7 +153,7 @@ def main():
 					if ret == True and curation == True:
 						fname = dir_sql + '1d_' + database_type + '_curation.sql'
 						print('Executing ' + fname + ' ...')
-						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug)
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)
 						if ret == True:
 							task_finished = "Finished curation on  " + database_type.upper() + " data in {0}".format(mapping_util.calc_time(time.time() - time1))
 							print(task_finished)
