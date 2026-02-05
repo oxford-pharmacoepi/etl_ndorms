@@ -340,12 +340,15 @@ With cte0 AS(
 	join {SOURCE_SCHEMA}.lookup626 as lkup on lkup.code = t1.data_provider
 	join {TARGET_SCHEMA}.observation_period as t2 on t1.eid = t2.person_id
 	where t1.event_dt >= t2.observation_period_start_date and t1.event_dt <= t2.observation_period_end_date
+), cte2 as (
+	SELECT max_id as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
+	WHERE lower(tbl_name) = 'visit_detail'
 )
 insert into {SOURCE_SCHEMA}.temp_visit_detail
 select 
-	ROW_NUMBER () OVER ( ORDER BY eid, event_dt, data_provider, source_table) as visit_detail_id,
-	*
-from cte1;
+	ROW_NUMBER () OVER ( ORDER BY eid, event_dt, data_provider, source_table) + cte2.start_id as visit_detail_id,
+	cte1.*
+from cte1, cte2;
 
 alter table {SOURCE_SCHEMA}.temp_visit_detail add constraint pk_temp_visit_d primary key (visit_detail_id);
 create index idx_temp_visit_1 on {SOURCE_SCHEMA}.temp_visit_detail (person_id, visit_detail_start_date, data_provider, source_table); 

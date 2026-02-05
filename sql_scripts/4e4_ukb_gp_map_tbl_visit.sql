@@ -3,17 +3,26 @@
 --------------------------------
 drop table if exists {TARGET_SCHEMA}.visit_occurrence CASCADE;
 
-With cte1 AS(
+WITH cte0 AS (
+	SELECT max_id as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
+	WHERE lower(tbl_name) = 'visit_occurrence'
+),
+cte1 AS (
 	SELECT 
-			row_number() over (order by person_id, visit_detail_start_date, data_provider) as visit_occurrence_id, 
-			person_id,
-			visit_detail_start_date,
-			data_provider
+		row_number() over (order by person_id, visit_detail_start_date, data_provider) as visit_occurrence_id, 
+		person_id,
+		visit_detail_start_date,
+		data_provider
 	from {SOURCE_SCHEMA}.temp_visit_detail
 	group by person_id, visit_detail_start_date, data_provider
+),
+cte2 AS (
+	SELECT visit_occurrence_id + cte0.start_id as visit_occurrence_id,
+	person_id, visit_detail_start_date, data_provider
+	from cte0, cte1
 )
 SELECT 
-	t1.visit_occurrence_id as visit_occurrence_id,
+	t1.visit_occurrence_id,
 	t1.person_id as person_id,
 	581477::integer as visit_concept_id,
 	t1.visit_detail_start_date as visit_start_date,
@@ -31,8 +40,8 @@ SELECT
 	NULL::varchar(50) as discharged_to_source_value,
 	t2.visit_occurrence_id as preceding_visit_occurrence_id
 INTO {TARGET_SCHEMA}.visit_occurrence
-from cte1 as t1
-left join cte1 as t2 on (t2.visit_occurrence_id + 1) = t1.visit_occurrence_id and t1.person_id = t2.person_id and t1.data_provider = t2.data_provider;
+from cte2 as t1
+left join cte2 as t2 on (t2.visit_occurrence_id + 1) = t1.visit_occurrence_id and t1.person_id = t2.person_id and t1.data_provider = t2.data_provider;
 
 
 alter table {TARGET_SCHEMA}.visit_occurrence add constraint xpk_visit_occurrence primary key (visit_occurrence_id) USING INDEX TABLESPACE pg_default;
@@ -45,18 +54,22 @@ CREATE INDEX idx_visit_concept_id ON {TARGET_SCHEMA}.visit_occurrence (visit_con
 --------------------------------
 drop table if exists {TARGET_SCHEMA}.visit_detail CASCADE;
 
-With cte1 AS(
+With cte0 as (
+	SELECT max_id as start_id_vo from {TARGET_SCHEMA_TO_LINK}._max_ids 
+	WHERE lower(tbl_name) = 'visit_occurrence'
+),
+cte1 AS (
 	SELECT 
-			row_number() over (order by person_id, visit_detail_start_date, data_provider) as visit_occurrence_id, 
-			person_id,
-			visit_detail_start_date,
-			data_provider, 
-			min(visit_detail_id) - 1 as tmp_id --preceding_visit_detail_id
+		row_number() over (order by person_id, visit_detail_start_date, data_provider) as visit_occurrence_id, 
+		person_id,
+		visit_detail_start_date,
+		data_provider, 
+		min(visit_detail_id) - 1 as tmp_id --preceding_visit_detail_id
 	from {SOURCE_SCHEMA}.temp_visit_detail
 	group by person_id, visit_detail_start_date, data_provider
 )
 select 
-	t1.visit_detail_id as visit_detail_id, 
+	t1.visit_detail_id, 
 	t1.person_id as person_id, 
 	581477::integer as visit_detail_concept_id,
 	t1.visit_detail_start_date as visit_detail_start_date,
@@ -74,10 +87,10 @@ select
 	null::integer as discharged_to_concept_id,
 	t3.visit_detail_id as preceding_visit_detail_id,
 	null::bigint as parent_visit_detail_id,
-	t2.visit_occurrence_id as visit_occurrence_id
+	t2.visit_occurrence_id + cte0.start_id_vo as visit_occurrence_id
 into {TARGET_SCHEMA}.visit_detail
-from {SOURCE_SCHEMA}.temp_visit_detail as t1
-left join cte1 as t2 on t1.person_id = t2.person_id and t1.visit_detail_start_date = t2.visit_detail_start_date and t1.data_provider =t2.data_provider
+from cte0, {SOURCE_SCHEMA}.temp_visit_detail as t1
+left join cte1 as t2 on t1.person_id = t2.person_id and t1.visit_detail_start_date = t2.visit_detail_start_date and t1.data_provider = t2.data_provider
 left join {SOURCE_SCHEMA}.temp_visit_detail as t3 on t2.tmp_id = t3.visit_detail_id and t2.person_id = t3.person_id;
 
 	
