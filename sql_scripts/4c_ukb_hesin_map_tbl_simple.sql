@@ -1,50 +1,50 @@
---------------------------------
--- LOCATION
---------------------------------
-INSERT INTO {TARGET_SCHEMA}.location
-SELECT 
-	location_id, 
-	address_1,
-	address_2, 
-	city, 
-	state, 
-	zip, 
-	county,
-	location_source_value,
-	country_concept_id,
-	country_source_value,
-	latitude,
-	longitude
-FROM public_ukb_baseline.location;
---------------------------------
--- PERSON
---------------------------------
-INSERT INTO {TARGET_SCHEMA}.person
-select distinct
-	eid,
-	0 as target_concept_id,
-	0,
-	NULL::int,
-	NULL::int,
-	NULL::timestamp,
-	0,
-	0,
-	NULL::bigint,
-	NULL::bigint,
-	NULL::int, 
-	eid,
-	NULL,
-	NULL::int,
-	NULL, 
-	NULL::int,
-	NULL, 
-	NULL::int
-from {SOURCE_SCHEMA}.hesin;
-
-ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default;
-CREATE UNIQUE INDEX idx_person_id ON {TARGET_SCHEMA}.person (person_id ASC) TABLESPACE pg_default;
-CLUSTER {TARGET_SCHEMA}.person USING xpk_person;
-CREATE INDEX idx_gender ON {TARGET_SCHEMA}.person (gender_concept_id ASC) TABLESPACE pg_default;
+----------------------------------
+---- LOCATION
+----------------------------------
+--INSERT INTO {TARGET_SCHEMA}.location
+--SELECT 
+--	location_id, 
+--	address_1,
+--	address_2, 
+--	city, 
+--	state, 
+--	zip, 
+--	county,
+--	location_source_value,
+--	country_concept_id,
+--	country_source_value,
+--	latitude,
+--	longitude
+--FROM public_ukb_baseline.location;
+----------------------------------
+---- PERSON
+----------------------------------
+--INSERT INTO {TARGET_SCHEMA}.person
+--select distinct
+--	eid,
+--	0 as target_concept_id,
+--	0,
+--	NULL::int,
+--	NULL::int,
+--	NULL::timestamp,
+--	0,
+--	0,
+--	NULL::bigint,
+--	NULL::bigint,
+--	NULL::int, 
+--	eid,
+--	NULL,
+--	NULL::int,
+--	NULL, 
+--	NULL::int,
+--	NULL, 
+--	NULL::int
+--from {SOURCE_SCHEMA}.hesin;
+--
+--ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default;
+--CREATE UNIQUE INDEX idx_person_id ON {TARGET_SCHEMA}.person (person_id ASC) TABLESPACE pg_default;
+--CLUSTER {TARGET_SCHEMA}.person USING xpk_person;
+--CREATE INDEX idx_gender ON {TARGET_SCHEMA}.person (gender_concept_id ASC) TABLESPACE pg_default;
 
 --------------------------------
 -- PROVIDER from hesin
@@ -101,29 +101,29 @@ FROM cte2;
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_pro;
 
 CREATE UNIQUE INDEX idx_provider_source ON {TARGET_SCHEMA}.provider (specialty_source_value ASC) TABLESPACE pg_default;
---------------------------------
--- DEATH
---------------------------------
-INSERT INTO {TARGET_SCHEMA}.death(
-	person_id, 
-	death_date, 
-	death_datetime, 
-	death_type_concept_id,
-	cause_concept_id, 
-	cause_source_value, 
-	cause_source_concept_id
-)
-select 
-	t1.person_id, 
-	t1.death_date, 
-	t1.death_datetime, 
-	t1.death_type_concept_id,
-	t1.cause_concept_id, 
-	t1.cause_source_value, 
-	t1.cause_source_concept_id
-from public_ukb_baseline.death as t1
-inner join {TARGET_SCHEMA}.person as t2 on t1.person_id = t2.person_id;
-
+----------------------------------
+---- DEATH
+----------------------------------
+--INSERT INTO {TARGET_SCHEMA}.death(
+--	person_id, 
+--	death_date, 
+--	death_datetime, 
+--	death_type_concept_id,
+--	cause_concept_id, 
+--	cause_source_value, 
+--	cause_source_concept_id
+--)
+--select 
+--	t1.person_id, 
+--	t1.death_date, 
+--	t1.death_datetime, 
+--	t1.death_type_concept_id,
+--	t1.cause_concept_id, 
+--	t1.cause_source_value, 
+--	t1.cause_source_concept_id
+--from public_ukb_baseline.death as t1
+--inner join {TARGET_SCHEMA}.person as t2 on t1.person_id = t2.person_id;
+--
 --------------------------------
 -- OBSERVATION_PERIOD --
 --------------------------------
@@ -157,9 +157,10 @@ select
 	t2.min_date as observation_period_start_date,  
 	LEAST(t2.max_date,t3.death_date) as observation_period_end_date,
 	32880
-from {TARGET_SCHEMA}.person as t1
+from {TARGET_SCHEMA_TO_LINK}.person as t1
 left join cte1 as t2 on t1.person_id = t2.eid
-left join public_ukb_baseline.death as t3 on t2.eid = t3.person_id; 
+left join {TARGET_SCHEMA_TO_LINK}.death as t3 on t2.eid = t3.person_id
+WHERE t2.min_date is not null or t2.max_date is not null;
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.observation_period_seq;
 
