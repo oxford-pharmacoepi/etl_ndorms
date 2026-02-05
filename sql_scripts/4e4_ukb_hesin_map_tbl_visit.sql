@@ -77,8 +77,8 @@ into {TARGET_SCHEMA}.visit_detail
 FROM {SOURCE_SCHEMA}.temp_visit_detail as t1
 INNER JOIN cte2 as t2 on t1.person_id = t2.person_id and t1.visit_source_value = t2.visit_source_value and t1.visit_detail_source_value = t2.visit_detail_source_value
 INNER JOIN {SOURCE_SCHEMA}.hesin AS t3 ON t3.eid = t1.person_id AND t1.visit_source_value = t3.spell_index::varchar(50) and t1.visit_detail_source_value = t3.ins_index::varchar(50)
-LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t4 on t4.source_code = CONCAT('265-',t3.admisorc_uni) and t4.target_domain_id = 'Visit' and t4.source_vocabulary_id = 'UKB_ADMISORC_STCM'
-LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map as t5 on t5.source_code = CONCAT('267-',t3.disdest_uni) and t5.target_domain_id = 'Visit' and t5.source_vocabulary_id = 'UKB_DISDEST_STCM'
+LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t4.source_code = CONCAT('265-',t3.admisorc_uni) and t4.target_domain_id = 'Visit' and t4.source_vocabulary_id = 'UKB_ADMISORC_STCM'
+LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t5 on t5.source_code = CONCAT('267-',t3.disdest_uni) and t5.target_domain_id = 'Visit' and t5.source_vocabulary_id = 'UKB_DISDEST_STCM'
 LEFT JOIN {SOURCE_SCHEMA}.temp_visit_detail as t6 on t1.person_id = t6.person_id and (t1.visit_detail_id - 1) = t6.visit_detail_id;
 
 
