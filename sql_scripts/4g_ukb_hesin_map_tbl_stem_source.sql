@@ -35,7 +35,7 @@ cte2 AS (
     t1.*, 
     CASE WHEN t2.source_concept_id is null then 0 else t2.source_concept_id END AS source_concept_id
 	FROM cte1 AS t1
-	LEFT JOIN {TARGET_SCHEMA}.source_to_standard_vocab_map AS t2 
+	LEFT JOIN {VOCABULARY_SCHEMA}.source_to_standard_vocab_map AS t2 
     ON t2.source_code = t1.source_value AND UPPER(t2.source_vocabulary_id) IN ('ICD9CM', 'ICD10') 
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (domain_id, person_id, visit_occurrence_id, visit_detail_id, provider_id, concept_id, source_value,
