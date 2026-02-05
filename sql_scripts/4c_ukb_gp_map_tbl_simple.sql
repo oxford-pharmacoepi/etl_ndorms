@@ -72,8 +72,8 @@ INSERT INTO {TARGET_SCHEMA}.observation_period(
 	select 
 		ROW_NUMBER () OVER ( ORDER BY t1.person_id) as observation_period_id,
 		t1.person_id, 
-		LEAST(t2.reg_date, t3.min_event_dt, t4.min_issue_date), 
-		COALESCE(LEAST(t5.death_date, GREATEST(t3.max_event_dt, t4.max_issue_date)), to_date(RIGHT(current_database(), 6), 'YYYYMM' || '01')),
+		LEAST(t2.reg_date, t3.min_event_dt, t4.min_issue_date) as observation_period_start_date, 
+		COALESCE(LEAST(t5.death_date, GREATEST(t3.max_event_dt, t4.max_issue_date)), to_date(RIGHT(current_database(), 6), 'YYYYMM' || '01')) as observation_period_end_date,
 		32880		-- same as GOLD 
 	from {TARGET_SCHEMA_TO_LINK}.person as t1
 	left join reg as t2 on t1.person_id = t2.eid
