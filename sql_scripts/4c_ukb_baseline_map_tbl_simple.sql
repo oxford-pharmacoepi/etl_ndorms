@@ -162,7 +162,8 @@ with cte as(
 			distinct 
 			t1.eid, 
 			t1.p53_i0, 
-			COALESCE(t2.date_of_death, to_date(RIGHT(current_database(), 6), 'YYYYMM' || '01')),
+--			COALESCE(t2.date_of_death, to_date(RIGHT(current_database(), 6), 'YYYYMM' || '01')),
+			COALESCE(t2.date_of_death, to_date({SOURCE_RELEASE_DATE},'YYYY-MM-DD')),
 			32880		-- same as GOLD 
 	from {SOURCE_SCHEMA}.baseline as t1
 	left join {SOURCE_SCHEMA}.death as t2 on t1.eid = t2.eid

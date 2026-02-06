@@ -58,7 +58,8 @@ With clinical AS(
 	group by eid
 ), reg AS(
 	select eid, 
-		min(reg_date) as reg_date
+		min(reg_date) as reg_date,
+		max(deduct_date) as deduct_date
 	from {SOURCE_SCHEMA}.gp_registrations 
 	group by eid
 ), prescript AS(
@@ -73,7 +74,7 @@ INSERT INTO {TARGET_SCHEMA}.observation_period(
 		ROW_NUMBER () OVER ( ORDER BY t1.person_id) as observation_period_id,
 		t1.person_id, 
 		LEAST(t2.reg_date, t3.min_event_dt, t4.min_issue_date) as observation_period_start_date, 
-		COALESCE(LEAST(t5.death_date, GREATEST(t3.max_event_dt, t4.max_issue_date)), to_date(RIGHT(current_database(), 6), 'YYYYMM' || '01')) as observation_period_end_date,
+		COALESCE(LEAST(t5.death_date, GREATEST(t3.max_event_dt, t4.max_issue_date), t2.deduct_date), to_date({SOURCE_RELEASE_DATE},'YYYY-MM-DD')) as observation_period_end_date,
 		32880		-- same as GOLD 
 	from {TARGET_SCHEMA_TO_LINK}.person as t1
 	left join reg as t2 on t1.person_id = t2.eid
