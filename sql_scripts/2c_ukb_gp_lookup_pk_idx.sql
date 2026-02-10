@@ -1,4 +1,4 @@
-alter table {SOURCE_SCHEMA}.lookup626 add constraint pk_626 primary key (code) USING INDEX TABLESPACE pg_default;
+alter table {SOURCE_SCHEMA}.coding626 add constraint pk_626 primary key (code) USING INDEX TABLESPACE pg_default;
 alter table {SOURCE_SCHEMA}.gold_product add constraint pk_gold_product primary key (prodcode) USING INDEX TABLESPACE pg_default;
 alter table {SOURCE_SCHEMA}.gold_daysupply_decodes add constraint pk_gold_daysupply_decodes primary key (id) USING INDEX TABLESPACE pg_default;
 alter table {SOURCE_SCHEMA}.gold_daysupply_modes add constraint pk_gold_daysupply_modes primary key (id) USING INDEX TABLESPACE pg_default;

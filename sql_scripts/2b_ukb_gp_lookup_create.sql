@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.lookup626
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.coding626
 (
 	code smallint NOT NULL,
 	description varchar(20) NOT NULL
