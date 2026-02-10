@@ -7,7 +7,9 @@ CREATE TABLE {SOURCE_NOK_SCHEMA}.cancer (LIKE {SOURCE_SCHEMA}.cancer) TABLESPACE
 
 INSERT INTO {SOURCE_NOK_SCHEMA}.cancer
 select t1.* from {SOURCE_SCHEMA}.cancer as t1
-join {SOURCE_SCHEMA}._patid_deleted as t2 on t1.eid = t2.patid;	--Remove withdrawal patients
+left join {TARGET_SCHEMA_TO_LINK}.person as t2 on t1.eid = t2.person_id	--Remove withdrawal patients
+where t2.person_id is null;
+
 
 alter table {SOURCE_NOK_SCHEMA}.cancer add constraint pk_cancer_nok primary key (eid) USING INDEX TABLESPACE pg_default;
 
@@ -101,14 +103,7 @@ alter table {SOURCE_SCHEMA}.cancer_longitude add constraint pk_cancer_longitude 
 ------------------------------------
 
 DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.cancer_longitude CASCADE;
-
-DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.baseline CASCADE;
-DROP TABLE IF EXISTS {SOURCE_NOK_SCHEMA}.death CASCADE;
-
 CREATE TABLE {SOURCE_NOK_SCHEMA}.cancer_longitude (LIKE {SOURCE_SCHEMA}.cancer_longitude) TABLESPACE pg_default;
-
-CREATE TABLE {SOURCE_NOK_SCHEMA}.baseline (LIKE {SOURCE_SCHEMA}.baseline) TABLESPACE pg_default;
-CREATE TABLE {SOURCE_NOK_SCHEMA}.death (LIKE {SOURCE_SCHEMA}.death) TABLESPACE pg_default;
 
 --------------------------------
 -- cancer_longitude
@@ -156,36 +151,6 @@ alter table {SOURCE_NOK_SCHEMA}.cancer_longitude add constraint pk_cancer_longit
 DELETE FROM {SOURCE_SCHEMA}.cancer_longitude as t1 
 using {SOURCE_NOK_SCHEMA}.cancer_longitude as t2
 WHERE t1.id = t2.id;
-
---------------------------------
--- baseline
---------------------------------
-INSERT INTO {SOURCE_NOK_SCHEMA}.baseline
-select t1.*
-from {SOURCE_SCHEMA}.baseline as t1
-left join {SOURCE_SCHEMA}.cancer_longitude as t2 on t1.eid = t2.eid
-where t2.eid is null;
-
-alter table {SOURCE_NOK_SCHEMA}.baseline add constraint pk_baseline_nok primary key (eid) USING INDEX TABLESPACE pg_default;
-
-DELETE FROM {SOURCE_SCHEMA}.baseline as t1 
-using {SOURCE_NOK_SCHEMA}.baseline as t2
-WHERE t1.eid = t2.eid;
-
---------------------------------
--- death
---------------------------------
-INSERT INTO {SOURCE_NOK_SCHEMA}.death
-select t1.*
-from {SOURCE_SCHEMA}.death as t1
-join {SOURCE_NOK_SCHEMA}.baseline as t2 on t1.eid = t2.eid; 
-
-alter table {SOURCE_NOK_SCHEMA}.death add constraint pk_death primary key (eid, ins_index) USING INDEX TABLESPACE pg_default;
-
-DELETE FROM {SOURCE_SCHEMA}.death as t1 
-using {SOURCE_NOK_SCHEMA}.death as t2
-WHERE t1.eid = t2.eid
-and t1.ins_index = t2.ins_index;
 
 -- create index in cancer_longitude
 create index idx_cancer_longitude_1 on {SOURCE_SCHEMA}.cancer_longitude(eid) TABLESPACE pg_default;
