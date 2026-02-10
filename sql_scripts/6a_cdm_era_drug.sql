@@ -115,7 +115,7 @@ WITH ctePreDrugTarget(drug_exposure_id, person_id, ingredient_concept_id, drug_e
 		, drug_sub_exposure_start_date
 		, drug_sub_exposure_end_date
 		, drug_exposure_count
-		, drug_sub_exposure_end_date - drug_sub_exposure_start_date AS days_exposed
+		, drug_sub_exposure_end_date - drug_sub_exposure_start_date + 1 AS days_exposed
 	INTO {TARGET_SCHEMA}.cteFinalTarget
 	FROM cteSubExposures;
 	
@@ -180,7 +180,7 @@ GROUP BY
 	, ft.days_exposed
 ),
 cte0 AS (
-	SELECT CASE WHEN '{TARGET_SCHEMA_TO_LINK}' = '{TARGET_SCHEMA}'
+	SELECT CASE WHEN '{TARGET_SCHEMA_TO_LINK}' = '' OR '{TARGET_SCHEMA_TO_LINK}' = '{TARGET_SCHEMA}'
 		THEN 0 ELSE (SELECT COALESCE(max_id,0) from {TARGET_SCHEMA_TO_LINK}._max_ids 
 		WHERE lower(tbl_name) = 'drug_era') 
 		END as start_id
@@ -209,7 +209,7 @@ DROP TABLE IF EXISTS {TARGET_SCHEMA}.cteFinalTarget;
 --------------------------------
 -- Add PK / IDX / FK to DRUG_ERA
 --------------------------------
-ALTER TABLE {TARGET_SCHEMA}.drug_era ADD CONSTRAINT xpk_drug_era PRIMARY KEY (drug_era_id) USING INDEX TABLESPACE pg_default;;
+ALTER TABLE {TARGET_SCHEMA}.drug_era ADD CONSTRAINT xpk_drug_era PRIMARY KEY (drug_era_id) USING INDEX TABLESPACE pg_default;
 
 CREATE INDEX idx_drug_era_person_id  ON {TARGET_SCHEMA}.drug_era (person_id ASC) TABLESPACE pg_default;
 CLUSTER {TARGET_SCHEMA}.drug_era USING idx_drug_era_person_id;
