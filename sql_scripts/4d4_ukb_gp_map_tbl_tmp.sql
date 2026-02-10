@@ -337,7 +337,7 @@ With cte0 AS(
 		lkup.description as data_provider,
 		source_table
 	from cte0 as t1
-	join {SOURCE_SCHEMA}.lookup626 as lkup on lkup.code = t1.data_provider
+	join {SOURCE_SCHEMA}.coding626 as lkup on lkup.code = t1.data_provider
 	join {TARGET_SCHEMA}.observation_period as t2 on t1.eid = t2.person_id
 	where t1.event_dt >= t2.observation_period_start_date and t1.event_dt <= t2.observation_period_end_date
 ), cte2 as (

@@ -32,7 +32,7 @@ WITH cte0 as (
 		t1.id						--keep duplication in source date
 	from {SOURCE_SCHEMA}.temp_gp_scripts_2 as t1
 	join cte0 on eid = cte0.person_id
-	join {SOURCE_SCHEMA}.lookup626 as lkup on lkup.code = t1.data_provider
+	join {SOURCE_SCHEMA}.coding626 as lkup on lkup.code = t1.data_provider
 	join {TARGET_SCHEMA}.observation_period as t2 on t1.eid = t2.person_id
 	join cte1 as t3 on t3.person_id = t1.eid and t3.visit_detail_start_date = t1.issue_date and t3.visit_detail_source_value = concat(lkup.description, '-Drug Prescription')
 	where t1.issue_date >= t2.observation_period_start_date and t1.issue_date <= t2.observation_period_end_date
@@ -131,7 +131,7 @@ select distinct
 	t1.id as stem_source_id
 from {SOURCE_SCHEMA}.gp_clinical as t1
 join cte0 on t1.eid = cte0.person_id
-join {SOURCE_SCHEMA}.lookup626 as lkup on lkup.code = t1.data_provider
+join {SOURCE_SCHEMA}.coding626 as lkup on lkup.code = t1.data_provider
 join {TARGET_SCHEMA}.observation_period as t2 on t1.eid = t2.person_id
 join cte1 as t3 on t3.person_id = t1.eid and t3.visit_detail_start_date = t1.event_dt and t3.visit_detail_source_value = concat(lkup.description, '-Clinical')
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t1.read_3 = t4.source_code and t4.source_vocabulary_id = 'UKB_GP_CLINICAL_READ_STCM'
@@ -202,7 +202,7 @@ select distinct
 	t1.id as stem_source_id
 from {SOURCE_SCHEMA}.gp_clinical as t1
 join cte0 on t1.eid = cte0.person_id
-join {SOURCE_SCHEMA}.lookup626 as lkup on lkup.code = t1.data_provider
+join {SOURCE_SCHEMA}.coding626 as lkup on lkup.code = t1.data_provider
 join {TARGET_SCHEMA}.observation_period as t2 on t1.eid = t2.person_id
 join cte1 as t3 on t3.person_id = t1.eid and t3.visit_detail_start_date = t1.event_dt and t3.visit_detail_source_value = concat(lkup.description, '-Clinical')
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t1.read_2 = t4.source_code and t4.source_vocabulary_id = 'UKB_GP_CLINICAL_READ_STCM'
@@ -324,7 +324,7 @@ select distinct
 	'gp_clinical' as stem_source_table,
 	t1.id as stem_source_id
 from cte2 as t1
-join {SOURCE_SCHEMA}.lookup626 as lkup on lkup.code = t1.data_provider
+join {SOURCE_SCHEMA}.coding626 as lkup on lkup.code = t1.data_provider
 join _read on t1.read_2 = _read._read_2
 join {TARGET_SCHEMA}.observation_period as t2 on t1.eid = t2.person_id
 join cte1 as t3 on t3.person_id = t1.eid and t3.visit_detail_start_date = t1.event_dt and t3.visit_detail_source_value = concat(lkup.description, '-Clinical')
@@ -456,7 +456,7 @@ select distinct
 	'gp_clinical' as stem_source_table,
 	t1.id as stem_source_id
 from _gp_clinical as t1
-join {SOURCE_SCHEMA}.lookup626 as lkup on lkup.code = t1.data_provider
+join {SOURCE_SCHEMA}.coding626 as lkup on lkup.code = t1.data_provider
 join cte2 as t3 on t3.person_id = t1.eid and t3.visit_detail_start_date = t1.event_dt and t3.visit_detail_source_value = concat(lkup.description, '-Clinical')
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t1.read_2 = t4.source_code and t4.source_vocabulary_id = 'UKB_GP_CLINICAL_READ_STCM'
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t5 on concat(t1.read_2, '00') = t5.source_code and t5.source_vocabulary_id = 'Read'
