@@ -7,20 +7,22 @@ WITH cte0 as (
 	from {CHUNK_SCHEMA}.chunk_person
 	where chunk_id = {CHUNK_ID}
 ), cte1 as(
-	select 
-		t1.eid, 
+	select distinct
+		t1.eid as person_id, 
 		t2.visit_occurrence_id,
 		t2.visit_detail_id,
-		t1.p40005, 
-		t1.p40006,  
-		t1.p40011, 
-		t1.p40012,  
-		COALESCE(lkup.description, t1.p40021),
+		t1.p40005 as start_date, 
+--		t1.p40006,  
+--		t1.p40011, 
+--		t1.p40012,  
+		(t1.p40011 || '/' || t1.p40012 || '-' || t1.p40006 ) as source_code,
+--		COALESCE(lkup.description, t1.p40021),
 		t1.id
 	from {SOURCE_SCHEMA}.cancer_longitude as t1
-	join cte0 on t1.eid = cte0.person_id
-	left join {SOURCE_SCHEMA}.lookup1970 as lkup on t1.p40021 = lkup.code
-	join {TARGET_SCHEMA}.visit_detail as t2 on t1.eid = t2.person_id and t2.visit_detail_start_date = t1.p40005 and t2.visit_detail_source_value = COALESCE(lkup.description, t1.p40021)
+--	left join {SOURCE_SCHEMA}.coding1970 as lkup on t1.p40021 = lkup.code
+	inner join cte0 on t1.eid = cte0.person_id
+	inner join {TARGET_SCHEMA}.visit_detail as t2 on t1.eid = t2.person_id and t2.visit_detail_start_date = t1.p40005 
+--	and t2.visit_detail_source_value = COALESCE(lkup.description, t1.p40021)
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	person_id, 
@@ -35,22 +37,23 @@ insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (
 	stem_source_table,
 	stem_source_id
 )
-select distinct
-	t1.eid as person_id, 
+select --distinct
+	t1.person_id, 
 	t1.visit_occurrence_id,
 	t1.visit_detail_id,
 	t2.source_code as source_value,
 	COALESCE(t2.source_concept_id, 0) as source_concept_id,
 	32879 as type_concept_id,
-	t1.p40005 as start_date,
-	t1.p40005 as end_date,
+	t1.start_date,
+	t1.start_date as end_date,
 	'00:00:00'::time start_time,
 	'cancer-Histology' as stem_source_table,
 	t1.id as stem_source_id
 from cte1 as t1
-join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on 
-(t1.p40011 || '/' || t1.p40012 || '-' || t1.p40006 ) = REPLACE(t2.source_code, '.', '') and t2.source_vocabulary_id = 'ICDO3'
-where t2.target_domain_id = 'Condition';
+inner join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on 
+--(t1.p40011 || '/' || t1.p40012 || '-' || t1.p40006 ) = REPLACE(t2.source_code, '.', '') and t2.source_vocabulary_id = 'ICDO3'
+t1.source_code = REPLACE(t2.source_code, '.', '')
+where t2.source_vocabulary_id = 'ICDO3' and t2.target_domain_id = 'Condition';
 
 
 -- map (Histology/Behaviour) by ICDO3 
@@ -73,7 +76,7 @@ WITH cte0 as (
 	from {SOURCE_SCHEMA}.cancer_longitude as t1
 	join cte0 on t1.eid = cte0.person_id
 	left join {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} as t3 on t1.id = t3.stem_source_id::numeric
-	left join {SOURCE_SCHEMA}.lookup1970 as lkup on t1.p40021 = lkup.code
+	left join {SOURCE_SCHEMA}.coding1970 as lkup on t1.p40021 = lkup.code
 	join {TARGET_SCHEMA}.visit_detail as t2 on t1.eid = t2.person_id and t2.visit_detail_start_date = t1.p40005 and t2.visit_detail_source_value = COALESCE(lkup.description, t1.p40021)
 	where t1.p40011 is not null and  t1.p40012 is not null
 	and t3.stem_source_id is null 
@@ -154,9 +157,9 @@ WITH cte0 as (
 	from {SOURCE_SCHEMA}.cancer_longitude as t1
 	join cte0 on t1.eid = cte0.person_id
 	left join {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} as t3 on t1.id = t3.stem_source_id::numeric
-	left join {SOURCE_SCHEMA}.lookup1970 as lkup on t1.p40021 = lkup.code
+	left join {SOURCE_SCHEMA}.coding1970 as lkup on t1.p40021 = lkup.code
 	join {TARGET_SCHEMA}.visit_detail as t2 on t1.eid = t2.person_id and t2.visit_detail_start_date = t1.p40005 and t2.visit_detail_source_value = COALESCE(lkup.description, t1.p40021)
-	where t1.p40011 is not null and  t1.p40012 is not null
+	where t1.p40011 is not null and t1.p40012 is not null
 	and t3.stem_source_id is null
 ), cte1 as(
 	select 
@@ -238,7 +241,7 @@ WITH cte0 as (
 	from {SOURCE_SCHEMA}.cancer_longitude as t1
 	join cte0 on t1.eid = cte0.person_id
 	left join {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} as t3 on t1.id = t3.stem_source_id::numeric
-	left join {SOURCE_SCHEMA}.lookup1970 as lkup on t1.p40021 = lkup.code
+	left join {SOURCE_SCHEMA}.coding1970 as lkup on t1.p40021 = lkup.code
 	join {TARGET_SCHEMA}.visit_detail as t2 on t1.eid = t2.person_id and t2.visit_detail_start_date = t1.p40005 and t2.visit_detail_source_value = COALESCE(lkup.description, t1.p40021)
 	where t1.p40011 is null and  t1.p40012 is null --and COALESCE(t1.p40006, t1.p40013) is not null
 	and t3.stem_source_id is null
