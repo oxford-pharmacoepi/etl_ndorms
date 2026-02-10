@@ -76,7 +76,7 @@ GROUP BY
 	, c.condition_start_date
 ),
 cte0 AS (
-	SELECT CASE WHEN '{TARGET_SCHEMA_TO_LINK}' = '{TARGET_SCHEMA}'
+	SELECT CASE WHEN '{TARGET_SCHEMA_TO_LINK}' = '' OR '{TARGET_SCHEMA_TO_LINK}' = '{TARGET_SCHEMA}'
 		THEN 0 ELSE (SELECT COALESCE(max_id,0) from {TARGET_SCHEMA_TO_LINK}._max_ids 
 		WHERE lower(tbl_name) = 'condition_era' ) 
 		END as start_id
