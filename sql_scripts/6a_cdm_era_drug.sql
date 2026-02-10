@@ -115,7 +115,7 @@ WITH ctePreDrugTarget(drug_exposure_id, person_id, ingredient_concept_id, drug_e
 		, drug_sub_exposure_start_date
 		, drug_sub_exposure_end_date
 		, drug_exposure_count
-		, drug_sub_exposure_end_date - drug_sub_exposure_start_date + 1 AS days_exposed
+		, drug_sub_exposure_end_date - drug_sub_exposure_start_date + INTERVAL '1 day' AS days_exposed
 	INTO {TARGET_SCHEMA}.cteFinalTarget
 	FROM cteSubExposures;
 	
