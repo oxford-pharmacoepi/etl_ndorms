@@ -16,7 +16,6 @@ def main():
 		(ret, dir_study, db_conf, debug) = mapping_util.get_parameters()
 		if ret == True and dir_study != '':
 			database_type = db_conf['database_type']
-			target_schema = db_conf['target_schema']
 			dir_sql = os.getcwd() + "\\sql_scripts\\"
 # ---------------------------------------------------------
 # Create ERA tables
