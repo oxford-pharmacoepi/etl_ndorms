@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS {CHUNK_SCHEMA}.chunk_person;
 CREATE TABLE {CHUNK_SCHEMA}.chunk_person TABLESPACE pg_default AS 
 	select (floor((row_number() over (order by person_id)-1)/{CHUNK_SIZE}) + 1)::int as chunk_id,
 	person_id
-	FROM {TARGET_SCHEMA}.person
+	FROM {TARGET_SCHEMA}.observation_period
 	order by chunk_id, person_id;
 
 ALTER TABLE {CHUNK_SCHEMA}.chunk_person ADD CONSTRAINT pk_chunk_person PRIMARY KEY (chunk_id, person_id) USING INDEX TABLESPACE pg_default;
