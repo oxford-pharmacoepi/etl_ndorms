@@ -1,52 +1,4 @@
 --------------------------------
--- PERSON
---------------------------------
-INSERT INTO {TARGET_SCHEMA}.person
-select 
-	t1.eid,
-	t2.target_concept_id,
-	0,
-	NULL::int,
-	NULL::int,
-	NULL::timestamp,
-	0,
-	0,
-	NULL::bigint,
-	NULL::bigint,
-	NULL::int, 
-	t1.eid,
-	CONCAT('9-', t1.p31),
-	NULL::int,
-	NULL, 
-	NULL::int,
-	NULL, 
-	NULL::int
-from {SOURCE_SCHEMA}.baseline as t1
-left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on CONCAT('9-', t1.p31) = t2.source_code
-and t2.source_vocabulary_id = 'UK Biobank' and t2.source_code like '9-%';
-
-ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default;
-CREATE UNIQUE INDEX idx_person_id ON {TARGET_SCHEMA}.person (person_id ASC) TABLESPACE pg_default;
-CLUSTER {TARGET_SCHEMA}.person USING xpk_person;
-CREATE INDEX idx_gender ON {TARGET_SCHEMA}.person (gender_concept_id ASC) TABLESPACE pg_default;
-
---------------------------------
--- DEATH
---------------------------------
-INSERT INTO {TARGET_SCHEMA}.death
-select distinct
-	eid,
-	date_of_death, 
-	date_of_death, 
-	32879, --same as cdm_ukb_202003
-	NULL::int, 
-	NULL, 
-	NULL::int
-from {SOURCE_SCHEMA}.death;
-
-ALTER TABLE {TARGET_SCHEMA}.death ADD CONSTRAINT xpk_death PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default;
-
---------------------------------
 -- OBSERVATION_PERIOD
 --------------------------------
 With cancer AS(
@@ -63,11 +15,9 @@ INSERT INTO {TARGET_SCHEMA}.observation_period(
 		min_p40005, 
 		max_p40005,
 		32879			--Registry		
-	from {TARGET_SCHEMA}.person as t1
+	from {TARGET_SCHEMA_TO_LINK}.person as t1
 	join cancer as t2 on t1.person_id = t2.eid
 );
-
-ALTER TABLE {TARGET_SCHEMA}.death DROP CONSTRAINT xpk_death;  
 
 ALTER TABLE {TARGET_SCHEMA}.observation_period ADD CONSTRAINT xpk_observation_period PRIMARY KEY (observation_period_id) USING INDEX TABLESPACE pg_default;
 CREATE INDEX IF NOT EXISTS idx_observation_period_id ON {TARGET_SCHEMA}.observation_period (person_id ASC) TABLESPACE pg_default;
