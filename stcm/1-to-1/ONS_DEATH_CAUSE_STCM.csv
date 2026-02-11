@@ -17,7 +17,7 @@ G31.2,45591167,ONS_DEATH_CAUSE_STCM,Degeneration of nervous system due to alcoho
 G31.8,45542879,ONS_DEATH_CAUSE_STCM,Other specified degenerative diseases of nervous system,4213310,SNOMED,1990-05-01,2099-12-31,
 G31.9,45600776,ONS_DEATH_CAUSE_STCM,"Degenerative disease of nervous system, unspecified",4213310,SNOMED,1990-05-01,2099-12-31,
 I09.1,45548006,ONS_DEATH_CAUSE_STCM,"Rheumatic diseases of endocardium, valve unspecified",319825,SNOMED,1990-05-01,2099-12-31,
-I33.0,45605794,ONS_DEATH_CAUSE_STCM,Acute and subacute infective endocarditis,4108805,SNOMED,1990-05-01,2099-12-31,
+I33.0,45605794,ONS_DEATH_CAUSE_STCM,Acute and subacute infective endocarditis,434663,SNOMED,2002-01-31,2099-12-31,
 I61.0,45605803,ONS_DEATH_CAUSE_STCM,"Intracerebral haemorrhage in hemisphere, subcortical",4049659,SNOMED,1990-05-01,2099-12-31,
 I65.2,45552808,ONS_DEATH_CAUSE_STCM,Occlusion and stenosis of carotid artery,442615,SNOMED,1990-05-01,2099-12-31,
 I67.1,45538401,ONS_DEATH_CAUSE_STCM,"Cerebral aneurysm, nonruptured",4029497,SNOMED,1990-05-01,2099-12-31,
