@@ -58,7 +58,7 @@ SELECT cte2.staffid,
 		NULL,
 		0
 FROM cte2
-LEFT JOIN {TARGET_SCHEMA}.SOURCE_TO_CONCEPT_MAP as stcm on upper(stcm.source_code) = upper(cte2."description")
+LEFT JOIN {VOCABULARY_SCHEMA}.SOURCE_TO_CONCEPT_MAP as stcm on upper(stcm.source_code) = upper(cte2."description")
 	and upper(stcm.source_vocabulary_id) = 'AURUM_JOBCAT_STCM';
 
 --------------------------------

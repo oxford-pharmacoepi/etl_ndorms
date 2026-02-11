@@ -9,7 +9,7 @@ select d.prodcodeid,
 	d.dmdid,
 	st1.target_concept_id as dmd_source_concept_id
 from {SOURCE_SCHEMA}.productdictionary d
-left join {TARGET_SCHEMA}.source_to_source_vocab_map st1 on d.dmdid::varchar = st1.source_code and st1.source_vocabulary_id = 'dm+d';
+left join {VOCABULARY_SCHEMA}.source_to_source_vocab_map st1 on d.dmdid::varchar = st1.source_code and st1.source_vocabulary_id = 'dm+d';
 
 alter table {SOURCE_SCHEMA}.temp_drug_concept_map add constraint pk_temp_drug_concept_map primary key (prodcodeid);
 
@@ -21,12 +21,12 @@ drop table if exists {SOURCE_SCHEMA}.temp_concept_map CASCADE;
 create table if not exists {SOURCE_SCHEMA}.temp_concept_map as
 with cte1 as (
 	SELECT source_code, target_concept_id as Read_source_concept_id
-		FROM {TARGET_SCHEMA}.source_to_source_vocab_map
+		FROM {VOCABULARY_SCHEMA}.source_to_source_vocab_map
 		WHERE source_vocabulary_id = 'Read'
 	),
 	cte2 as (
 	SELECT source_code, target_concept_id as SNOMED_source_concept_id
-		FROM {TARGET_SCHEMA}.source_to_source_vocab_map
+		FROM {VOCABULARY_SCHEMA}.source_to_source_vocab_map
 		WHERE source_vocabulary_id = 'SNOMED'
 	)
 SELECT m.medcodeid,
