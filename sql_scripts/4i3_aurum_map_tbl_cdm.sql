@@ -71,7 +71,7 @@ with cte2 as (
 		s.route_source_value,
 		s.dose_unit_source_value
 from {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
-left join {TARGET_SCHEMA}.source_to_standard_vocab_map t2 on t2.source_code = s.route_source_value and t2.source_vocabulary_id = 'AURUM_ROUTE_STCM'
+left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map t2 on t2.source_code = s.route_source_value and t2.source_vocabulary_id = 'AURUM_ROUTE_STCM'
 left join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id	--AD: 2023_05_18 changed JOIN to LEFT JOIN - it was always empty?????? as stem does not have visit_occurrence_ids for drugs without links to Problem. INTEGRATED WITH THE FOLLOWING, which is removed
 where s.domain_id = 'Drug'
 )
@@ -162,8 +162,8 @@ cte6b as (select t1.unit_source_value,
 		 WHEN t3.target_concept_id is NOT NULL THEN t3.target_concept_id
 		 ELSE 0 END AS unit_concept_id
 	from cte6a as t1
-	left join {TARGET_SCHEMA}.source_to_standard_vocab_map t2 on t1.unit_source_value = t2.source_code and t2.source_vocabulary_id = 'UCUM'
-	left join {TARGET_SCHEMA}.source_to_standard_vocab_map t3 on t2.target_concept_id is NULL AND t1.unit_source_value = t3.source_code
+	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map t2 on t1.unit_source_value = t2.source_code and t2.source_vocabulary_id = 'UCUM'
+	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map t3 on t2.target_concept_id is NULL AND t1.unit_source_value = t3.source_code
 		and t3.source_vocabulary_id = 'AURUM_UNIT_STCM'
 ),
 cte6 as	(
@@ -217,8 +217,8 @@ cte7b as (select t1.unit_source_value,
 		 WHEN t3.target_concept_id is NOT NULL THEN t3.target_concept_id
 		 ELSE 0 END AS unit_concept_id
 	from cte7a as t1
-	left join {TARGET_SCHEMA}.source_to_standard_vocab_map t2 on t1.unit_source_value = t2.source_code and t2.source_vocabulary_id = 'UCUM'
-	left join {TARGET_SCHEMA}.source_to_standard_vocab_map t3 on t2.target_concept_id is NULL AND t1.unit_source_value = t3.source_code
+	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map t2 on t1.unit_source_value = t2.source_code and t2.source_vocabulary_id = 'UCUM'
+	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map t3 on t2.target_concept_id is NULL AND t1.unit_source_value = t3.source_code
 		and t3.source_vocabulary_id = 'AURUM_UNIT_STCM'
 ),
 cte7 as (

@@ -61,7 +61,7 @@ with t as (
 			s.stem_source_table,
 			s.stem_source_id
 	from {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} s
-	left join {TARGET_SCHEMA}.source_to_standard_vocab_map v
+	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map v
 		on s.source_concept_id = v.source_concept_id
 		and s.source_concept_id <> 0
 )
