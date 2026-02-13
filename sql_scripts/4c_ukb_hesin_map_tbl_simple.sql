@@ -1,51 +1,3 @@
-----------------------------------
----- LOCATION
-----------------------------------
---INSERT INTO {TARGET_SCHEMA}.location
---SELECT 
---	location_id, 
---	address_1,
---	address_2, 
---	city, 
---	state, 
---	zip, 
---	county,
---	location_source_value,
---	country_concept_id,
---	country_source_value,
---	latitude,
---	longitude
---FROM public_ukb_baseline.location;
-----------------------------------
----- PERSON
-----------------------------------
---INSERT INTO {TARGET_SCHEMA}.person
---select distinct
---	eid,
---	0 as target_concept_id,
---	0,
---	NULL::int,
---	NULL::int,
---	NULL::timestamp,
---	0,
---	0,
---	NULL::bigint,
---	NULL::bigint,
---	NULL::int, 
---	eid,
---	NULL,
---	NULL::int,
---	NULL, 
---	NULL::int,
---	NULL, 
---	NULL::int
---from {SOURCE_SCHEMA}.hesin;
---
---ALTER TABLE {TARGET_SCHEMA}.person ADD CONSTRAINT xpk_person PRIMARY KEY (person_id) USING INDEX TABLESPACE pg_default;
---CREATE UNIQUE INDEX idx_person_id ON {TARGET_SCHEMA}.person (person_id ASC) TABLESPACE pg_default;
---CLUSTER {TARGET_SCHEMA}.person USING xpk_person;
---CREATE INDEX idx_gender ON {TARGET_SCHEMA}.person (gender_concept_id ASC) TABLESPACE pg_default;
-
 --------------------------------
 -- PROVIDER from hesin
 --------------------------------
@@ -61,7 +13,6 @@ with cte1 AS (
 ),
 cte2 AS (
 	SELECT DISTINCT COALESCE(t2.target_concept_id, t3.target_concept_id) AS specialty_concept_id, 
---	t1.provider_source_value,
 	COALESCE(t2.source_code_description, t3.source_code_description, 
 	CASE WHEN provider_specialty = '620' THEN 'Other than Maternity' ELSE provider_specialty END) AS specialty_source_value
 	FROM cte1 as t1
@@ -105,29 +56,7 @@ FROM cte2;
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.sequence_pro;
 
 CREATE UNIQUE INDEX idx_provider_source ON {TARGET_SCHEMA}.provider (specialty_source_value ASC) TABLESPACE pg_default;
-----------------------------------
----- DEATH
-----------------------------------
---INSERT INTO {TARGET_SCHEMA}.death(
---	person_id, 
---	death_date, 
---	death_datetime, 
---	death_type_concept_id,
---	cause_concept_id, 
---	cause_source_value, 
---	cause_source_concept_id
---)
---select 
---	t1.person_id, 
---	t1.death_date, 
---	t1.death_datetime, 
---	t1.death_type_concept_id,
---	t1.cause_concept_id, 
---	t1.cause_source_value, 
---	t1.cause_source_concept_id
---from public_ukb_baseline.death as t1
---inner join {TARGET_SCHEMA}.person as t2 on t1.person_id = t2.person_id;
---
+
 --------------------------------
 -- OBSERVATION_PERIOD --
 --------------------------------
