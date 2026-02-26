@@ -106,6 +106,10 @@ def main():
 				database_name = 'NCRAS'
 				database_type = 'linkage'
 				schema = db_conf['linkage_schema']
+			elif database_type.upper() == 'ONS':
+				database_name = 'ONS'
+				database_type = 'linkage'
+				schema = db_conf['linkage_schema']
 			dir_sql = os.getcwd() + '\\sql_scripts\\'
 			dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
 			if not os.path.exists(dir_sql_processed):
