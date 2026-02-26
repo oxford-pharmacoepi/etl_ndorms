@@ -11,7 +11,7 @@ C78.7,45595688,UKB_DEATH_CAUSE_STCM,Secondary malignant neoplasm of liver and in
 C79.3,45561831,UKB_DEATH_CAUSE_STCM,Secondary malignant neoplasm of brain and cerebral meninges,36768862,Cancer Modifier,2020-09-23,2099-12-31,
 C79.5,45571540,UKB_DEATH_CAUSE_STCM,Secondary malignant neoplasm of bone and bone marrow,35226074,Cancer Modifier,2020-10-13,2099-12-31,
 C79.8,45547524,UKB_DEATH_CAUSE_STCM,Secondary malignant neoplasm of other specified sites,432851,SNOMED,2002-01-31,2099-12-31,
-C80.0,4149322,UKB_DEATH_CAUSE_STCM,"Malignant neoplasm, primary site unknown, so stated",4149322,SNOMED,2002-01-31,2099-12-31,
+C80.0,45557017,UKB_DEATH_CAUSE_STCM,"Malignant neoplasm, primary site unknown, so stated",4149322,SNOMED,2002-01-31,2099-12-31,
 E10.1,45542735,UKB_DEATH_CAUSE_STCM,"Type 1 diabetes mellitus, With ketoacidosis",439770,SNOMED,2006-07-31,2099-12-31,
 E10.2,45586137,UKB_DEATH_CAUSE_STCM,"Type 1 diabetes mellitus, With renal complications",200687,SNOMED,2006-07-31,2099-12-31,
 E10.5,45595796,UKB_DEATH_CAUSE_STCM,Type 1 diabetes mellitus with circulatory complications,318712,SNOMED,2006-07-31,2099-12-31,
