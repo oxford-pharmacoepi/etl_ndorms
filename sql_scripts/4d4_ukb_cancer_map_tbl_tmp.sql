@@ -9,7 +9,7 @@ CREATE TABLE {SOURCE_SCHEMA}.temp_visit_detail
 	person_id bigint NOT NULL,
 	visit_detail_start_date date NOT NULL,
 	visit_source_value varchar(60)
-);
+) TABLESPACE pg_default;
 
 WITH cte as (
     SELECT max_id as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
@@ -36,5 +36,5 @@ select
 	cte1.data_source
 from cte0, cte1;
 
-alter table {SOURCE_SCHEMA}.temp_visit_detail add constraint pk_temp_visit_d primary key (visit_detail_id);
-create index idx_temp_visit_1 on {SOURCE_SCHEMA}.temp_visit_detail (person_id, visit_detail_start_date, visit_source_value); 
+alter table {SOURCE_SCHEMA}.temp_visit_detail add constraint pk_temp_visit_d primary key (visit_detail_id) USING INDEX TABLESPACE pg_default;
+create index idx_temp_visit_1 on {SOURCE_SCHEMA}.temp_visit_detail (person_id, visit_detail_start_date, visit_source_value) TABLESPACE pg_default; 

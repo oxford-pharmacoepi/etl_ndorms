@@ -1,4 +1,4 @@
-CREATE TABLE {CHUNK_SCHEMA}.stem_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM);
+CREATE TABLE {CHUNK_SCHEMA}.stem_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM) TABLESPACE pg_default;
 
 --insert into stem from stem_source, this is the Athena vocab mapping portion
 insert into {CHUNK_SCHEMA}.stem_{CHUNK_ID} (
@@ -207,12 +207,11 @@ from {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} as t1
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t1.source_value = t2.source_code and t2.source_vocabulary_id in ('UKB_GP_SCRIPT_DRUG_STCM', 'UKB_GP_SCRIPT_READ_STCM')
 where t1.stem_source_table = 'gp_scripts';
 
-ALTER TABLE {CHUNK_SCHEMA}.stem_{CHUNK_ID} ADD CONSTRAINT pk_stem_{CHUNK_ID} PRIMARY KEY (id);
-create index idx_stem_{CHUNK_ID}_1 on {CHUNK_SCHEMA}.stem_{CHUNK_ID} (domain_id);
-create index idx_stem_{CHUNK_ID}_2 on {CHUNK_SCHEMA}.stem_{CHUNK_ID} (unit_source_value);
-create index idx_stem_{CHUNK_ID}_3 on {CHUNK_SCHEMA}.stem_{CHUNK_ID} (source_value);
-
-create index idx_stem_{CHUNK_ID}_4 on {CHUNK_SCHEMA}.stem_{CHUNK_ID} (stem_source_table, stem_source_id);
+ALTER TABLE {CHUNK_SCHEMA}.stem_{CHUNK_ID} ADD CONSTRAINT pk_stem_{CHUNK_ID} PRIMARY KEY (id) USING INDEX TABLESPACE pg_default;
+create index idx_stem_{CHUNK_ID}_1 on {CHUNK_SCHEMA}.stem_{CHUNK_ID} (domain_id) TABLESPACE pg_default;
+create index idx_stem_{CHUNK_ID}_2 on {CHUNK_SCHEMA}.stem_{CHUNK_ID} (unit_source_value) TABLESPACE pg_default;
+create index idx_stem_{CHUNK_ID}_3 on {CHUNK_SCHEMA}.stem_{CHUNK_ID} (source_value) TABLESPACE pg_default;
+create index idx_stem_{CHUNK_ID}_4 on {CHUNK_SCHEMA}.stem_{CHUNK_ID} (stem_source_table, stem_source_id) TABLESPACE pg_default;
 
 -- link corresponding records to measurement
 With _measurement AS(

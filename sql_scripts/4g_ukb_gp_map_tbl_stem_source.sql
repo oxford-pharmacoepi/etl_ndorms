@@ -1,4 +1,4 @@
-CREATE TABLE {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM_SOURCE);
+CREATE TABLE {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM_SOURCE) TABLESPACE pg_default;
 
 --insert into stem_source from temp_gp_scripts_2 --duplication exists
 -- a GP can produce identical prescriptions intentionally, 
@@ -463,9 +463,9 @@ left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t5 on concat(t1.re
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t6 on t1.value3 = t6.source_code and t6.source_vocabulary_id = 'UKB_GP_CLINICAL_UNIT_STCM';
 
 
-create index idx_stem_source_{CHUNK_ID}_1 on {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (source_concept_id);
-create index idx_stem_source_{CHUNK_ID}_2 on {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (source_value);
-create index idx_stem_source_{CHUNK_ID}_3 on {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (value_as_string);
+create index idx_stem_source_{CHUNK_ID}_1 on {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (source_concept_id) TABLESPACE pg_default;
+create index idx_stem_source_{CHUNK_ID}_2 on {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (source_value) TABLESPACE pg_default;
+create index idx_stem_source_{CHUNK_ID}_3 on {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (value_as_string) TABLESPACE pg_default;
 
 
 -----------------------------------------

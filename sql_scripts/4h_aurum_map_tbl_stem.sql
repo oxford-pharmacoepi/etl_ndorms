@@ -15,7 +15,7 @@
 --truncate table {TARGET_SCHEMA}.observation;               --MOVED
 --truncate table {TARGET_SCHEMA}.specimen;                  --MOVED
 
-CREATE TABLE {CHUNK_SCHEMA}.stem_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM);
+CREATE TABLE {CHUNK_SCHEMA}.stem_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM) TABLESPACE pg_default;
 
 
 --insert into stem from stem_source, this is the vocab mapping portion

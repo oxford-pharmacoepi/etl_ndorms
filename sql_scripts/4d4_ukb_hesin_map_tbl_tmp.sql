@@ -14,7 +14,7 @@ CREATE TABLE {SOURCE_SCHEMA}.temp_visit_detail
 	visit_detail_start_date date NOT NULL,
 	visit_detail_end_date date NOT NULL,
 	visit_detail_source_value varchar(50) NOT NULL
-);
+) TABLESPACE pg_default;
 
 with cte0 AS (
 	select * from 
@@ -65,5 +65,5 @@ inner join cte5 as t2 on t1.person_id = t2.person_id and t1.visit_source_value =
 order by visit_detail_id;
 
 
-alter table {SOURCE_SCHEMA}.temp_visit_detail add constraint pk_temp_visit_d primary key (visit_occurrence_id, visit_detail_id);
-create index idx_temp_visit_1 on {SOURCE_SCHEMA}.temp_visit_detail (person_id, visit_source_value, visit_detail_source_value); 
+alter table {SOURCE_SCHEMA}.temp_visit_detail add constraint source_ukb_hesinpk_temp_visit_d primary key (visit_occurrence_id, visit_detail_id) USING INDEX TABLESPACE pg_default;
+create index idx_temp_visit_1 on {SOURCE_SCHEMA}.temp_visit_detail (person_id, visit_source_value, visit_detail_source_value) TABLESPACE pg_default; 

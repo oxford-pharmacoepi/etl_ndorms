@@ -29,6 +29,8 @@ INTO {TARGET_SCHEMA}.visit_occurrence
 from cte1 as t1
 left join cte1 as t2 on (t2.visit_detail_id + 1) = t1.visit_detail_id and t1.person_id = t2.person_id and t1.visit_source_value = t2.visit_source_value;
 
+ALTER TABLE {TARGET_SCHEMA}.visit_occurrence SET TABLESPACE pg_default;
+
 alter table {TARGET_SCHEMA}.visit_occurrence add constraint xpk_visit_occurrence primary key (visit_occurrence_id) USING INDEX TABLESPACE pg_default;
 create index idx_visit_occ1 on {TARGET_SCHEMA}.visit_occurrence (person_id, visit_start_date, visit_source_value) TABLESPACE pg_default;
 CLUSTER {TARGET_SCHEMA}.visit_occurrence USING idx_visit_occ1;
@@ -73,7 +75,8 @@ from {SOURCE_SCHEMA}.temp_visit_detail as t1
 left join cte1 as t2 on t1.visit_detail_id = t2.visit_occurrence_id
 left join {SOURCE_SCHEMA}.temp_visit_detail as t3 on t2.tmp_id = t3.visit_detail_id and t2.person_id = t3.person_id;
 
-	
+ALTER TABLE {TARGET_SCHEMA}.visit_detail SET TABLESPACE pg_default;
+
 ALTER TABLE {TARGET_SCHEMA}.visit_detail ADD CONSTRAINT xpk_visit_detail PRIMARY KEY (visit_detail_id) USING INDEX TABLESPACE pg_default;
 CREATE INDEX idx_visit_detail_person_id  ON {TARGET_SCHEMA}.visit_detail (person_id) TABLESPACE pg_default;
 CLUSTER {TARGET_SCHEMA}.visit_detail USING idx_visit_detail_person_id;

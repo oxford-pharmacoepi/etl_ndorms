@@ -97,6 +97,6 @@ WHERE t2.min_date is not null or t2.max_date is not null;
 
 DROP SEQUENCE IF EXISTS {TARGET_SCHEMA}.observation_period_seq;
 
-ALTER TABLE {TARGET_SCHEMA}.observation_period ADD CONSTRAINT xpk_observation_period PRIMARY KEY (observation_period_id);
+ALTER TABLE {TARGET_SCHEMA}.observation_period ADD CONSTRAINT xpk_observation_period PRIMARY KEY (observation_period_id) USING INDEX TABLESPACE pg_default;
 CREATE INDEX idx_observation_period_id ON {TARGET_SCHEMA}.observation_period (person_id ASC) TABLESPACE pg_default;
 CLUSTER {TARGET_SCHEMA}.observation_period USING idx_observation_period_id;

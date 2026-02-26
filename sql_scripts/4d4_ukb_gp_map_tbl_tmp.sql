@@ -350,8 +350,8 @@ select
 	cte1.*
 from cte1, cte2;
 
-alter table {SOURCE_SCHEMA}.temp_visit_detail add constraint pk_temp_visit_d primary key (visit_detail_id);
-create index idx_temp_visit_1 on {SOURCE_SCHEMA}.temp_visit_detail (person_id, visit_detail_start_date, data_provider, source_table); 
+alter table {SOURCE_SCHEMA}.temp_visit_detail add constraint pk_temp_visit_d primary key (visit_detail_id) USING INDEX TABLESPACE pg_default;
+create index idx_temp_visit_1 on {SOURCE_SCHEMA}.temp_visit_detail (person_id, visit_detail_start_date, data_provider, source_table) TABLESPACE pg_default; 
 
 VACUUM (ANALYZE) {SOURCE_SCHEMA}.temp_visit_detail;
 ALTER TABLE {SOURCE_SCHEMA}.temp_visit_detail SET (autovacuum_enabled = True);

@@ -1,4 +1,4 @@
-CREATE TABLE {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM_SOURCE);
+CREATE TABLE {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM_SOURCE) TABLESPACE pg_default;
 
 --insert into stem_source from cancer_longitude 
 --map (Histology/Behaviour-ICD10) by ICDO3
@@ -285,8 +285,8 @@ left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on COALESCE(t1.
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t3 on t1.p40006 = Replace(t3.source_code, '.', '') and t3.source_vocabulary_id ='ICD10'
 left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t4 on t1.p40013 = Replace(t4.source_code, '.', '') and t4.source_vocabulary_id ='ICD9CM';
 
-create index idx_stem_source_{CHUNK_ID}_1 on {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (source_concept_id);
-create index idx_stem_source_{CHUNK_ID}_2 on {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (source_value);
+create index idx_stem_source_{CHUNK_ID}_1 on {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (source_concept_id) TABLESPACE pg_default;
+create index idx_stem_source_{CHUNK_ID}_2 on {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (source_value) TABLESPACE pg_default;
 
 -----------------------------------------
 -- UPDATE CHUNK

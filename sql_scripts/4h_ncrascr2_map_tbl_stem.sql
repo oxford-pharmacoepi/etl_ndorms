@@ -1,4 +1,4 @@
-CREATE TABLE {CHUNK_SCHEMA}.stem_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM);
+CREATE TABLE {CHUNK_SCHEMA}.stem_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM) TABLESPACE pg_default;
 
 --insert into stem from stem_source when source_concept_id <> 0
 insert into {CHUNK_SCHEMA}.stem_{CHUNK_ID} (
