@@ -2,6 +2,7 @@ _obsolete/
 sql_scripts/_obsolete/
 sql_scripts/processed/
 stcm/maybe/
+stcm/obsolete/
 .idea/
 __pycache__/
 
