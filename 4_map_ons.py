@@ -20,7 +20,8 @@ def updatefromDeathONS():
 		cnx = sql.connect(
 			user=db_conf['username'],
 			password=db_conf['password'],
-			database=db_conf['database']
+			database=db_conf['database'],
+			port=db_conf['port']
 		)
 		cnx.autocommit = False
 		cursor1 = cnx.cursor()
@@ -130,7 +131,8 @@ def main():
 				if qa.lower() in ['y', 'yes']:
 					fname = dir_sql + '4c_ons_map_tbl_death_ons.sql'
 					print('Calling ' + fname + ' ...')
-					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+#					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)
 # ---------------------------------------------------------
 # Update Death from Death_ONS
 # ---------------------------------------------------------
