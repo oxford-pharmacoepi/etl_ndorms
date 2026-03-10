@@ -127,7 +127,7 @@ def main():
 					sql_file_list = sorted(glob.iglob(dir_sql + '1c_' + database_type + '_pk_idx*.sql'))
 					print(dir_sql + '1c_' + database_type + '_pk_idx*.sql')
 					print(sql_file_list)
-					ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, debug)
+					ret = mapping_util.execute_sql_files_parallel(db_conf, sql_file_list, debug, False)
 					if ret == True:
 						task_finished = 'Finished adding PKs/indexes to ' + database_type.upper() + ' in {0}'.format(mapping_util.calc_time(time.time() - time1))
 						print(task_finished)
