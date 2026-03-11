@@ -2,7 +2,7 @@
 With temp1 AS(
 	select t1.* 
 	from {TARGET_SCHEMA}.death_ons as t1
-	join {TARGET_SCHEMA_TO_LINK}.death as t2 on t1.person_id = t2.person_id
+	inner join {TARGET_SCHEMA_TO_LINK}.death as t2 on t1.person_id = t2.person_id
 ), cte as(
 	update {TARGET_SCHEMA_TO_LINK}.death as t1
 	set death_date =  t2.death_date,

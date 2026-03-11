@@ -1,2 +1,4 @@
-alter table {SOURCE_SCHEMA}.ons_death add constraint pk_ons_death primary key (patid) USING INDEX TABLESPACE pg_default;
+--alter table {SOURCE_SCHEMA}.ons_death add constraint pk_ons_death primary key (patid) USING INDEX TABLESPACE pg_default;
+alter table {SOURCE_SCHEMA}.ons_death add constraint pk_ons_death primary key (id) USING INDEX TABLESPACE pg_default;
+create index idx_dpatient on {SOURCE_SCHEMA}.ons_death(patid) TABLESPACE pg_default;
 create index idx_dpatient_cause on {SOURCE_SCHEMA}.ons_death(s_cod_code_1) TABLESPACE pg_default;

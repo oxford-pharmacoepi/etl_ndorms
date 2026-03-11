@@ -6,6 +6,7 @@
 --)TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.ons_death (
+	id 					bigserial,
 	patid				bigint,
 	pracid				int,
 --	gen_death_id		bigint,
