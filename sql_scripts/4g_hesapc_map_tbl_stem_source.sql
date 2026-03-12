@@ -92,6 +92,26 @@ WITH cte0 as (
 		select person_id
 		from {CHUNK_SCHEMA}.chunk_person
 		where chunk_id = {CHUNK_ID}
+),
+cte1 as (
+	select t2.patid as person_id, 
+	NULL as provider_id, 
+	t2.spno::varchar as visit_source_value, 
+	t2.epikey::varchar as visit_detail_source_value, 
+	COALESCE(t2.evdate,t2.epistart) as start_date, 
+	COALESCE(t2.evdate,t2.discharged) as end_date,
+	CASE WHEN length(t2.opcs) = 4 THEN CONCAT(LEFT(t2.opcs,3),'.',RIGHT(t2.opcs,1)) ELSE t2.opcs end as source_value, 
+	t2.p_order AS modifier_source_value
+	from cte0 as t1
+	inner join {SOURCE_SCHEMA}.hes_procedures_epi as t2 on t1.person_id = t2.patid
+	WHERE t2.opcs <> '&'
+	order by t2.patid, t2.epikey, COALESCE(t2.evdate,t2.epistart), p_order
+),
+cte2 as (
+	SELECT DISTINCT t1.*, t2.source_concept_id
+	FROM cte1 as t1
+	left join {VOCABULARY_SCHEMA}.source_to_standard_vocab_map as t2 on t2.source_code = t1.source_value
+	WHERE upper(t2.source_vocabulary_id) = 'OPCS4'
 )
 insert into {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (domain_id, person_id, visit_occurrence_id, visit_detail_id, provider_id, concept_id, source_value,
 					 source_concept_id, type_concept_id, start_date, end_date, start_time, days_supply, dose_unit_concept_id,
