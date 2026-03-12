@@ -144,7 +144,7 @@ def main():
 						idx_patient = db_conf[tbl_db].index('patient')
 						idx_observation = db_conf[tbl_db].index('observation')
 						(ret, curation) = is_curation_needed_aurum(tbl_db_list[idx_patient], tbl_db_list[idx_observation])
-					elif database_type in ['gold', 'ons', 'ncrascr']:
+					elif database_type in ['gold', 'ons', 'ncrascr', 'townsend_patient']:
 						curation = True
 					elif database_type[0:3].lower() == 'hes':
 						curation = True

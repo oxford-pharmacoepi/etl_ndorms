@@ -34,21 +34,22 @@ def main():
 # ---------------------------------------------------------
 # Create/Recreate CDM tables? Parallel execution of queries in the file - Ask the user for DROP confirmation
 # ---------------------------------------------------------
-			qa = input('Are you sure you want to DROP/CREATE all the CDM tables (y/n):') 
-			while qa.lower() not in ['y', 'n', 'yes', 'no']:
-				qa = input('I did not understand that. Are you sure you want to DROP/CREATE all the CDM tables (y/n):') 
-			if qa.lower() in ['y', 'yes']:
-				fname = dir_sql + '4a_cdm_drop_tbl.sql'
-				print('Calling ' + fname + ' ...')
-				ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)
-				if ret == True:
-					cdm_version = db_conf['cdm_version']
-					if cdm_version[:3] == '5.3':
-						fname = dir_sql + '4b_OMOPCDM_postgresql_5_3_ddl.sql'
-					elif cdm_version[:3] == '5.4':
-						fname = dir_sql + '4b_OMOPCDM_postgresql_5_4_ddl.sql'
+			if database_type not in ('townsend_patient'):
+				qa = input('Are you sure you want to DROP/CREATE all the CDM tables (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Are you sure you want to DROP/CREATE all the CDM tables (y/n):') 
+				if qa.lower() in ['y', 'yes']:
+					fname = dir_sql + '4a_cdm_drop_tbl.sql'
 					print('Calling ' + fname + ' ...')
-					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
+					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)
+					if ret == True:
+						cdm_version = db_conf['cdm_version']
+						if cdm_version[:3] == '5.3':
+							fname = dir_sql + '4b_OMOPCDM_postgresql_5_3_ddl.sql'
+						elif cdm_version[:3] == '5.4':
+							fname = dir_sql + '4b_OMOPCDM_postgresql_5_4_ddl.sql'
+						print('Calling ' + fname + ' ...')
+						ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False, False)
 # ---------------------------------------------------------
 # Connect to db
 # ---------------------------------------------------------
@@ -67,6 +68,7 @@ def main():
 # ---------------------------------------------------------
 				vocabulary_schema = db_conf['vocabulary_schema']
 				target_schema = db_conf['target_schema']
+			if database_type not in ('townsend_patient'):
 				chunk_schema = db_conf['chunk_schema']
 				source_release_date = db_conf['source_release_date']
 				source_description = db_conf['data_provider'] + ' ' + database_type
@@ -102,8 +104,8 @@ def main():
 # If this is a linked dataset, create/recreate _max_ids table in target_schema_to_link
 # ---------------------------------------------------------
 			if ret == True:
-				if 'target_schema_to_link' in db_conf and db_conf['target_schema_to_link'] != '' \
-					and db_conf['target_schema_to_link'] != db_conf['target_schema']:
+				if 'target_schema_to_link' in db_conf and db_conf['target_schema_to_link'] != '': 
+#					and db_conf['target_schema_to_link'] != db_conf['target_schema']:
 					target_schema_to_link = db_conf['target_schema_to_link']
 					qa = input('Do you want to CREATE/RECREATE ' + target_schema_to_link.upper() + '._max_ids and ' + target_schema.upper() + '._next_ids? (y/n):').lower() 
 					while qa not in ['y', 'n', 'yes', 'no']:
@@ -155,13 +157,14 @@ def main():
 # Tables to load: PERSON, OBSERVATION_PERIOD, etc.
 # ---------------------------------------------------------
 			if ret == True:
-				qa = input('Do you want to map the simple tables: PERSON, OBSERVATION_PERIOD, etc. (y/n):').lower()
-				while qa not in ['y', 'n', 'yes', 'no']:
-					qa = input('I did not understand that. Do you want to map the simple tables: LOCATION, CARE_SITE, PROVIDER, PERSON, DEATH, OBSERVATION_PERIOD (y/n):') 
-				if qa in ['y', 'yes']:
-					fname = dir_sql + '4c_' + database_type + '_map_tbl_simple.sql'
-					print('Executing ' + fname + ' ... (PERSON, OBSERVATION_PERIOD, etc.)')
-					ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)
+				if database_type not in ('townsend_patient'):
+					qa = input('Do you want to map the simple tables: PERSON, OBSERVATION_PERIOD, etc. (y/n):').lower()
+					while qa not in ['y', 'n', 'yes', 'no']:
+						qa = input('I did not understand that. Do you want to map the simple tables: LOCATION, CARE_SITE, PROVIDER, PERSON, DEATH, OBSERVATION_PERIOD (y/n):') 
+					if qa in ['y', 'yes']:
+						fname = dir_sql + '4c_' + database_type + '_map_tbl_simple.sql'
+						print('Executing ' + fname + ' ... (PERSON, OBSERVATION_PERIOD, etc.)')
+						ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, debug, False)
 # ---------------------------------------------------------
 # Tables to load: TEMP_CONCEPT_MAP, TEMP_DRUG_CONCEPT_MAP, TEMP_VISIT_DETAIL
 # ---------------------------------------------------------
@@ -178,7 +181,7 @@ def main():
 # Tables to load: VISIT_OCCURRENCE, VISIT_DETAIL
 # ---------------------------------------------------------
 			if ret == True:
-				if 'ukb'!= database_type: #ukb baseline has no event tables
+				if database_type not in ('ukb_baseline', 'townsend_patient'): # no visit tables
 					qa = input('Do you want to CREATE/RECREATE the visit tables (VISIT_OCCURRENCE, VISIT_DETAIL)? (y/n):').lower() 
 					while qa not in ['y', 'n', 'yes', 'no']:
 						qa = input('I did not understand that. Do you want to CREATE/RECREATE the visit tables (VISIT_OCCURRENCE, VISIT_DETAIL)? (y/n):').lower()
@@ -190,10 +193,10 @@ def main():
 # Create/Recreate CHUNK table and any chunk job previously done?
 # ---------------------------------------------------------
 			if ret == True:
-				if database_type == 'ukb_baseline':
-					qa = input('Do you want to PROCEED with UKBB baseline MEASUREMENTS/OBSERVATIONS mapping? (y/n):').lower() 
+				if database_type in ('ukb_baseline', 'townsend_patient'):
+					qa = input('Do you want to PROCEED with MEASUREMENTS/OBSERVATIONS mapping? (y/n):').lower() 
 					while qa not in ['y', 'n', 'yes', 'no']:
-						qa = input('I did not understand that. Do you want to PROCEED with UKBB baseline MEASUREMENTS/OBSERVATIONS mapping? (y/n):').lower()
+						qa = input('I did not understand that. Do you want to PROCEED with MEASUREMENTS/OBSERVATIONS mapping? (y/n):').lower()
 					if qa in ['y', 'yes']:
 						fname = dir_sql + '4i' + db_conf['cdm_version'][2] + '_' + database_type + '_map_tbl_cdm.sql'
 						print('Executing ' + fname + ' ... (MEASUREMENT)')
