@@ -1,6 +1,5 @@
 drop table if exists {SOURCE_SCHEMA}.hes_patient CASCADE;
 drop table if exists {SOURCE_SCHEMA}.hes_hospital CASCADE;
-drop table if exists {SOURCE_SCHEMA}.hes_acp CASCADE;
 drop table if exists {SOURCE_SCHEMA}.hes_ccare CASCADE;
 drop table if exists {SOURCE_SCHEMA}.hes_maternity CASCADE;
 drop table if exists {SOURCE_SCHEMA}.hes_hrg CASCADE;
