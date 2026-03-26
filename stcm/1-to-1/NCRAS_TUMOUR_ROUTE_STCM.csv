@@ -1,0 +1,7 @@
+source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
+TWW,0,NCRAS_TUMOUR_ROUTE_STCM,Two week wait,4046885,SNOMED,2002-01-31,2099-12-31,
+GP referral,0,NCRAS_TUMOUR_ROUTE_STCM,GP referral,44787814,SNOMED,2004-01-31,2099-12-31,
+Emergency presentation,0,NCRAS_TUMOUR_ROUTE_STCM,Emergency presentation,4163685,SNOMED,2002-01-31,2099-12-31,
+Screening,0,NCRAS_TUMOUR_ROUTE_STCM,Screening,44803659,SNOMED,2010-10-01,2099-12-31,
+Other outpatient,0,NCRAS_TUMOUR_ROUTE_STCM,Other outpatient,44809116,SNOMED,2012-10-01,2099-12-31,
+Inpatient elective,0,NCRAS_TUMOUR_ROUTE_STCM,Inpatient elective,4228491,SNOMED,2004-01-31,2099-12-31,

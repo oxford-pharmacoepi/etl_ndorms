@@ -1,0 +1,6 @@
+source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
+1,0,NCRAS_TUMOUR_CLARK_STCM,Clark's stage 1 for skin cancer,4306480,SNOMED,2002-01-31,2099-12-31,
+2,0,NCRAS_TUMOUR_CLARK_STCM,Clark's stage 2 for skin cancer,4197288,SNOMED,2002-01-31,2099-12-31,
+3,0,NCRAS_TUMOUR_CLARK_STCM,Clark's stage 3 for skin cancer,4059564,SNOMED,2002-01-31,2099-12-31,
+4,0,NCRAS_TUMOUR_CLARK_STCM,Clark's stage 4 for skin cancer,4049019,SNOMED,2002-01-31,2099-12-31,
+5,0,NCRAS_TUMOUR_CLARK_STCM,Clark's stage 5 for skin cancer,4050810,SNOMED,2002-01-31,2099-12-31,

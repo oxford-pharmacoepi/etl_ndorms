@@ -1,0 +1,9 @@
+source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
+1,0,NCRAS_TUMOUR_MARGIN_STCM,Excision margin clear,4149319,SNOMED,2020-09-23,2099-12-31,
+2,0,NCRAS_TUMOUR_MARGIN_STCM,Excision margin clear (tumour >5mm from margin),4149319,SNOMED,2020-09-23,2099-12-31,
+3,0,NCRAS_TUMOUR_MARGIN_STCM,Excision margin clear (tumour >1mm and <=5mm from margin),4149319,SNOMED,2020-09-23,2099-12-31,
+4,0,NCRAS_TUMOUR_MARGIN_STCM,Excision margin not involved (tumour <1mm from margin),36768441,Cancer Modifier,2020-09-23,2099-12-31,
+5,0,NCRAS_TUMOUR_MARGIN_STCM,Excision margin involved,36770563,Cancer Modifier,2020-09-23,2099-12-31,
+7,0,NCRAS_TUMOUR_MARGIN_STCM,Excision margin not involved (tumour =>1mm from margin),36768441,Cancer Modifier,2020-09-23,2099-12-31,
+8,0,NCRAS_TUMOUR_MARGIN_STCM,Excision margin not involved (tumour <1mm from margin),36768441,Cancer Modifier,2020-09-23,2099-12-31,
+9,0,NCRAS_TUMOUR_MARGIN_STCM,Excision margin not involved (tumour 1-5mm from margin),36768441,Cancer Modifier,2020-09-23,2099-12-31,

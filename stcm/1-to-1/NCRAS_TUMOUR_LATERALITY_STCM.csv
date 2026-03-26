@@ -1,0 +1,5 @@
+source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
+R,0,NCRAS_TUMOUR_LATERALITY_STCM,Right,36770058,Cancer Modifier,2020-09-23,2099-12-31,
+L,0,NCRAS_TUMOUR_LATERALITY_STCM,Left,36770232,Cancer Modifier,2020-09-23,2099-12-31,
+B,0,NCRAS_TUMOUR_LATERALITY_STCM,Bilateral,36770109,Cancer Modifier,2020-09-23,2099-12-31,
+M,0,NCRAS_TUMOUR_LATERALITY_STCM,Midline,36769853,Cancer Modifier,2020-09-23,2099-12-31,

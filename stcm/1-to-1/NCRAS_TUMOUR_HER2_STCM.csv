@@ -1,0 +1,3 @@
+source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
+N,0,NCRAS_TUMOUR_HER2_STCM,HER2 negative,44790896,SNOMED,2006-10-02,2099-12-31,
+P,0,NCRAS_TUMOUR_HER2_STCM,HER2 positive,44790895,SNOMED,2006-10-02,2099-12-31,
