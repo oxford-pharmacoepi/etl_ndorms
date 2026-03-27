@@ -8,7 +8,7 @@ CREATE TABLE {SOURCE_SCHEMA}.temp_visit_detail
 	visit_detail_id bigint NOT NULL,
 	visit_occurrence_id bigint NOT NULL,
 	person_id bigint NOT NULL,
-	visit_detail_source_id bigint NOT NULL,
+	visit_detail_source_id varchar(25) NOT NULL,
 	visit_detail_start_date date NOT NULL,
 	visit_detail_end_date date NOT NULL,
 	source_table varchar(20) NULL
@@ -20,8 +20,8 @@ with cte0 AS (
 ),
 cte3 as (
 	select 
-		e_patid 			as person_id,
-		e_cr_id 			as visit_detail_source_id,
+		patid 				as person_id,
+		cr_id				as visit_detail_source_id,
 		diagnosisdatebest 	as visit_detail_start_date,
 		diagnosisdatebest 	as visit_detail_end_date,
 		'Tumour' 			as source_table
@@ -29,8 +29,8 @@ cte3 as (
 ),
 cte4 as (
 	select 
-		e_patid			as person_id,
-		treatment_id 	as visit_detail_source_id,
+		patid			as person_id,
+		treatment_id::varchar 	as visit_detail_source_id,
 		eventdate		as visit_detail_start_date,
 		eventdate		as visit_detail_end_date,
 		'Treatment' 	as source_table
