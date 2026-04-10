@@ -1,0 +1,4 @@
+source_code,source_concept_id,source_vocabulary_id,source_code_description,target_concept_id,target_vocabulary_id,valid_start_date,valid_end_date,invalid_reason
+A,0,NCRAS_TUMOUR_STAGE_BINET_STCM,RaiBinet Stage A,1635315,Cancer Modifier,2022-05-09,2099-12-31,
+B,0,NCRAS_TUMOUR_STAGE_BINET_STCM,RaiBinet Stage B,1635179,Cancer Modifier,2022-05-09,2099-12-31,
+C,0,NCRAS_TUMOUR_STAGE_BINET_STCM,RaiBinet Stage C,1635062,Cancer Modifier,2022-05-09,2099-12-31,
