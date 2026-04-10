@@ -4,3 +4,7 @@ G1,0,NCRAS_TUMOUR_GRADE_STCM,Well differentiated,36768162,Cancer Modifier,2020-0
 G2,0,NCRAS_TUMOUR_GRADE_STCM,Moderately differentiated,36770626,Cancer Modifier,2020-09-23,2099-12-31,
 G3,0,NCRAS_TUMOUR_GRADE_STCM,Poorly differentiated,36769666,Cancer Modifier,2020-09-23,2099-12-31,
 G4,0,NCRAS_TUMOUR_GRADE_STCM,Undifferentiated / anaplastic,36769737,Cancer Modifier,2020-09-23,2099-12-31,
+1,0,NCRAS_TUMOUR_GRADE_STCM,Well differentiated,36768162,Cancer Modifier,2020-09-23,2099-12-31,
+2,0,NCRAS_TUMOUR_GRADE_STCM,Moderately differentiated,36770626,Cancer Modifier,2020-09-23,2099-12-31,
+3,0,NCRAS_TUMOUR_GRADE_STCM,Poorly differentiated,36769666,Cancer Modifier,2020-09-23,2099-12-31,
+4,0,NCRAS_TUMOUR_GRADE_STCM,Undifferentiated / anaplastic,36769737,Cancer Modifier,2020-09-23,2099-12-31,
