@@ -78,7 +78,7 @@ def build_fk(dir_code):
 				list1.append(list1.pop(0))
 		if ret == True and db_conf['cdm_version'][:3] == '5.4':
 			fname = dir_code + "5c4_cdm_fk.sql"
-			ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True)
+			ret = mapping_util.execute_multiple_queries(db_conf, fname, None, None, True, True, True)
 	except:
 		ret = False
 		err = sys.exc_info()
