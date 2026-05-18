@@ -583,7 +583,7 @@ def main():
 								dist_csv_file_list = []
 								
 								for f in csv_file_list:
-									dist_csv_file_list.append(re.sub("_update.csv|_delete.csv\Z", "", os.path.basename(f)))
+									dist_csv_file_list.append(re.sub("_update.csv|_delete.csv\\Z", "", os.path.basename(f)))
 
 								dist_csv_file_list = dict.fromkeys(dist_csv_file_list) #remove duplicated stcm fname
 						
