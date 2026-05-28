@@ -10,10 +10,10 @@ with cte1 AS (
 	FROM {TARGET_SCHEMA}.observation_period
 ),
 cte2 AS (
-	SELECT t2.spno, MIN(t2.epistart) AS date_min, MAX(t2.epiend) AS date_max 
+	SELECT t2.patid, t2.spno, MIN(t2.epistart) AS date_min, MAX(t2.epiend) AS date_max 
 	FROM cte1 as t1
 	INNER JOIN {SOURCE_SCHEMA}.hes_episodes AS t2 ON t2.patid = t1.person_id
-	GROUP BY t2.spno
+	GROUP BY t2.patid, t2.spno
 ),
 cte3 AS (
 	SELECT
@@ -35,7 +35,7 @@ cte3 AS (
 	NULL::int AS preceding_visit_occurrence_id
 	FROM {SOURCE_SCHEMA}.hes_hospital AS t1
 	INNER JOIN cte1 as t2 ON t1.patid = t2.person_id
-	LEFT JOIN cte2 as t3 ON t1.spno = t3.spno
+	LEFT JOIN cte2 as t3 ON t1.patid = t3.patid and t1.spno = t3.spno
 ),
 cte4 AS (
 	SELECT person_id, visit_source_value,
