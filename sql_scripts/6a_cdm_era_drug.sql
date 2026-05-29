@@ -118,7 +118,7 @@ WITH ctePreDrugTarget(drug_exposure_id, person_id, ingredient_concept_id, drug_e
 		, drug_sub_exposure_end_date - drug_sub_exposure_start_date AS days_exposed
 	INTO {TARGET_SCHEMA}.cteFinalTarget
 	FROM cteSubExposures;
-	
+
 CREATE INDEX idx_cteFinalTarget ON {TARGET_SCHEMA}.cteFinalTarget (person_id ASC, ingredient_concept_id ASC, drug_sub_exposure_start_date ASC);
 	
 WITH cteEndDates (person_id, ingredient_concept_id, end_date) AS -- the magic
