@@ -11,7 +11,9 @@ select d.prodcodeid,
 from {SOURCE_SCHEMA}.productdictionary d
 left join {VOCABULARY_SCHEMA}.source_to_source_vocab_map st1 on d.dmdid::varchar = st1.source_code and st1.source_vocabulary_id = 'dm+d';
 
-alter table {SOURCE_SCHEMA}.temp_drug_concept_map add constraint pk_temp_drug_concept_map primary key (prodcodeid);
+ALTER TABLE {SOURCE_SCHEMA}.temp_drug_concept_map SET TABLESPACE pg_default;
+
+alter table {SOURCE_SCHEMA}.temp_drug_concept_map add constraint pk_temp_drug_concept_map primary key (prodcodeid) USING INDEX TABLESPACE pg_default;
 
 --------------------------------
 -- TEMP_CONCEPT_MAP
@@ -39,7 +41,9 @@ from {SOURCE_SCHEMA}.medicaldictionary m
 left join cte1 on m.cleansedreadcode = cte1.source_code
 left join cte2 on m.snomedctconceptid = cte2.source_code;
 
-alter table {SOURCE_SCHEMA}.temp_concept_map add constraint pk_temp_concept_map primary key (medcodeid);
+ALTER TABLE {SOURCE_SCHEMA}.temp_concept_map SET TABLESPACE pg_default;
+
+alter table {SOURCE_SCHEMA}.temp_concept_map add constraint pk_temp_concept_map primary key (medcodeid) USING INDEX TABLESPACE pg_default;
 
 --------------------------------
 -- TEMP_VISIT_DETAIL
@@ -58,7 +62,7 @@ CREATE TABLE {SOURCE_SCHEMA}.temp_visit_detail
 	care_site_id bigint NULL,
 	parent_visit_detail_id bigint NULL,
 	source_table varchar(20) NULL
-);
+) TABLESPACE pg_default;
 
 WITH cte3 as (
 	select o.obsid as visit_detail_source_id,
@@ -128,6 +132,6 @@ inner join cte7 as t2 on t1.person_id = t2.person_id and t1.visit_detail_start_d
 --SELECT row_number() over (order by visit_detail_source_id) as visit_detail_id, *
 --FROM cte6;
 
-alter table {SOURCE_SCHEMA}.temp_visit_detail add constraint pk_temp_visit_d primary key (visit_detail_id); --added 31/10/2022
-create index idx_temp_visit_det1 on {SOURCE_SCHEMA}.temp_visit_detail (visit_detail_source_id, source_table); --modified 27/10/2022
-create index idx_temp_visit_det2 on {SOURCE_SCHEMA}.temp_visit_detail (person_id, visit_detail_start_date, care_site_id); 
+alter table {SOURCE_SCHEMA}.temp_visit_detail add constraint pk_temp_visit_d primary key (visit_detail_id) USING INDEX TABLESPACE pg_default; --added 31/10/2022
+create index idx_temp_visit_det1 on {SOURCE_SCHEMA}.temp_visit_detail (visit_detail_source_id, source_table) TABLESPACE pg_default; --modified 27/10/2022
+create index idx_temp_visit_det2 on {SOURCE_SCHEMA}.temp_visit_detail (person_id, visit_detail_start_date, care_site_id) TABLESPACE pg_default;

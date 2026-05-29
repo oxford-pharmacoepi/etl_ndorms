@@ -350,7 +350,7 @@ from t2
 left join {SOURCE_SCHEMA}.refservicetype rs on t2.refservicetypeid = rs.refservicetypeid;
 --	where v.visit_detail_start_date is not null  -- visit_detail_start_date was made NULL in map_in_chunks_initial
 
-create index idx_stem_source_{CHUNK_ID} on {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (source_concept_id);
+create index idx_stem_source_{CHUNK_ID} on {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (source_concept_id) TABLESPACE pg_default;
 
 -----------------------------------------
 -- UPDATE CHUNK

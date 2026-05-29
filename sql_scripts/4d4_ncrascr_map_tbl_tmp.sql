@@ -12,14 +12,14 @@ CREATE TABLE {SOURCE_SCHEMA}.temp_visit_detail
 	visit_detail_start_date date NOT NULL,
 	visit_detail_end_date date NOT NULL,
 	source_table varchar(20) NULL
-);
+) TABLESPACE pg_default;
 
 with cte0 AS (
 	SELECT max_id + 1 as start_id from {TARGET_SCHEMA_TO_LINK}._max_ids 
 	WHERE lower(tbl_name) = 'max_of_all'
 ),
 cte3 as (
-	select 
+	select distinct
 		patid 				as person_id,
 		cr_id				as visit_detail_source_id,
 		diagnosisdatebest 	as visit_detail_start_date,
@@ -28,7 +28,7 @@ cte3 as (
 	from {SOURCE_SCHEMA}.tumour t1
 ),
 cte4 as (
-	select 
+	select distinct 
 		patid			as person_id,
 		treatment_id::varchar 	as visit_detail_source_id,
 		eventdate		as visit_detail_start_date,
@@ -58,6 +58,5 @@ FROM cte0, cte5 as t1
 inner join cte6 as t2 on t1.person_id = t2.person_id and t1.visit_detail_start_date = t2.visit_detail_start_date;
 
 
-alter table {SOURCE_SCHEMA}.temp_visit_detail add constraint pk_temp_visit_d primary key (visit_detail_id);
-create index idx_temp_visit_1 on {SOURCE_SCHEMA}.temp_visit_detail (person_id, visit_detail_source_id, visit_detail_start_date);
-
+alter table {SOURCE_SCHEMA}.temp_visit_detail add constraint pk_temp_visit_d primary key (visit_detail_id) USING INDEX TABLESPACE pg_default;
+create index idx_temp_visit_1 on {SOURCE_SCHEMA}.temp_visit_detail (person_id, visit_detail_source_id, visit_detail_start_date) TABLESPACE pg_default;
