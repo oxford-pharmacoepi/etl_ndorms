@@ -252,7 +252,7 @@ cte7 as (
 		s.unit_source_value,
 		s.qualifier_source_value
 	from {CHUNK_SCHEMA}.stem_{CHUNK_ID} s
-	left join (values('Condition', 'Procedure', 'Measurement', 'Drug', 'Device')) as t2(domain_id) on t2.domain_id = s.domain_id
+	left join (values('Condition'), ('Procedure'), ('Measurement'), ('Drug'), ('Device')) as t2(domain_id) on t2.domain_id = s.domain_id
 	left join cte7b as t3 on s.unit_source_value = t3.unit_source_value
 	inner join {TARGET_SCHEMA}.visit_occurrence v on s.visit_occurrence_id = v.visit_occurrence_id
 --	where s.domain_id not in ('Condition', 'Procedure', 'Measurement', 'Drug', 'Device')
