@@ -82,7 +82,7 @@ select NULL as domain_id,
 	'hes_diagnosis_epi' stem_source_table,
 	NULL as stem_source_id
 from cte2 as t1
-inner join {TARGET_SCHEMA}.visit_occurrence as t2 on t1.visit_source_value = t2.visit_source_value
+inner join {TARGET_SCHEMA}.visit_occurrence as t2 on t1.person_id = t2.person_id and t1.visit_source_value = t2.visit_source_value
 inner join {TARGET_SCHEMA}.visit_detail as t3 on t1.person_id = t3.person_id and t1.visit_detail_source_value = t3.visit_detail_source_value
 WHERE t3.visit_detail_concept_id = 9201;
 
@@ -166,7 +166,7 @@ select NULL as domain_id,
 	'hes_procedures_epi' stem_source_table,
 	NULL as stem_source_id
 from cte2 as t1
-inner join {TARGET_SCHEMA}.visit_occurrence as t2 on t1.visit_source_value = t2.visit_source_value
+inner join {TARGET_SCHEMA}.visit_occurrence as t2 on t1.person_id = t2.person_id and t1.visit_source_value = t2.visit_source_value
 inner join {TARGET_SCHEMA}.visit_detail as t3 on t1.person_id = t3.person_id and t1.visit_detail_source_value = t3.visit_detail_source_value
 WHERE t3.visit_detail_concept_id = 9201;	
 
