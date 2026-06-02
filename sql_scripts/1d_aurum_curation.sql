@@ -17,6 +17,7 @@ with cte1 as (
 	OR gender is null 
 	OR yob < 1875
 	OR regstartdate is null
+	OR regstartdate > cprd_ddate
 )
 INSERT INTO {SOURCE_NOK_SCHEMA}.patient
 SELECT t1.* FROM {SOURCE_SCHEMA}.patient as t1
