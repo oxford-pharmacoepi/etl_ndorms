@@ -25,8 +25,6 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.gold_allpractices (
 	uts date
 ) TABLESPACE pg_default;
 
-patid	pracid	linkdate	hes_apc_e	ons_death_e	lsoa_e	sgss_e	chess_e	hes_op_e	hes_ae_e	hes_did_e	cr_e	sact_e	rtds_e	mhds_e	icnarc_e
-
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.gold_eligibility (
 	patid bigint,
 	pracid integer,
