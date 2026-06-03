@@ -65,7 +65,7 @@ CREATE TABLE {SOURCE_SCHEMA}.temp_visit_detail
 ) TABLESPACE pg_default;
 
 WITH cte3 as (
-	select o.obsid as visit_detail_source_id,
+	select distinct o.obsid as visit_detail_source_id,
 		o.patid as person_id,
 		case
 			when c.consdate is NULL then o.obsdate
