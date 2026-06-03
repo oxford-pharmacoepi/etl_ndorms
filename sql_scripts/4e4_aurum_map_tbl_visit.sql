@@ -15,7 +15,7 @@ drop table if exists {TARGET_SCHEMA}.visit_occurrence CASCADE;
 --SELECT row_number() over (order by person_id, visit_start_date, care_site_id) as visit_occurrence_id, 
 with cte1 as (
 	SELECT distinct visit_occurrence_id, person_id, care_site_id, visit_detail_start_date
-	from {SOURCE_SCHEMA}.temp_visit_detail as t1
+	from {SOURCE_SCHEMA}.temp_visit_detail
 )
 SELECT 
 		t1.visit_occurrence_id,
