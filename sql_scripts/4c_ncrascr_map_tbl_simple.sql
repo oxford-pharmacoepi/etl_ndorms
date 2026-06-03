@@ -2,8 +2,6 @@
 -- PERSON
 --------------------------------
 WITH cte1 as (
---	SELECT DISTINCT patid, ethnicityname
---	FROM {SOURCE_SCHEMA}.tumour
 	select patid 
 	from {SOURCE_SCHEMA}.tumour 
 	group by patid 
@@ -20,7 +18,6 @@ cte3 as (
 	left join cte1 as t2 on t1.patid = t2.patid
 	where t2.patid is null
 	and t1.ethnicityname is not null 
---	and t1.ethnicity <> '0'
 	and t1.ethnicityname not in ('NOT STATED', 'NOT KNOWN')
 ),
 cte4 as (
