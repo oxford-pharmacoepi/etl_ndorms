@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS  {LINKAGE_SCHEMA}.patient_townsend
+CREATE TABLE IF NOT EXISTS {LINKAGE_SCHEMA}.patient_townsend
 (
 	patid bigint NOT NULL,
 	pracid int NOT NULL,
