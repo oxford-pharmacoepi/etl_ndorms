@@ -19,21 +19,36 @@ def main():
 			database_type = db_conf['database_type']
 			source_schema = db_conf['source_schema']
 			tbl_db = 'tbl_' + database_type
-			tbl_db_list =  [source_schema + "." + tbl for tbl in db_conf[tbl_db]]
+			tbl_denom = 'tbl_' + database_type + '_denom'
+			tbl_denom_list = [tbl for tbl in db_conf[tbl_denom]]
 			dir_denom = dir_study + '\\denominators\\'
 			dir_denom_processed = dir_denom + db_conf['dir_processed']
 			dir_sql = os.getcwd() + '\\sql_scripts\\'
 			dir_sql_processed = os.getcwd() + '\\sql_scripts' + db_conf['dir_processed']
 # ---------------------------------------------------------
+# If database does not exist, create database
+# ---------------------------------------------------------
+			(ret, exist) = mapping_util.does_db_exist(db_conf)
+			if exist == False:
+				ret = mapping_util.create_db(db_conf)
+			if ret == True:
+# ---------------------------------------------------------
+# Create the schemas
+# ---------------------------------------------------------
+				fname = dir_sql + '1__schema_create.sql'
+				print('Calling ' + fname + ' ...')
+				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, debug, False)
+			if ret == True:
+# ---------------------------------------------------------
 # Ask the user for DROP confirmation
 # ---------------------------------------------------------
-			qa = input('Are you sure you want to DROP the ' + database_type.upper() + ' denominators tables (y/n):') 
-			while qa.lower() not in ['y', 'n', 'yes', 'no']:
-				qa = input('I did not understand that. Are you sure you want to DROP the ' + database_type.upper() + ' denominators tables (y/n):') 
-			if qa.lower() in ['y', 'yes']:
-				fname = dir_sql + '8a_' + database_type + '_denom_drop.sql'
-				print('Calling ' + fname + ' ...')
-				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
+				qa = input('Are you sure you want to DROP the ' + database_type.upper() + ' denominators tables (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Are you sure you want to DROP the ' + database_type.upper() + ' denominators tables (y/n):') 
+				if qa.lower() in ['y', 'yes']:
+					fname = dir_sql + '8a_' + database_type + '_denom_drop.sql'
+					print('Calling ' + fname + ' ...')
+					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, False)
 			if ret == True:
 # ---------------------------------------------------------
 # Ask the user for LOAD confirmation
@@ -52,14 +67,12 @@ def main():
 # Load denominators data - Parallel execution
 # ---------------------------------------------------------
 					if ret == True:
-						tbl_denom = 'tbl_' + database_type + '_denom'
-						tbl_denom_list = [tbl for tbl in db_conf[tbl_denom]]
 						file_denom_list = [[dir_denom + '*' + tbl + '.txt'] for tbl in tbl_denom_list]
 						if not os.path.exists(dir_denom_processed):
 							os.makedirs(dir_denom_processed)
 						ret = mapping_util.load_files_parallel(db_conf, source_schema, tbl_denom_list, file_denom_list, dir_denom_processed)
 						if ret == True:
-							print('Finished loading cdm vocabulary.')
+							print('Finished loading denominators.')
 # ---------------------------------------------------------
 # Ask the user for PK/IDX creation confirmation
 # ---------------------------------------------------------
@@ -80,15 +93,18 @@ def main():
 # Ask the user for RECORD COUNTS confirmation
 # ---------------------------------------------------------
 			if ret == True:
-				qa = input('Are you sure you want to COUNT the records for all the ' + database_type.upper() + ' tables (y/n):') 
+				qa = input('Are you sure you want to COUNT the records for the ' + database_type.upper() + ' denominators tables (y/n):') 
 				while qa.lower() not in ['y', 'n', 'yes', 'no']:
-					qa = input('Are you sure you want to COUNT the records for all the ' + database_type.upper() + ' tables (y/n):') 
+					qa = input('Are you sure you want to COUNT the records for the ' + database_type.upper() + ' denominators tables (y/n):') 
 				if qa.lower() in ['y', 'yes']:
-					source_nok_schema = db_conf['source_nok_schema']
-					tbl_list_count = tbl_db_list + [source_nok_schema + "." + tbl for tbl in db_conf[tbl_db] if tbl not in ('practice', 'staff')]
-					ret = mapping_util.get_table_count_parallel(db_conf, tbl_list_count, source_schema + '._records')
+					fname = dir_sql + '1e_source_records_create.sql'
+					print('Calling ' + fname + ' ...')
+					ret = mapping_util.execute_multiple_queries(db_conf, fname)			
 					if ret == True:
-						print('Finished counting on ' + database_type.upper() + ' data\n')	
+						tbl_denom_list_full = [source_schema + '.' + tbl for tbl in tbl_denom_list]
+						ret = mapping_util.get_table_count_parallel(db_conf, tbl_denom_list_full, source_schema + '._records')
+						if ret == True:
+							print('Finished counting on ' + database_type.upper() + ' data\n')	
 # ---------------------------------------------------------
 # Move CODE to the processed directory?
 # ---------------------------------------------------------
