@@ -20,7 +20,6 @@ db_conf = dict({
 	'chunk_size': 1000,
 	'chunk_limit': 0,
 	'dir_processed': '/processed/',
-#	'dir_study': '<project_directory>/',
 	'dir_log': '<project_directory>/log',
 	'dir_stcm': '<project_directory>/source_to_concept_map',
 	'dir_source_data': '<project_directory>/data',
@@ -44,6 +43,6 @@ db_conf = dict({
 	'tbl_ukb_cancer': ['cancer'],
 	'tbl_ukb_cancer_lookup': ['coding1970'],
 	'tbl_cprd': ['denominators', 'documentation', 'lookups', 'reference'],
-	'tbl_cdm': ['care_site', 'condition_era', 'condition_occurrence', 'death', 'device_exposure', 'dose_era', 'drug_era', 'drug_exposure', 'location', 'measurement', 'observation', 'observation_period', 'person', 'procedure_occurrence', 'provider', 'specimen', 'visit_detail', 'visit_occurrence'],
-	'tbl_cdm_voc': ['drug_strength', 'concept', 'concept_relationship', 'concept_ancestor', 'concept_synonym', 'vocabulary', 'relationship', 'concept_class', 'domain']
+	'tbl_cdm': ['care_site', 'condition_era', 'condition_occurrence', 'death', 'device_exposure', 'dose_era', 'drug_era', 'drug_exposure', 'episode', 'episode_event', 'location', 'measurement', 'observation', 'observation_period', 'person', 'procedure_occurrence', 'provider', 'specimen', 'visit_detail', 'visit_occurrence'],
+	'tbl_cdm_voc': ['concept', 'concept_ancestor', 'concept_class', 'concept_relationship', 'concept_synonym', 'domain', 'drug_strength', 'relationship', 'vocabulary']
 })
