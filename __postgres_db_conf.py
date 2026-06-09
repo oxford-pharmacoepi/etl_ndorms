@@ -27,6 +27,7 @@ db_conf = dict({
 	'dir_voc': '<project_directory>/vocabulary', #Do not change below here
 	'tbl_gold': ['additional', 'clinical', 'consultation', 'immunisation', 'patient', 'practice', 'referral', 'staff', 'test', 'therapy'],
 	'tbl_gold_lookup':['bnfcodes', 'common_dosages', 'entity', 'medical', 'packtype', 'product', 'scoremethod', 'txtfiles\\*.txt'],
+	'tbl_gold_denom': ['gold_acceptable_pats', 'gold_allpractices'],
 	'tbl_aurum' : ['practice', 'staff', 'patient', 'consultation', 'observation', 'problem', 'referral', 'drugissue'],
 	'tbl_aurum_lookup': ['gender', 'region', 'jobcat', 'numunit', 'quantunit', 'refservicetype', 'medicaldictionary', 'productdictionary', 'visiontoemismigrators'],
 	'tbl_aurum_denom': ['aurum_acceptablepats', 'aurum_practices'],
@@ -34,7 +35,7 @@ db_conf = dict({
 	'tbl_hesapc': ['hes_patient', 'hes_hospital', 'hes_acp', 'hes_ccare', 'hes_maternity', 'hes_episodes', 'hes_diagnosis_hosp', 'hes_primary_diag_hosp', 'hes_diagnosis_epi', 'hes_procedures_epi', 'hes_hrg'],
 	'tbl_hesop': ['hesop_patient', 'hesop_appointment', 'hesop_clinical'],
 	'tbl_hesae': ['hesae_patient', 'hesae_attendance', 'hesae_diagnosis', 'hesae_investigation', 'hesae_treatment', 'hesae_hrg', 'hesae_pathway'],
-	'tbl_ons': ['linkage_coverage','ons_death'],
+	'tbl_ons': ['ons_death'],
 	'tbl_ncrascr': ['tumour', 'treatment'],
 	'tbl_ukb_baseline': ['_patid_deleted', 'baseline', 'death', 'death_cause'],
 	'tbl_ukb_gp': ['gp_clinical', 'gp_registrations', 'gp_scripts'],
