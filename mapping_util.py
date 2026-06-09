@@ -534,7 +534,7 @@ def execute_multiple_queries(db_conf, filename, chunk_id = None, cnx = None, com
 						print(msg)
 					cursor1.execute(query)
 					if debug:
-						msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Finished  : ' + query.split('\n')[0] + ' in '
+						msg = '[' + datetime.now().strftime("%d/%m/%Y, %H:%M:%S") + '] Finished: ' + query.split('\n')[0] + ' in '
 						msg += calc_time(time.time() - time1) + "\n"
 						print(msg)
 			if move_files == True:
@@ -753,8 +753,11 @@ def load_folders(db_conf, schema, folder):
 						cursor1.copy_expert("COPY " + tbl_name + " FROM STDIN WITH (FORMAT CSV, delimiter '	', quote '\u0007', NULL '')", stream)
 				elif data_provider == 'cprd':
 					if tbl_name == 'ons_death':
-						col_ons_death = ('patid', 'pracid', 'icd9_orig_mention_1', 'icd9_orig_mention_2', 'icd9_orig_mention_3', 'icd9_orig_mention_4', 'icd9_orig_mention_5', 'icd9_orig_mention_6', 'icd9_orig_mention_7', 'icd9_orig_mention_8', 'icd9_orig_mention_9', 'icd9_orig_mention_10',	 'icd9_orig_mention_11',	 'icd9_orig_mention_12',	 'icd9_orig_mention_13',	 'icd9_orig_mention_14',	 'icd9_orig_mention_15',	 'neo_nate_flag', 'pod_code', 'pod_establishment_type', 'pod_nhs_establishment', 'reg_date', 'reg_date_of_death', 's_cod_code_1', 's_cod_code_2', 's_cod_code_3', 's_cod_code_4', 's_cod_code_5', 's_cod_code_6', 's_cod_code_7', 's_cod_code_8', 's_cod_code_9', 's_cod_code_10', 's_cod_code_11', 's_cod_code_12', 's_cod_code_13', 's_cod_code_14', 's_cod_code_15', 's_underlying_cod_icd10', 's_underlying_cod_icd9')
-						cursor1.copy_from(stream, tbl_name, sep = '	', null = '', columns=col_ons_death)
+						cols = ('patid', 'pracid', 'icd9_orig_mention_1', 'icd9_orig_mention_2', 'icd9_orig_mention_3', 'icd9_orig_mention_4', 'icd9_orig_mention_5', 'icd9_orig_mention_6', 'icd9_orig_mention_7', 'icd9_orig_mention_8', 'icd9_orig_mention_9', 'icd9_orig_mention_10',	 'icd9_orig_mention_11',	 'icd9_orig_mention_12',	 'icd9_orig_mention_13',	 'icd9_orig_mention_14',	 'icd9_orig_mention_15',	 'neo_nate_flag', 'pod_code', 'pod_establishment_type', 'pod_nhs_establishment', 'reg_date', 'reg_date_of_death', 's_cod_code_1', 's_cod_code_2', 's_cod_code_3', 's_cod_code_4', 's_cod_code_5', 's_cod_code_6', 's_cod_code_7', 's_cod_code_8', 's_cod_code_9', 's_cod_code_10', 's_cod_code_11', 's_cod_code_12', 's_cod_code_13', 's_cod_code_14', 's_cod_code_15', 's_underlying_cod_icd10', 's_underlying_cod_icd9')
+						cursor1.copy_from(stream, tbl_name, sep = '	', null = '', columns=cols)
+					elif tbl_name == 'treatment':
+						cols = ('patid', 'cr_patid', 'cr_id', 'number_of_tumours', 'eventcode', 'eventdesc', 'eventdate', 'within_six_months_flag', 'six_months_after_flag', 'opcs4_code', 'opcs4_name', 'radiocode', 'radiodesc', 'imagingcode', 'imagingdesc', 'imagingsite', 'lesionsize', 'chemo_all_drug', 'chemo_drug_group')
+						cursor1.copy_from(stream, tbl_name, sep = '	', null = '', columns=cols)
 					else:
 						cursor1.copy_from(stream, tbl_name, sep = '	', null = '')
 				else:
