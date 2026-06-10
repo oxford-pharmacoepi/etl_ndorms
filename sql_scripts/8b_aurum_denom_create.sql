@@ -26,3 +26,4 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.aurum_practices (
 	uts date,
 	region int
 ) TABLESPACE pg_default;
+
