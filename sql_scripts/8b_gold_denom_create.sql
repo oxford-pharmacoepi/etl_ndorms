@@ -25,21 +25,3 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.gold_allpractices (
 	uts date
 ) TABLESPACE pg_default;
 
-CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.gold_eligibility (
-	patid bigint,
-	pracid integer,
-	linkdare date,
-	hes_apc_e smallint,
-	ons_death_e smallint,
-	lsoa_e smallint,
-	sgss_e smallint,
-	chess_e smallint,
-	hes_op_e smallint,
-	hes_ae_e smallint,
-	hes_did_e smallint,
-	cr_e smallint,
-	sact_e smallint,
-	rtds_e smallint,
-	mhds_e smallint,
-	icnarc_e smallint
-) TABLESPACE pg_default;
