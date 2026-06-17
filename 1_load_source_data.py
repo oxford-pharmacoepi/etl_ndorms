@@ -97,7 +97,6 @@ def main():
 # ---------------------------------------------------------
 # Create source tables
 # ---------------------------------------------------------
-					time1 = time.time()
 					fname = dir_sql + '1b_' + database_type + '_create.sql'
 					print('Calling ' + fname + ' ...')
 					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, debug, False)
@@ -112,12 +111,13 @@ def main():
 # ---------------------------------------------------------
 # Load source data
 # ---------------------------------------------------------
-						dir_list_folders = [dir_source_files + tbl for tbl in db_conf[tbl_db]]
-						print(dir_list_folders)
-						ret = mapping_util.load_folders_parallel(db_conf, source_schema, dir_list_folders)
-						if ret == True:
-							task_finished = "Finished loading " + database_type.upper() + " source data in {0}".format(mapping_util.calc_time(time.time() - time1))
-							print(task_finished)
+					time1 = time.time()
+					dir_list_folders = [dir_source_files + tbl for tbl in db_conf[tbl_db]]
+					print(dir_list_folders)
+					ret = mapping_util.load_folders_parallel(db_conf, source_schema, dir_list_folders)
+					if ret == True:
+						task_finished = "Finished loading " + database_type.upper() + " source data in {0}".format(mapping_util.calc_time(time.time() - time1))
+						print(task_finished)
 # ---------------------------------------------------------
 # Ask the user for PK/IDX creation confirmation
 # ---------------------------------------------------------
