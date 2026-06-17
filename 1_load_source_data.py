@@ -75,10 +75,10 @@ def main():
 				fname = dir_sql + '1__schema_create.sql'
 				print('Calling ' + fname + ' ...')
 				ret = mapping_util.execute_sql_file_parallel(db_conf, fname, debug, False)
-			if ret == True:
 # ---------------------------------------------------------
 # Ask the user for DROP confirmation
 # ---------------------------------------------------------
+			if ret == True:
 				qa = input('Are you sure you want to DROP all the ' + database_type.upper() + ' tables (y/n):') 
 				while qa.lower() not in ['y', 'n', 'yes', 'no']:
 					qa = input('I did not understand that. Are you sure you want to DROP all the ' + database_type.upper() + ' tables (y/n):') 
@@ -86,13 +86,13 @@ def main():
 					fname = dir_sql + '1a_' + database_type + '_drop.sql'
 					print('Calling ' + fname + ' ...')
 					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, debug, False)
+# ---------------------------------------------------------
+# Ask the user for CREATE confirmation
+# ---------------------------------------------------------
 			if ret == True:
-# ---------------------------------------------------------
-# Ask the user for LOAD confirmation
-# ---------------------------------------------------------
-				qa = input('Are you sure you want to CREATE/LOAD all the ' + database_type.upper() + ' tables (y/n):') 
+				qa = input('Are you sure you want to CREATE all the ' + database_type.upper() + ' tables (y/n):') 
 				while qa.lower() not in ['y', 'n', 'yes', 'no']:
-					qa = input('I did not understand that. Are you sure you want to CREATE/LOAD all the ' + database_type.upper() + ' tables (y/n):') 
+					qa = input('I did not understand that. Are you sure you want to CREATE all the ' + database_type.upper() + ' tables (y/n):') 
 				if qa.lower() in ['y', 'yes']:
 # ---------------------------------------------------------
 # Create source tables
@@ -102,9 +102,16 @@ def main():
 					print('Calling ' + fname + ' ...')
 					ret = mapping_util.execute_sql_file_parallel(db_conf, fname, debug, False)
 # ---------------------------------------------------------
+# Ask the user for LOAD confirmation
+# ---------------------------------------------------------
+			if ret == True:
+				qa = input('Are you sure you want to LOAD all the ' + database_type.upper() + ' tables (y/n):') 
+				while qa.lower() not in ['y', 'n', 'yes', 'no']:
+					qa = input('I did not understand that. Are you sure you want to LOAD all the ' + database_type.upper() + ' tables (y/n):') 
+				if qa.lower() in ['y', 'yes']:
+# ---------------------------------------------------------
 # Load source data
 # ---------------------------------------------------------
-					if ret == True:
 						dir_list_folders = [dir_source_files + tbl for tbl in db_conf[tbl_db]]
 						print(dir_list_folders)
 						ret = mapping_util.load_folders_parallel(db_conf, source_schema, dir_list_folders)
