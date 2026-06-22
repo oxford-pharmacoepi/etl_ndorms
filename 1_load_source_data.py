@@ -19,7 +19,8 @@ def is_curation_needed_aurum(tbl_patient, tbl_observation):
 		cnx = sql.connect(
 			user = db_conf['username'],
 			password = db_conf['password'],
-			database = db_conf['database']
+			database = db_conf['database'],
+			port = db_conf['port']
 		)
 		cursor1 = cnx.cursor()
 		query1 = "SELECT 1 FROM " + tbl_patient + " WHERE acceptable = 0 OR gender in (0,3,4) OR gender is null OR yob < 1875 OR regstartdate is null LIMIT 1"
