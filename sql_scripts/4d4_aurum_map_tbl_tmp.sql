@@ -84,26 +84,26 @@ WITH cte3 as (
 --	where c.consdate is not null or o.obsdate is not null -- not necessary as obsdate is always not NULL, filtered in check_source_data.sql
 ),
 cte4 as (
-	select c.consid	as visit_detail_source_id,
-		c.patid		as person_id,
-		c.consdate	as visit_detail_start_date,
-		c.consdate	as visit_detail_end_date,
-		c.staffid	as provider_id,
-		c.pracid	as care_site_id,
+	select c.consid		as visit_detail_source_id,
+		c.patid			as person_id,
+		c.consdate		as visit_detail_start_date,
+		c.consdate		as visit_detail_end_date,
+		c.staffid		as provider_id,
+		c.pracid		as care_site_id,
 		NULL::bigint	as parent_visit_detail_id,
-		'Consultation' as source_table
+		'Consultation' 	as source_table
 	from {SOURCE_SCHEMA}.consultation c
 	where c.consdate is not null
 ),
 cte5 as (
-	select issueid	as visit_detail_source_id,
-		patid		as person_id,
-		issuedate	as visit_detail_start_date,
-		issuedate	as visit_detail_end_date,
-		staffid	as provider_id,
-		pracid	as care_site_id,
+	select issueid		as visit_detail_source_id,
+		patid			as person_id,
+		issuedate		as visit_detail_start_date,
+		issuedate		as visit_detail_end_date,
+		staffid			as provider_id,
+		pracid			as care_site_id,
 		NULL::bigint	as parent_visit_detail_id,
-		'DrugIssue' as source_table
+		'DrugIssue' 	as source_table
 	from {SOURCE_SCHEMA}.drugissue
 	where probobsid is null
 ),
@@ -128,9 +128,7 @@ SELECT row_number() over (order by t1.person_id, t1.visit_detail_start_date, t1.
 t2.visit_occurrence_id, t1.*
 FROM cte6 as t1
 inner join cte7 as t2 on t1.person_id = t2.person_id and t1.visit_detail_start_date = t2.visit_detail_start_date;
---INSERT INTO {SOURCE_SCHEMA}.temp_visit_detail
---SELECT row_number() over (order by visit_detail_source_id) as visit_detail_id, *
---FROM cte6;
+
 
 alter table {SOURCE_SCHEMA}.temp_visit_detail add constraint pk_temp_visit_d primary key (visit_detail_id) USING INDEX TABLESPACE pg_default; --added 31/10/2022
 create index idx_temp_visit_det1 on {SOURCE_SCHEMA}.temp_visit_detail (visit_detail_source_id, source_table) TABLESPACE pg_default; --modified 27/10/2022
