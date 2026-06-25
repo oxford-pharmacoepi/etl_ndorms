@@ -64,17 +64,11 @@ CREATE TABLE {SOURCE_SCHEMA}.temp_visit_detail
 	source_table varchar(20) NULL
 ) TABLESPACE pg_default;
 
-WITH cte3 as (
-	select distinct o.obsid as visit_detail_source_id,
+WITH cte3 as ( -- VERY SLOW
+	select o.obsid as visit_detail_source_id,
 		o.patid as person_id,
-		case
-			when c.consdate is NULL then o.obsdate
-			else c.consdate
-			end as visit_detail_start_date,
-		case
-			when c.consdate is NULL then o.obsdate
-			else c.consdate
-			end as visit_detail_end_date,
+		coalesce(c.consdate, o.obsdate) as visit_detail_start_date,
+		coalesce(c.consdate, o.obsdate) as visit_detail_end_date,
 		c.staffid as provider_id,
 		o.pracid as care_site_id,
 		o.parentobsid as parent_visit_detail_id,
