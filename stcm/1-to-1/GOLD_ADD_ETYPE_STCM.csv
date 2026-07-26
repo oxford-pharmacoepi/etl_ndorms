@@ -353,3 +353,4 @@ source_code,source_concept_id,source_vocabulary_id,source_code_description,targe
 87-Medical History-Family History-Read Code For Condition,0,GOLD_ADD_ETYPE_STCM,87-Medical History-Family History-Read Code For Condition,4167217,SNOMED,1970-01-01,2099-12-31,
 96-Examination Findings-Heart examination-Rhythm,0,GOLD_ADD_ETYPE_STCM,96-Examination Findings-Heart examination-Rhythm,3022318,LOINC,1970-01-01,2099-12-31,
 96-Examination Findings-Heart examination-Sounds,0,GOLD_ADD_ETYPE_STCM,96-Examination Findings-Heart examination-Sounds,21494971,LOINC,2016-06-24,2099-12-31,
+98-Elderly-Next of kin - elderly-Next of Kin,0,GOLD_ADD_ETYPE_STCM,98-Elderly-Next of kin - elderly-Next of Kin,4081585,SNOMED,2002-01-31,2099-12-31,
