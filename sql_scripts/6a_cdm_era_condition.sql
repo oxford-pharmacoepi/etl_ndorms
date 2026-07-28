@@ -3,6 +3,7 @@
 -----------------------
 DROP TABLE IF EXISTS {TARGET_SCHEMA}.condition_era;
 
+CREATE TABLE {TARGET_SCHEMA}.condition_era TABLESPACE pg_default AS
 WITH cteConditionTarget (condition_occurrence_id, person_id, condition_concept_id, condition_start_date, condition_end_date) AS
 (
 	SELECT
@@ -74,18 +75,11 @@ GROUP BY
 	, c.person_id
 	, c.condition_concept_id
 	, c.condition_start_date
-),
-cte0 AS (
-	SELECT CASE WHEN '{TARGET_SCHEMA_TO_LINK}' = '' OR '{TARGET_SCHEMA_TO_LINK}' = '{TARGET_SCHEMA}'
-		THEN 0 ELSE (SELECT COALESCE(max_id,0) from {TARGET_SCHEMA_TO_LINK}._max_ids 
-		WHERE lower(tbl_name) = 'condition_era' ) 
-		END as start_id
 )
 --------------------------------------------------------------------------------------------------------------
-SELECT condition_era_id + cte0.start_id as condition_era_id, person_id, condition_concept_id,
+SELECT condition_era_id, person_id, condition_concept_id,
 	condition_era_start_date, condition_era_end_date, condition_occurrence_count
-INTO {TARGET_SCHEMA}.condition_era	
-	FROM cte0, (
+	FROM (
 	SELECT
 		row_number() over (order by person_id, condition_concept_id) as condition_era_id
 		, person_id
@@ -97,7 +91,7 @@ INTO {TARGET_SCHEMA}.condition_era
 	GROUP BY person_id, condition_concept_id, era_end_date
 	ORDER BY person_id, condition_concept_id) as t;
 
-ALTER TABLE {TARGET_SCHEMA}.condition_era SET TABLESPACE pg_default;
+--ALTER TABLE {TARGET_SCHEMA}.condition_era SET TABLESPACE pg_default;
 -----------------------
 -- Add PK / IDX / FK
 -----------------------
