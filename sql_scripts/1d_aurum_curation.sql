@@ -29,17 +29,14 @@ DELETE FROM {SOURCE_SCHEMA}.patient as t1
 using {SOURCE_NOK_SCHEMA}.patient as t2
 WHERE t1.patid = t2.patid;
 
-
--- PATIENT SET TO NULL unexistent staffids
-with cte2 as (
-	SELECT t1.patid
-	FROM {SOURCE_SCHEMA}.patient as t1
-	left join {SOURCE_SCHEMA}.staff as t2 on t1.usualgpstaffid = t2.staffid
-	WHERE t2.staffid is null
-)
-update {SOURCE_SCHEMA}.patient as t3
-set usualgpstaffid = null
-from cte2 where t3.patid = cte2.patid;
+UPDATE {SOURCE_SCHEMA}.patient as t1
+SET usualgpstaffid = NULL
+WHERE t1.usualgpstaffid IS NOT NULL
+AND NOT EXISTS (
+	SELECT 1
+	FROM {SOURCE_SCHEMA}.staff as t2
+	WHERE t2.staffid = t1.usualgpstaffid
+);
 
 -- PATIENT SET TO NULL unexistent pracids
 --POC	with t as (
@@ -78,16 +75,14 @@ WHERE t3.consid = cte4.consid;
 
 -- CONSULTATION SET TO NULL unexistent staffids
 
-with cte5 as (
-	SELECT t1.consid
-	FROM {SOURCE_SCHEMA}.consultation as t1
-	left join {SOURCE_SCHEMA}.staff as t2 on t1.staffid = t2.staffid
-	WHERE t2.staffid is null
-)
-update {SOURCE_SCHEMA}.consultation as t3
-set staffid = null
-from cte5 where t3.consid = cte5.consid;
-
+UPDATE {SOURCE_SCHEMA}.consultation as t1
+SET staffid = NULL
+WHERE t1.staffid IS NOT NULL
+AND NOT EXISTS (
+	SELECT 1
+	FROM {SOURCE_SCHEMA}.staff as t2
+	WHERE t2.staffid = t1.staffid
+);
 
 -- DRUGISSUE - MOVE UNACCEPTABLE AND UNEXISTENT PATIENTS. Unacceptable patients have already been removed from {SOURCE_SCHEMA}.patient, so we can remove both unexistent and acceptable at once.
 CREATE TABLE {SOURCE_NOK_SCHEMA}.drugissue (LIKE {SOURCE_SCHEMA}.drugissue) TABLESPACE pg_default;
@@ -112,16 +107,15 @@ DELETE FROM {SOURCE_SCHEMA}.drugissue as t3
 USING cte7
 WHERE t3.issueid = cte7.issueid;
 
--- DRUGISSUE SET TO NULL unexistent staffids
-with cte8 as (
-	SELECT t1.issueid
-	FROM {SOURCE_SCHEMA}.drugissue as t1
-	left join {SOURCE_SCHEMA}.staff as t2 on t1.staffid = t2.staffid
-	WHERE t2.staffid is null
-)
-update {SOURCE_SCHEMA}.drugissue as t3
-set staffid = null
-from cte8 where t3.issueid = cte8.issueid;
+-- DRUGISSUE SET TO NULL unexistent staffids (VERY SLOW: added cluster on staff.staffid, see if it helps)
+UPDATE {SOURCE_SCHEMA}.drugissue as t1
+SET staffid = NULL
+WHERE t1.staffid IS NOT NULL
+AND NOT EXISTS (
+	SELECT 1
+	FROM {SOURCE_SCHEMA}.staff as t2
+	WHERE t2.staffid = t1.staffid
+);
 
 -- OBSERVATION - MOVE UNACCEPTABLE AND UNEXISTENT PATIENTS. Unacceptable patients have already been removed from {SOURCE_SCHEMA}.patient, so we can remove both unexistent and acceptable at once.
 CREATE TABLE {SOURCE_NOK_SCHEMA}.observation (LIKE {SOURCE_SCHEMA}.observation) TABLESPACE pg_default;
@@ -147,17 +141,15 @@ USING cte10
 WHERE t3.obsid = cte10.obsid;
 
 
--- OBSERVATION SET TO NULL unexistent staffids
-with cte11 as (
-	SELECT t1.obsid
-	FROM {SOURCE_SCHEMA}.observation as t1
-	left join {SOURCE_SCHEMA}.staff as t2 on t1.staffid = t2.staffid
-	WHERE t2.staffid is null
-)
-update {SOURCE_SCHEMA}.observation as t3
-set staffid = null
-from cte11 
-WHERE t3.obsid = cte11.obsid;
+-- OBSERVATION SET TO NULL unexistent staffids (VERY SLOW: changed approach, see if it helps)
+UPDATE {SOURCE_SCHEMA}.observation as t1
+SET staffid = NULL
+WHERE t1.staffid IS NOT NULL
+AND NOT EXISTS (
+	SELECT 1
+	FROM {SOURCE_SCHEMA}.staff as t2
+	WHERE t2.staffid = t1.staffid
+);
 
 -- OBSERVATION SET TO NULL unexistent pracids
 --POC	with t as (
@@ -194,17 +186,12 @@ WHERE t3.obsid = cte11.obsid;
 
 
 -- OBSERVATION SET obsdate to consdate when obsdate is NULL and consdate is not NULL
-with cte12 as (
-	SELECT t1.obsid, t2.consdate
-	FROM {SOURCE_SCHEMA}.observation as t1
-	INNER JOIN {SOURCE_SCHEMA}.consultation as t2 on t1.patid = t2.patid and t1.consid = t2.consid
-	WHERE t1.obsdate is null
-	AND t2.consdate is not null
-)
-update {SOURCE_SCHEMA}.observation as t3
-set obsdate = cte12.consdate
-from cte12 
-WHERE t3.obsid = cte12.obsid;
+UPDATE {SOURCE_SCHEMA}.observation as t1
+SET obsdate = t2.consdate
+FROM {SOURCE_SCHEMA}.consultation as t2
+WHERE t1.obsdate IS NULL
+  AND t1.consid = t2.consid
+  AND t2.consdate IS NOT NULL;
 
 -- OBSERVATION - remove observations where obsdate is NULL 
 with cte13 as (
@@ -252,17 +239,14 @@ USING cte16
 WHERE t3.obsid = cte16.obsid;
 
 -- PROBLEM SET TO NULL unexistent staffids
-
-with cte17 as (
-	SELECT t1.obsid
-	FROM {SOURCE_SCHEMA}.problem as t1
-	left join {SOURCE_SCHEMA}.staff as t2 on t1.lastrevstaffid = t2.staffid
-	WHERE t2.staffid is null
-)
-update {SOURCE_SCHEMA}.problem as t3
-set lastrevstaffid = null
-from cte17 where t3.obsid = cte17.obsid;
-
+UPDATE {SOURCE_SCHEMA}.problem as t1
+SET lastrevstaffid = NULL
+WHERE t1.lastrevstaffid IS NOT NULL
+AND NOT EXISTS (
+	SELECT 1
+	FROM {SOURCE_SCHEMA}.staff as t2
+	WHERE t2.staffid = t1.lastrevstaffid
+);
 
 
 -- REFERRAL - UNACCEPTABLE AND UNEXISTENT PATIENTS. Unacceptable patients have already been removed from {SOURCE_SCHEMA}.patient, so we can remove both unexistent and acceptable at once.
