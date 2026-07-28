@@ -121,6 +121,7 @@ WITH ctePreDrugTarget(drug_exposure_id, person_id, ingredient_concept_id, drug_e
 
 CREATE INDEX idx_cteFinalTarget ON {TARGET_SCHEMA}.cteFinalTarget (person_id ASC, ingredient_concept_id ASC, drug_sub_exposure_start_date ASC);
 	
+CREATE TABLE {TARGET_SCHEMA}.drug_era TABLESPACE pg_default AS
 WITH cteEndDates (person_id, ingredient_concept_id, end_date) AS -- the magic
 (
 	SELECT
@@ -178,18 +179,11 @@ GROUP BY
 	, ft.drug_sub_exposure_start_date
 	, ft.drug_exposure_count
 	, ft.days_exposed
-),
-cte0 AS (
-	SELECT CASE WHEN '{TARGET_SCHEMA_TO_LINK}' = '' OR '{TARGET_SCHEMA_TO_LINK}' = '{TARGET_SCHEMA}'
-		THEN 0 ELSE (SELECT COALESCE(max_id,0) from {TARGET_SCHEMA_TO_LINK}._max_ids 
-		WHERE lower(tbl_name) = 'drug_era') 
-		END as start_id
 )
 --INSERT INTO {TARGET_SCHEMA}.drug_era(drug_era_id, person_id, drug_concept_id, drug_era_start_date, drug_era_end_date, drug_exposure_count, gap_days)
-SELECT drug_era_id + cte0.start_id as drug_era_id, person_id, drug_concept_id,
+SELECT drug_era_id, person_id, drug_concept_id,
 	drug_era_start_date, drug_era_end_date, drug_exposure_count, gap_days
-INTO {TARGET_SCHEMA}.drug_era --(drug_era_id, person_id, drug_concept_id, drug_era_start_date, drug_era_end_date, drug_exposure_count, gap_days)
-FROM cte0, (
+FROM (
 	SELECT
 		row_number() over (order by person_id, drug_concept_id) as drug_era_id
 		, person_id
@@ -202,7 +196,7 @@ FROM cteDrugEraEnds
 GROUP BY person_id, drug_concept_id, drug_era_end_date
 ORDER BY person_id, drug_concept_id) as t;
 
-ALTER TABLE {TARGET_SCHEMA}.drug_era SET TABLESPACE pg_default;
+--ALTER TABLE {TARGET_SCHEMA}.drug_era SET TABLESPACE pg_default;
 
 DROP TABLE IF EXISTS {TARGET_SCHEMA}.cteFinalTarget;
 
