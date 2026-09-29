@@ -69,3 +69,76 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.VisionToEmisMigrators
 	emis_joindate	date NOT NULL,
 	emis_fdcdate	date NOT NULL
 )TABLESPACE pg_default;
+
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.common_dosages
+(
+	dosageid			varchar(64) NOT NULL,
+	dosage_text			varchar(1000),
+	daily_dose			real,
+	dose_number			real,
+	dose_unit			varchar(7),
+	dose_frequency		real,
+	dose_interval		real,
+	choice_of_dose		int,
+	dose_max_average 	int,
+	change_dose			int,
+	dose_duration		real
+)TABLESPACE pg_default;
+
+
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.PatientType
+(
+	patienttypeid int NOT NULL,
+	description varchar(50)
+)TABLESPACE pg_default;
+
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.ConsSource
+(
+	id bigint NOT NULL,
+	description varchar(255)
+)TABLESPACE pg_default;
+
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.RefUrgency
+(
+	refurgencyid int NOT NULL,
+	description varchar(255)
+)TABLESPACE pg_default;
+
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.RefMode
+(
+	refmodeid int NOT NULL,
+	description varchar(255)
+)TABLESPACE pg_default;
+
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.ParentProbRel
+(
+	parentprobrelid int NOT NULL,
+	description varchar(255)
+)TABLESPACE pg_default;
+
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.ProbStatus
+(
+	probstatusid int NOT NULL,
+	description varchar(255)
+)TABLESPACE pg_default;
+
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.Sign
+(
+	signid int NOT NULL,
+	description varchar(255)
+)TABLESPACE pg_default;
+
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.emiscodecat
+(
+	emiscodecatid int NOT NULL,
+	description varchar(255)
+)TABLESPACE pg_default;
+
+CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.obstype
+(
+	obstypeid int NOT NULL,
+	description varchar(255)
+)TABLESPACE pg_default;
+
+
+
