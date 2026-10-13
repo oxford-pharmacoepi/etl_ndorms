@@ -1,4 +1,4 @@
---insert into temp table from observation
+--insert into stem_source table from observation
 CREATE TABLE {CHUNK_SCHEMA}.stem_source_{CHUNK_ID} (LIKE {TARGET_SCHEMA}.STEM_SOURCE) TABLESPACE pg_default;
 
 WITH cte0 as (
@@ -179,7 +179,7 @@ WITH cte2 as (
 		where chunk_id = {CHUNK_ID}
 	),
 	t1 as (
-		select d.patid, d.staffid, d.issuedate, d.duration, d.quantity, d.issueid, 
+		select d.patid, d.staffid, d.issuedate, d.dosageid, d.duration, d.quantity, d.issueid, 
 				d.prodcodeid, d.quantunitid, d.probobsid
 		from cte2
 		inner join {SOURCE_SCHEMA}.drugissue d on cte2.person_id = d.patid 
@@ -238,7 +238,7 @@ select 	NULL,
 		NULL::double precision,
 		0 as route_concept_id,
 		left(routeofadministration,50) as route_source_value,
-		NULL,
+		dosage_text as sig,
 		NULL,
 		NULL,
 		0,
@@ -257,7 +257,8 @@ select 	NULL,
 		t4.issueid as stem_source_id
 from t4
 left join {SOURCE_SCHEMA}.productdictionary dc on t4.prodcodeid = dc.prodcodeid
-left join {SOURCE_SCHEMA}.quantunit q	on t4.quantunitid = q.quantunitid
+left join {SOURCE_SCHEMA}.quantunit q on t4.quantunitid = q.quantunitid
+left join {SOURCE_SCHEMA}.common_dosages d on t4.dosageid = d.dosageid
 left join {SOURCE_SCHEMA}.temp_drug_concept_map t on t4.prodcodeid = t.prodcodeid
 --left join {TARGET_SCHEMA}.visit_detail vd on t2.visit_detail_id = vd.visit_detail_id -- not sure why this makes some chunks to hang. Showing the full vd record as above works. ???
 --and d.issuedate is not null -- it is always not null
