@@ -104,6 +104,7 @@ TABLESPACE pg_default;
 
 --------------Creating RTDS Tables ---------------------------------------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.rtds_episode (
+	episode_id							bigserial,		--to allow for a PK
 	patid								bigint,
 	pracid								int,
 	attendid							bigint,
@@ -127,6 +128,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.rtds_episode (
 TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.rtds_prescription (
+	id							bigserial,		--to allow for a PK
 	patid						bigint,
 	pracid						int,
 	prescriptionid				bigint,
@@ -142,6 +144,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.rtds_prescription (
 TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.rtds_exposures (
+	exposure_id					bigserial,		--to allow for a PK
 	patid						bigint,
 	pracid						int,
 	attendid					bigint,
@@ -154,6 +157,7 @@ CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.rtds_exposures (
 TABLESPACE pg_default;
 
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.rtds_opcds (
+	procedure_id				bigserial,		--to allow for a PK
 	patid						bigint,
 	pracid						int,
 	attendid					bigint,
@@ -166,6 +170,7 @@ TABLESPACE pg_default;
 	
 --------------Creating SACT Table ---------------------------------------
 CREATE TABLE IF NOT EXISTS {SOURCE_SCHEMA}.sact (
+	sact_id								bigserial,		--to allow for a PK
 	patid								bigint,
 	pracid								int,
 	consultant_speciality_code			varchar(8),
