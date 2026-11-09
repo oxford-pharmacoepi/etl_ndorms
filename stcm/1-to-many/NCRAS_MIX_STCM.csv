@@ -26,4 +26,3 @@ actualfractions,0,NCRAS_MIX_STCM,Actual number of fractions of a teletherapy tre
 teletherapy,0,NCRAS_MIX_STCM,teletherapy,4141448,SNOMED,2002-01-31,2099-12-31,
 5,0,NCRAS_MIX_STCM,teletherapy,4141448,SNOMED,2002-01-31,2099-12-31,
 6,0,NCRAS_MIX_STCM,brachytherapy,40317890,SNOMED,2018-07-31,2099-12-31,
-prescriptionid,0,NCRAS_MIX_STCM,Radiotherapy planning,4044940,SNOMED,2002-01-31,2099-12-31,
